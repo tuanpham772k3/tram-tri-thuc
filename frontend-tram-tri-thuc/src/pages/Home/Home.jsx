@@ -3,6 +3,7 @@ import Navbar from "../../components/Header/Navbar";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import Content from "../../components/Content/Content";
 import Modal from "../../components/Modals/Modal";
+import Footer from "../../components/Footer/Footer";
 
 const Home = () => {
     const [modalType, setModalType] = useState(null);
@@ -16,6 +17,7 @@ const Home = () => {
             {modalType && (
                 <Modal type={modalType} onClose={() => setModalType(null)} />
             )}
+            <Footer />
         </div>
     );
 };
