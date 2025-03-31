@@ -5,8 +5,9 @@ const Navbar = () => {
     const [darkMode, setDarkMode] = useState(false);
     return (
         <nav
-            className={`bg-white shadow-md p-4 flex justify-between items-center ${darkMode ? "bg-gray-800 text-white" : ""}`}
+            className={`w-full bg-white shadow-md p-4 flex justify-between items-center ${darkMode ? "bg-gray-800 text-white" : ""}`}
         >
+            <h2 className="text-xl font-bold mb-4">📚 Trạm Tri Thức</h2>
             <input
                 type="text"
                 placeholder="🔍 Tìm kiếm..."
