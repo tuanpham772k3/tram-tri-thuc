@@ -1,7 +1,7 @@
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import connectDB from "./config/db.js";
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const connectDB = require("./config/db.js");
 
 dotenv.config();
 
@@ -12,8 +12,12 @@ app.use(express.json());
 // Connect to MongoDB
 connectDB();
 
+// Import routes
+const authRoutes = require("./routes/auth.router.js");
+app.use("/api/auth", authRoutes);
+
 app.get("/", (req, res) => {
-  res.send("Backend API is running...");
+    res.send("Backend API is running...");
 });
 
 const PORT = process.env.PORT || 5000;
