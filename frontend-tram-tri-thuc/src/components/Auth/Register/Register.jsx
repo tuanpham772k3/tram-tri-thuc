@@ -4,7 +4,7 @@ import { useState } from "react";
 import { FaEnvelope, FaEye, FaEyeSlash, FaLock, FaUser } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { register } from "../../../features/authSlice";
+import { register } from "../../../redux/slices/authSlice";
 
 const Register = () => {
     const [showPassword, setShowPassword] = useState(false);

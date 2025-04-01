@@ -3,7 +3,7 @@ import { Button, Card, Input } from "antd";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { resetPassword } from "../../../features/authSlice";
+import { resetPassword } from "../../../redux/slices/authSlice";
 
 const ResetPassword = () => {
     const [showPassword, setShowPassword] = useState(false);

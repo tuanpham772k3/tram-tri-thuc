@@ -3,7 +3,7 @@ import { Button, Card, Input, Checkbox } from "antd";
 import { FaEnvelope, FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../../../features/authSlice";
+import { login } from "../../../redux/slices/authSlice";
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -19,7 +19,7 @@ const Login = () => {
         e.preventDefault();
         await dispatch(login({ email, password }));
         if (token) {
-            navigate("/dashboard"); // Điều hướng sau khi đăng nhập thành công
+            navigate("/home"); // Điều hướng sau khi đăng nhập thành công
         }
     };
 

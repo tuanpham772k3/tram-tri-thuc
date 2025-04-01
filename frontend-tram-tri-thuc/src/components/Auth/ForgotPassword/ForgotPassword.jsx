@@ -3,7 +3,7 @@ import { FaEnvelope } from "react-icons/fa";
 import { Button, Card, Input } from "antd";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { forgotPassword } from "../../../features/authSlice";
+import { forgotPassword } from "../../../redux/slices/authSlice";
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState("");
