@@ -4,7 +4,7 @@ import axios from "axios";
 // Base URL của backend (thay đổi theo cấu hình của bạn)
 const API_URL = "http://localhost:5000/api/auth";
 
-// Async thunks cho các API
+// Thunk để gửi yêu cầu đăng ký
 export const register = createAsyncThunk(
     "auth/register",
     async (userData, { rejectWithValue }) => {
@@ -17,6 +17,7 @@ export const register = createAsyncThunk(
     }
 );
 
+// Thunk để gửi yêu cầu đăng nhập
 export const login = createAsyncThunk(
     "auth/login",
     async (credentials, { rejectWithValue }) => {
@@ -30,12 +31,29 @@ export const login = createAsyncThunk(
     }
 );
 
+// Thunk để gửi yêu cầu quên mật khẩu
 export const forgotPassword = createAsyncThunk(
     "auth/forgotPassword",
     async (email, { rejectWithValue }) => {
         try {
             const response = await axios.post(`${API_URL}/forgot-password`, {
                 email,
+            });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+// Thunk để đặt lại mật khẩu
+export const resetPassword = createAsyncThunk(
+    "auth/resetPassword",
+    async ({ token, newPassword }, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(`${API_URL}/reset-password`, {
+                token,
+                newPassword,
             });
             return response.data;
         } catch (error) {
@@ -100,6 +118,21 @@ const authSlice = createSlice({
         builder.addCase(forgotPassword.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload?.message || "Gửi yêu cầu thất bại";
+        });
+
+        // Reset Password
+        builder.addCase(resetPassword.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+        });
+        builder.addCase(resetPassword.fulfilled, (state, action) => {
+            state.loading = false;
+            state.message = action.payload.message;
+        });
+        builder.addCase(resetPassword.rejected, (state, action) => {
+            state.loading = false;
+            state.error =
+                action.payload?.message || "Đặt lại mật khẩu thất bại";
         });
     },
 });
