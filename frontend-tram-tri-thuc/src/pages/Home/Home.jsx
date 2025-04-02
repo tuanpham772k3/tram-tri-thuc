@@ -1,23 +1,14 @@
-import React, { useState } from "react";
 import Navbar from "../../components/Header/Navbar";
 import Sidebar from "../../components/Sidebar/Sidebar";
-import Content from "../../components/Content/Content";
-import Modal from "../../components/Modals/Modal";
-import Footer from "../../components/Footer/Footer";
 
-const Home = () => {
-    const [modalType, setModalType] = useState(null);
+const Home = ({ children }) => {
     return (
-        <div className="flex flex-col h-screen w-screen bg-gray-100">
-            <Navbar />
-            <div className="flex flex-1 pt-16">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+            <Navbar isLoggedIn={true} />
+            <div className="flex pt-16">
                 <Sidebar />
-                <Content setModalType={setModalType} />
+                <main className="flex-1 p-6">{children}</main>
             </div>
-            {modalType && (
-                <Modal type={modalType} onClose={() => setModalType(null)} />
-            )}
-            <Footer />
         </div>
     );
 };
