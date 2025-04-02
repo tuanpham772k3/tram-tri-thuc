@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import axiosInstance from "../../custom/Axios/AxiosCustom";
 
 // Thunk để gửi yêu cầu đăng ký
@@ -27,9 +26,9 @@ export const login = createAsyncThunk(
                 `/auth/login`,
                 credentials
             );
-            localStorage.setItem("token", response.data.token); // Lưu token vào localStorage
             return response.data;
         } catch (error) {
+            console.log("Login error:", error.response?.data || error.message);
             return rejectWithValue(error.response.data);
         }
     }
@@ -106,6 +105,7 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.token = action.payload.token;
                 state.message = action.payload.message;
+                localStorage.setItem("token", action.payload.token); // Lưu token ở đây
             })
             .addCase(login.rejected, (state, action) => {
                 state.loading = false;

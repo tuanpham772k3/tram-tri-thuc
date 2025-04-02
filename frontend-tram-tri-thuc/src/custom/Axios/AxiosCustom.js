@@ -29,15 +29,9 @@ axiosInstance.interceptors.request.use(
 
 // Thêm interceptor để xử lý lỗi cho các response
 axiosInstance.interceptors.response.use(
-    (response) => {
-        return response; // Trả về response nếu thành công
-    },
+    (response) => response, // Trả về response nếu thành công
     (error) => {
         // Xử lý lỗi chung (ví dụ: token hết hạn)
-        if (error.response?.status === 401) {
-            localStorage.removeItem("token");
-            window.location.href = "/login"; // Chuyển hướng về trang đăng nhập
-        }
         return Promise.reject(error);
     }
 );
