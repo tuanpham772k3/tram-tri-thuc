@@ -5,7 +5,7 @@ const fs = require("fs");
 const uploadDocument = async (req, res) => {
     try {
         const file = req.file;
-        const userId = req.user.id;
+        const userId = req.user;
 
         if (!file) {
             console.log("No file received");
@@ -19,13 +19,26 @@ const uploadDocument = async (req, res) => {
         // Upload lên Google Drive
         console.log("Uploading to Google Drive...");
         const driveResponse = await drive.files.create({
-            requestBody: { name: file.originalname },
+            requestBody: {
+                name: file.originalname,
+                parents: ["1-fgLMBdBpSISgbSTAuLzt-5VM_-K6BB7"],
+            },
             media: {
                 mimeType: file.mimetype,
                 body: fs.createReadStream(file.path),
             },
         });
         console.log("Google Drive response:", driveResponse.data);
+
+        // Chia sẻ file với tài khoản cá nhân của bạn
+        await drive.permissions.create({
+            fileId: driveResponse.data.id,
+            requestBody: {
+                role: "writer", // Hoặc 'reader' nếu chỉ cần xem
+                type: "user",
+                emailAddress: "tuanphamu23@gmail.com", // Thay bằng email của bạn
+            },
+        });
 
         const fileUrl = `https://drive.google.com/file/d/${driveResponse.data.id}/view`;
 
@@ -65,7 +78,7 @@ const uploadDocument = async (req, res) => {
 
 const getDocuments = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user;
         const documents = await Document.find({ userId });
         res.json({ success: true, documents });
     } catch (error) {
