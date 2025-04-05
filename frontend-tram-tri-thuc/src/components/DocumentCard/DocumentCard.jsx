@@ -1,17 +1,19 @@
-import { FaFilePdf, FaFilePowerpoint, FaFileWord } from "react-icons/fa";
+import { FaFileExcel, FaFilePdf, FaFileWord, FaImage } from "react-icons/fa";
 
-const DocumentCard = ({ document, view }) => {
+const DocumentCard = ({ document, view, onPreview }) => {
     const getIcon = (type) => {
         switch (type) {
-            case "pdf":
+            case "application/pdf":
                 return <FaFilePdf size={30} className="text-red-500" />;
-            case "pptx":
-                return (
-                    <FaFilePowerpoint size={30} className="text-orange-500" />
-                );
-            case "docx":
-            case "doc":
+            case "application/msword":
+            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
                 return <FaFileWord size={30} className="text-blue-500" />;
+            case "application/vnd.ms-excel":
+            case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+                return <FaFileExcel size={30} className="text-green-500" />;
+            case "image/jpeg":
+            case "image/png":
+                return <FaImage size={30} className="text-purple-500" />;
             default:
                 return <FaFilePdf size={30} className="text-gray-500" />;
         }
@@ -24,22 +26,30 @@ const DocumentCard = ({ document, view }) => {
             }`}
         >
             {getIcon(document.type)}
-            <div className="text-3xl">
-                {document.type === "pdf" ? "📄" : "📝"}
-            </div>
             <div className={view === "list" ? "flex-1" : ""}>
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-white truncate">
                     {document.name}
                 </h3>
+                {view === "list" && (
+                    <>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Loại: {document.type.split("/")[1] || document.type}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Kích thước: {(document.size / 1024).toFixed(2)} KB
+                        </p>
+                    </>
+                )}
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {new Date(document.date).toLocaleDateString()}
+                    {new Date(document.uploadDate).toLocaleDateString()}
                 </p>
             </div>
-            {view === "list" && (
-                <button className="text-blue-500 hover:underline transition-colors">
-                    Xem chi tiết
-                </button>
-            )}
+            <button
+                onClick={() => onPreview()}
+                className="text-blue-500 hover:underline transition-colors"
+            >
+                Preview
+            </button>
         </div>
     );
 };
