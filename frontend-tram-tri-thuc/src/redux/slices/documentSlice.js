@@ -19,7 +19,7 @@ export const fetchDocuments = createAsyncThunk(
 // Async thunk để upload tài liệu
 export const uploadDocument = createAsyncThunk(
     "documents/uploadDocument",
-    async (file, { getState, rejectWithValue }) => {
+    async (file, { getState, dispatch, rejectWithValue }) => {
         const { token } = getState().auth;
         if (!token) return rejectWithValue("No token available");
 
@@ -33,7 +33,10 @@ export const uploadDocument = createAsyncThunk(
         });
         if (!res.ok) throw new Error("Failed to upload document");
         const data = await res.json();
-        return data.file; // Trả về file vừa upload
+
+        // Fetch lại danh sách sau khi upload để đồng bộ với MongoDB
+        await dispatch(fetchDocuments());
+        return data.file; // Vẫn trả về file để thông báo upload thành công
     }
 );
 
@@ -67,9 +70,9 @@ const documentSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(uploadDocument.fulfilled, (state, action) => {
+            .addCase(uploadDocument.fulfilled, (state) => {
                 state.loading = false;
-                state.documents.push(action.payload); // Thêm file mới vào danh sách
+                // Không thêm thủ công, fetchDocuments đã cập nhật state
             })
             .addCase(uploadDocument.rejected, (state, action) => {
                 state.loading = false;

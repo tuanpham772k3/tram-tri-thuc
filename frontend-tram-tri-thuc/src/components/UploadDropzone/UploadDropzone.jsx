@@ -6,11 +6,15 @@ import {
     FaFileUpload,
     FaUpload,
 } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { uploadDocument } from "../../redux/slices/documentSlice";
 
-const UploadDropzone = ({ onUploadSuccess, token }) => {
+const UploadDropzone = () => {
     const [message, setMessage] = useState("");
-    const [loading, setLoading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
+    const dispatch = useDispatch();
+    const { loading } = useSelector((state) => state.documents);
+    const { token } = useSelector((state) => state.auth);
 
     const onDrop = async (acceptedFiles) => {
         const file = acceptedFiles[0];
@@ -22,88 +26,61 @@ const UploadDropzone = ({ onUploadSuccess, token }) => {
             return;
         }
 
-        setLoading(true);
         setUploadProgress(0);
-        const formData = new FormData();
-        formData.append("file", file);
-
-        try {
-            // Mô phỏng tiến trình upload bằng cách cập nhật định kỳ
-            const progressInterval = setInterval(() => {
-                setUploadProgress((prev) => {
-                    if (prev >= 95) {
-                        clearInterval(progressInterval);
-                        return 95;
-                    }
-                    return prev + 5;
-                });
-            }, 200);
-
-            // Gửi yêu cầu upload
-            const res = await fetch("http://localhost:5000/api/upload", {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-                body: formData,
+        const progressInterval = setInterval(() => {
+            setUploadProgress((prev) => {
+                if (prev >= 95) {
+                    clearInterval(progressInterval);
+                    return 95;
+                }
+                return prev + 5;
             });
-
-            clearInterval(progressInterval); // Dừng cập nhật tiến trình
-            setUploadProgress(100); // Hoàn thành upload
-
-            const data = await res.json();
-            if (data.success) {
-                setMessage("Upload thành công!");
-                onUploadSuccess(); // Gọi để fetch lại danh sách
-
-                // Xóa thông báo sau 5 giây
-                setTimeout(() => {
-                    setMessage("");
-                    setUploadProgress(0);
-                }, 5000);
-            } else {
-                setMessage(data.message || "Upload thất bại!");
-            }
+        }, 200);
+        try {
+            await dispatch(uploadDocument(file)).unwrap();
+            clearInterval(progressInterval);
+            setUploadProgress(100);
+            setMessage("Upload thành công!");
+            setTimeout(() => {
+                setMessage("");
+                setUploadProgress(0);
+            }, 5000);
         } catch (error) {
-            setMessage("Lỗi khi upload!");
+            clearInterval(progressInterval);
+            setMessage("Upload thất bại!");
+            setUploadProgress(0);
             console.error(error);
-        } finally {
-            setLoading(false);
         }
     };
 
-    const { getRootProps, getInputProps, isDragActive, acceptedFiles } =
-        useDropzone({
-            onDrop,
-            accept: {
-                "application/pdf": [".pdf"],
-                "application/msword": [".doc"],
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-                    [".docx"],
-                "application/vnd.ms-excel": [".xls"],
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-                    [".xlsx"],
-                "image/jpeg": [".jpg", ".jpeg"],
-                "image/png": [".png"],
-            }, // Chỉ chấp nhận các loại file này
-            maxSize: 10 * 1024 * 1024, // 10MB
-            multiple: false,
-        });
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop,
+        accept: {
+            "application/pdf": [".pdf"],
+            "application/msword": [".doc"],
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                [".docx"],
+            "application/vnd.ms-excel": [".xls"],
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+                [".xlsx"],
+            "image/jpeg": [".jpg", ".jpeg"],
+            "image/png": [".png"],
+        }, // Chỉ chấp nhận các loại file này
+        maxSize: 10 * 1024 * 1024, // 10MB
+        multiple: false,
+    });
 
     const renderContent = () => {
         if (loading) {
             return (
                 <div className="text-center">
-                    <div className="mb-2">
-                        <FaFileUpload
-                            className="mx-auto text-blue-500 animate-bounce"
-                            size={32}
-                        />
-                    </div>
+                    <FaFileUpload
+                        className="mx-auto text-blue-500 animate-bounce"
+                        size={32}
+                    />
                     <p className="text-gray-600 dark:text-gray-300">
                         Đang tải lên...
                     </p>
-                    {/* Progress bar */}
                     <div className="w-64 bg-gray-200 rounded-full h-2.5 mt-3 mx-auto overflow-hidden">
                         <div
                             className="bg-blue-500 h-2.5 rounded-full transition-all duration-300 ease-out"
