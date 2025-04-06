@@ -9,6 +9,14 @@ const DocumentSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    directUrl: {
+        type: String,
+        required: true,
+    },
+    driveId: {
+        type: String,
+        required: true,
+    },
     userId: {
         type: String,
         required: true,

@@ -27,8 +27,18 @@ const uploadDocument = async (req, res) => {
                 mimeType: file.mimetype,
                 body: fs.createReadStream(file.path),
             },
+            fields: "id, webContentLink",
         });
         console.log("Google Drive response:", driveResponse.data);
+
+        // Cấu hình quyền truy cập công khai để dễ dàng embed
+        await drive.permissions.create({
+            fileId: driveResponse.data.id,
+            requestBody: {
+                role: "reader",
+                type: "anyone", // Cho phép bất kỳ ai có link đều có thể xem
+            },
+        });
 
         // Chia sẻ file với tài khoản cá nhân của bạn
         await drive.permissions.create({
@@ -41,15 +51,18 @@ const uploadDocument = async (req, res) => {
         });
 
         const fileUrl = `https://drive.google.com/file/d/${driveResponse.data.id}/view`;
+        const directUrl = driveResponse.data.webContentLink; // Link tải trực tiếp
 
         // Lưu vào MongoDB
         console.log("Saving to MongoDB...");
         const document = new Document({
             name: file.originalname,
             url: fileUrl,
+            directUrl,
             userId,
             type: file.mimetype,
             size: file.size,
+            driveId: driveResponse.data.id, // Lưu thêm ID để dễ xử lý
         });
         await document.save();
         console.log("Saved to MongoDB");
@@ -64,6 +77,7 @@ const uploadDocument = async (req, res) => {
             file: {
                 name: file.originalname,
                 url: fileUrl,
+                directUrl,
                 id: driveResponse.data.id,
             },
         });
