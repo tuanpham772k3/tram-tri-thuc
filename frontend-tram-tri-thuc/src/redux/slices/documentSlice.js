@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axiosInstance from "../../custom/Axios/AxiosCustom";
 
 // Async thunk để fetch danh sách tài liệu
 export const fetchDocuments = createAsyncThunk(
@@ -7,12 +8,14 @@ export const fetchDocuments = createAsyncThunk(
         const { token } = getState().auth;
         if (!token) return rejectWithValue("No token available");
 
-        const res = await fetch("http://localhost:5000/api/documents", {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Failed to fetch documents");
-        const data = await res.json();
-        return data.documents;
+        try {
+            const res = await axiosInstance.get("/documents");
+            return res.data.documents;
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to fetch documents"
+            );
+        }
     }
 );
 
@@ -26,17 +29,20 @@ export const uploadDocument = createAsyncThunk(
         const formData = new FormData();
         formData.append("file", file);
 
-        const res = await fetch("http://localhost:5000/api/upload", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` },
-            body: formData,
-        });
-        if (!res.ok) throw new Error("Failed to upload document");
-        const data = await res.json();
-
-        // Fetch lại danh sách sau khi upload để đồng bộ với MongoDB
-        await dispatch(fetchDocuments());
-        return data.file; // Vẫn trả về file để thông báo upload thành công
+        try {
+            const response = await axiosInstance.post("/upload", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            // Fetch lại danh sách sau khi upload để đồng bộ với MongoDB
+            await dispatch(fetchDocuments());
+            return response.data.file; // Giả sử backend trả về { file: {...} }
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to upload document"
+            );
+        }
     }
 );
 
@@ -47,34 +53,36 @@ export const deleteDocument = createAsyncThunk(
         const { token } = getState().auth;
         if (!token) return rejectWithValue("No token available");
 
-        const res = await fetch(`http://localhost:5000/api/documents/${id}`, {
-            method: "DELETE",
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Failed to delete document");
-        await dispatch(fetchDocuments());
-        return id;
+        try {
+            await axiosInstance.delete(`/documents/${id}`);
+            await dispatch(fetchDocuments());
+            return id;
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to delete document"
+            );
+        }
     }
 );
 
+// Async thunk để đổi tên tài liệu
 export const renameDocument = createAsyncThunk(
     "documents/renameDocument",
     async ({ id, name }, { getState, dispatch, rejectWithValue }) => {
         const { token } = getState().auth;
         if (!token) return rejectWithValue("No token available");
 
-        const res = await fetch(`http://localhost:5000/api/documents/${id}`, {
-            method: "PUT",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ name }),
-        });
-        if (!res.ok) throw new Error("Failed to rename document");
-        await dispatch(fetchDocuments());
-        const data = await res.json();
-        return data.document;
+        try {
+            const response = await axiosInstance.put(`/documents/${id}`, {
+                name,
+            });
+            await dispatch(fetchDocuments());
+            return response.data.document; // Giả sử backend trả về { document: {...} }
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to rename document"
+            );
+        }
     }
 );
 
