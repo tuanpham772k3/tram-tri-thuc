@@ -24,7 +24,7 @@ const RouterCustom = () => {
             {/* Lúc đã đăng nhập */}
             <Route path="/home" element={<DocumentList />} />
             <Route path="/documents" element={<DocumentList />} />
-            <Route path="/document/:id" element={<DocumentDetail />} />
+            <Route path="/documents/:id" element={<DocumentDetail />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/storage" element={<StorageStats />} />
         </Routes>

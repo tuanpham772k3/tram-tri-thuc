@@ -49,6 +49,7 @@ const uploadDocument = async (req, res) => {
                 emailAddress: "tuanphamu23@gmail.com", // Thay bằng email của bạn
             },
         });
+        console.log("Uploaded file ID:", driveResponse.data.id);
 
         const fileUrl = `https://drive.google.com/file/d/${driveResponse.data.id}/view`;
         const directUrl = driveResponse.data.webContentLink; // Link tải trực tiếp
@@ -104,4 +105,72 @@ const getDocuments = async (req, res) => {
     }
 };
 
-module.exports = { uploadDocument, getDocuments };
+const deleteDocument = async (req, res) => {
+    try {
+        const { id } = req.params; // _id từ MongoDB
+        const userId = req.user;
+
+        // Tìm document trong MongoDB
+        const document = await Document.findOne({ _id: id, userId });
+        if (!document) {
+            return res
+                .status(404)
+                .json({ success: false, message: "Document not found" });
+        }
+
+        // Xóa file trên Google Drive
+        await drive.files.delete({ fileId: document.driveId });
+
+        // Xóa document trong MongoDB
+        await Document.deleteOne({ _id: id });
+
+        res.json({ success: true, message: "Document deleted successfully" });
+    } catch (error) {
+        console.error("Delete Error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error deleting document",
+        });
+    }
+};
+
+const renameDocument = async (req, res) => {
+    try {
+        const { id } = req.params; // _id từ MongoDB
+        const { name } = req.body; // Tên mới
+        const userId = req.user;
+
+        // Tìm document trong MongoDB
+        const document = await Document.findOne({ _id: id, userId });
+        if (!document) {
+            return res
+                .status(404)
+                .json({ success: false, message: "Document not found" });
+        }
+
+        // Cập nhật tên trên Google Drive
+        await drive.files.update({
+            fileId: document.driveId,
+            requestBody: { name },
+        });
+
+        // Cập nhật tên trong MongoDB
+        document.name = name;
+        await document.save();
+
+        res.json({ success: true, document });
+    } catch (error) {
+        console.error("Rename Error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error renaming document",
+        });
+    }
+};
+
+module.exports = {
+    uploadDocument,
+    getDocuments,
+    deleteDocument,
+    renameDocument,
+};

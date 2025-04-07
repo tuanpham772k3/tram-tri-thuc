@@ -40,6 +40,44 @@ export const uploadDocument = createAsyncThunk(
     }
 );
 
+// Async thunk để xóa tài liệu
+export const deleteDocument = createAsyncThunk(
+    "documents/deleteDocument",
+    async (id, { getState, dispatch, rejectWithValue }) => {
+        const { token } = getState().auth;
+        if (!token) return rejectWithValue("No token available");
+
+        const res = await fetch(`http://localhost:5000/api/documents/${id}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("Failed to delete document");
+        await dispatch(fetchDocuments());
+        return id;
+    }
+);
+
+export const renameDocument = createAsyncThunk(
+    "documents/renameDocument",
+    async ({ id, name }, { getState, dispatch, rejectWithValue }) => {
+        const { token } = getState().auth;
+        if (!token) return rejectWithValue("No token available");
+
+        const res = await fetch(`http://localhost:5000/api/documents/${id}`, {
+            method: "PUT",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name }),
+        });
+        if (!res.ok) throw new Error("Failed to rename document");
+        await dispatch(fetchDocuments());
+        const data = await res.json();
+        return data.document;
+    }
+);
+
 const documentSlice = createSlice({
     name: "documents",
     initialState: {
@@ -49,8 +87,8 @@ const documentSlice = createSlice({
     },
     reducers: {},
     extraReducers: (builder) => {
-        // Fetch documents
         builder
+            // Fetch documents
             .addCase(fetchDocuments.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -62,10 +100,9 @@ const documentSlice = createSlice({
             .addCase(fetchDocuments.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
-            });
+            })
 
-        // Upload document
-        builder
+            // Upload document
             .addCase(uploadDocument.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -75,6 +112,32 @@ const documentSlice = createSlice({
                 // Không thêm thủ công, fetchDocuments đã cập nhật state
             })
             .addCase(uploadDocument.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+
+            // Delete document
+            .addCase(deleteDocument.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(deleteDocument.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(deleteDocument.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+
+            // Rename document
+            .addCase(renameDocument.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(renameDocument.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(renameDocument.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
             });
