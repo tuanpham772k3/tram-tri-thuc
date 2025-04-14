@@ -1,5 +1,7 @@
 // src/api/axios.js
 import axios from "axios";
+import { toast } from "react-toastify";
+import { logout } from "../../redux/slices/authSlice";
 
 // Base URL của backend
 const API_URL = "http://localhost:5000/api";
@@ -7,7 +9,7 @@ const API_URL = "http://localhost:5000/api";
 // Tạo instance axios với cấu hình mặc định
 const axiosInstance = axios.create({
     baseURL: API_URL, // URL gốc cho tất cả request
-    timeout: 5000, // Thời gian chờ tối đa (5 giây)
+    timeout: 10000,
     headers: {
         "Content-Type": "application/json", // Header mặc định
     },
@@ -16,7 +18,7 @@ const axiosInstance = axios.create({
 // Thêm interceptor để xử lý token cho các request
 axiosInstance.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem("token");
+        const token = config.token || localStorage.getItem("token");
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -31,6 +33,26 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
     (response) => response, // Trả về response nếu thành công
     (error) => {
+        const status = error.response?.status;
+
+        if (status === 401) {
+            localStorage.removeItem("token");
+            toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
+
+            if (window.location.pathname !== "/login") {
+                window.location.href = "/login";
+            }
+        } else if (!error.response) {
+            toast.error("Lỗi mạng. Vui lòng kiểm tra kết nối.");
+            console.error("🔥 Lỗi mạng chi tiết:", error.message);
+            console.log("👉 Request URL:", error.config?.url);
+            console.log("👉 Full request config:", error.config);
+        } else {
+            const errorMessage =
+                error.response?.data?.message || "Có lỗi xảy ra";
+            toast.error(errorMessage);
+            console.error("API Error:", errorMessage);
+        }
         // Xử lý lỗi chung (ví dụ: token hết hạn)
         return Promise.reject(error);
     }

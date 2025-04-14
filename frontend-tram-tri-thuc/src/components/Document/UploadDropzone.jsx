@@ -7,50 +7,72 @@ import {
     FaUpload,
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { uploadDocument } from "../../redux/slices/documentSlice";
+import {
+    uploadDocument,
+    fetchDocuments,
+} from "../../redux/slices/documentSlice";
+import { toast } from "react-toastify";
 
-const UploadDropzone = () => {
+const UploadDropzone = ({ parentId }) => {
     const [message, setMessage] = useState("");
     const [uploadProgress, setUploadProgress] = useState(0);
     const dispatch = useDispatch();
     const { loading } = useSelector((state) => state.documents);
-    const { token } = useSelector((state) => state.auth);
 
     const onDrop = async (acceptedFiles) => {
         const file = acceptedFiles[0];
         if (!file) return;
 
-        // Kiểm tra kích thước file (10MB = 10 * 1024 * 1024 bytes)
         if (file.size > 10 * 1024 * 1024) {
             setMessage("File vượt quá 10MB!");
+            setUploadProgress(0);
+            toast.error("File vượt quá 10MB!");
             return;
         }
 
         setUploadProgress(0);
         const progressInterval = setInterval(() => {
-            setUploadProgress((prev) => {
-                if (prev >= 95) {
-                    clearInterval(progressInterval);
-                    return 95;
-                }
-                return prev + 5;
-            });
+            setUploadProgress((prev) =>
+                prev >= 95 ? (clearInterval(progressInterval), 95) : prev + 5
+            );
         }, 200);
+
+        const formData = new FormData();
+        formData.append("file", file);
+        const uploadParentId = parentId === "root" ? null : parentId;
+        if (uploadParentId) formData.append("parentId", uploadParentId);
+
         try {
-            await dispatch(uploadDocument(file)).unwrap();
+            console.log(
+                "Uploading:",
+                formData.get("file").name,
+                "parentId:",
+                formData.get("parentId")
+            );
+            await dispatch(uploadDocument(formData)).unwrap();
             clearInterval(progressInterval);
             setUploadProgress(100);
             setMessage("Upload thành công!");
-            setTimeout(() => {
-                setMessage("");
-                setUploadProgress(0);
-            }, 5000);
+            toast.success("Tải lên thành công!");
+            await dispatch(
+                fetchDocuments({ parentId: uploadParentId || null })
+            ).unwrap();
         } catch (error) {
             clearInterval(progressInterval);
-            setMessage("Upload thất bại!");
+            setMessage(
+                "Upload thất bại! " + (error.message || "Lỗi không xác định")
+            );
+            toast.error(
+                "Tải lên thất bại! " + (error.message || "Lỗi không xác định")
+            );
             setUploadProgress(0);
-            console.error(error);
+            console.error("Upload error:", error.response?.data || error);
+            return; // Thoát nếu upload thất bại
         }
+        setTimeout(() => {
+            setMessage("");
+            setUploadProgress(0);
+        }, 5000);
     };
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -65,13 +87,13 @@ const UploadDropzone = () => {
                 [".xlsx"],
             "image/jpeg": [".jpg", ".jpeg"],
             "image/png": [".png"],
-        }, // Chỉ chấp nhận các loại file này
-        maxSize: 10 * 1024 * 1024, // 10MB
+        },
+        maxSize: 10 * 1024 * 1024,
         multiple: false,
     });
 
     const renderContent = () => {
-        if (loading) {
+        if (loading)
             return (
                 <div className="text-center">
                     <FaFileUpload
@@ -92,9 +114,7 @@ const UploadDropzone = () => {
                     </p>
                 </div>
             );
-        }
-
-        if (message && message.includes("thành công")) {
+        if (message && message.includes("thành công"))
             return (
                 <div className="text-center">
                     <FaCheckCircle
@@ -107,9 +127,7 @@ const UploadDropzone = () => {
                     </p>
                 </div>
             );
-        }
-
-        if (message) {
+        if (message)
             return (
                 <div className="text-center">
                     <FaExclamationCircle
@@ -122,9 +140,7 @@ const UploadDropzone = () => {
                     </p>
                 </div>
             );
-        }
-
-        if (isDragActive) {
+        if (isDragActive)
             return (
                 <div className="text-center">
                     <FaUpload
@@ -136,8 +152,6 @@ const UploadDropzone = () => {
                     </p>
                 </div>
             );
-        }
-
         return (
             <div className="text-center">
                 <FaUpload

@@ -4,6 +4,7 @@ import { FaEnvelope, FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../../redux/slices/authSlice";
+import { toast } from "react-toastify";
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -17,9 +18,11 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await dispatch(login({ email, password }));
-        if (token) {
-            navigate("/home"); // Điều hướng sau khi đăng nhập thành công
+        const result = await dispatch(login({ email, password }));
+        if (result.error && !result.payload?.message) {
+            toast.error("Không thể kết nối tới server");
+        } else if (token) {
+            navigate("/home");
         }
     };
 

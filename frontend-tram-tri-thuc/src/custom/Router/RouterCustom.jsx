@@ -9,6 +9,7 @@ import DocumentList from "../../pages/DocumentList";
 import DocumentDetail from "../../pages/DocumentDetail";
 import Profile from "../../pages/Profile";
 import StorageStats from "../../pages/StorageStats";
+import Recent from "../../pages/Recent/Recent";
 
 const RouterCustom = () => {
     return (
@@ -25,6 +26,7 @@ const RouterCustom = () => {
             <Route path="/home" element={<DocumentList />} />
             <Route path="/documents" element={<DocumentList />} />
             <Route path="/documents/:id" element={<DocumentDetail />} />
+            <Route path="/recent" element={<Recent />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/storage" element={<StorageStats />} />
         </Routes>
