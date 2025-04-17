@@ -1,7 +1,6 @@
 // src/api/axios.js
 import axios from "axios";
 import { toast } from "react-toastify";
-import { logout } from "../../redux/slices/authSlice";
 
 // Base URL của backend
 const API_URL = "http://localhost:5000/api";
@@ -34,6 +33,7 @@ axiosInstance.interceptors.response.use(
     (response) => response, // Trả về response nếu thành công
     (error) => {
         const status = error.response?.status;
+        const errorMessage = error.response?.data?.message || "Có lỗi xảy ra";
 
         if (status === 401) {
             localStorage.removeItem("token");
@@ -48,12 +48,11 @@ axiosInstance.interceptors.response.use(
             console.log("👉 Request URL:", error.config?.url);
             console.log("👉 Full request config:", error.config);
         } else {
-            const errorMessage =
-                error.response?.data?.message || "Có lỗi xảy ra";
             toast.error(errorMessage);
             console.error("API Error:", errorMessage);
+            console.log("👉 Response data:", error.response?.data);
         }
-        // Xử lý lỗi chung (ví dụ: token hết hạn)
+        
         return Promise.reject(error);
     }
 );

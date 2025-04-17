@@ -1,23 +1,45 @@
+import { useState } from "react";
 import Navbar from "../../components/Header/Navbar";
 import Sidebar from "../../components/Sidebar/Sidebar";
 
 const Home = ({ children }) => {
-    return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
-            {/* Navbar cố định trên cùng */}
-            <div className="fixed top-0 left-0 right-0 h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 z-50">
-                <Navbar isLoggedIn={true} />
-            </div>
+    const [darkMode, setDarkMode] = useState(false);
 
-            <div className="flex pt-16">
-                {" "}
-                {/* Thêm padding-top để không bị navbar che */}
-                {/* Sidebar cố định */}
-                <div className="fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-40">
-                    <Sidebar />
+    const toggleDarkMode = () => {
+        setDarkMode(!darkMode);
+    };
+
+    const handleLogout = () => {
+        // Your logout logic here
+        console.log("Logged out");
+    };
+
+    return (
+        <div className={`min-h-screen ${darkMode ? "dark" : ""}`}>
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+                {/* Navbar fixed at top */}
+                <div className="fixed top-0 left-0 right-0 z-10">
+                    <Navbar
+                        isLoggedIn={true}
+                        darkMode={darkMode}
+                        toggleDarkMode={toggleDarkMode}
+                        handleLogout={handleLogout}
+                    />
                 </div>
-                {/* Main content */}
-                <div className="ml-64 w-[calc(100%-16rem)] p-6">{children}</div>
+
+                <div className="flex pt-16 h-screen">
+                    {/* Sidebar fixed on the left */}
+                    <div className="hidden md:block md:w-64 flex-shrink-0 h-full fixed top-16 left-0 border-r border-gray-200 dark:border-gray-800">
+                        <Sidebar />
+                    </div>
+
+                    {/* Mobile sidebar overlay - would need to be implemented with state to show/hide */}
+
+                    {/* Main content */}
+                    <div className="w-full md:ml-64 flex-1 overflow-auto">
+                        <div className="p-6">{children}</div>
+                    </div>
+                </div>
             </div>
         </div>
     );

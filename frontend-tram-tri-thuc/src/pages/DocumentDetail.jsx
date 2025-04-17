@@ -2,12 +2,12 @@
     import { useParams, useNavigate } from "react-router-dom";
     import { useDispatch, useSelector } from "react-redux";
     import {
-        deleteDocument,
         renameDocument,
         fetchDocuments,
     } from "../redux/slices/documentSlice";
     import { FaArrowLeft, FaDownload, FaEdit, FaTrash } from "react-icons/fa";
     import Home from "./Home/Home";
+import { deleteDocument } from "../redux/slices/trashSlice";
 
     const DocumentDetail = () => {
         const { id } = useParams();

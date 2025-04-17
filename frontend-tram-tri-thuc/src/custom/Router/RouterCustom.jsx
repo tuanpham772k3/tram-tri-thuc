@@ -10,6 +10,8 @@ import DocumentDetail from "../../pages/DocumentDetail";
 import Profile from "../../pages/Profile";
 import StorageStats from "../../pages/StorageStats";
 import Recent from "../../pages/Recent/Recent";
+import Starred from "../../pages/Starred/Starred";
+import Trash from "../../pages/Trash/Trash";
 
 const RouterCustom = () => {
     return (
@@ -27,6 +29,8 @@ const RouterCustom = () => {
             <Route path="/documents" element={<DocumentList />} />
             <Route path="/documents/:id" element={<DocumentDetail />} />
             <Route path="/recent" element={<Recent />} />
+            <Route path="/starred" element={<Starred />} />
+            <Route path="/trash" element={<Trash />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/storage" element={<StorageStats />} />
         </Routes>

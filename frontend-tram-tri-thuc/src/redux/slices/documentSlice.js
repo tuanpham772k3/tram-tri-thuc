@@ -4,32 +4,43 @@ import axiosInstance from "../../custom/Axios/AxiosCustom";
 // Async thunk để fetch danh sách tài liệu
 export const fetchDocuments = createAsyncThunk(
     "documents/fetchDocuments",
-    async ({ parentId = "root" }, { getState, rejectWithValue }) => {
-        if (
-            parentId &&
-            parentId !== "root" &&
-            !/^[0-9a-fA-F]{24}$/.test(parentId)
-        ) {
+    async (
+        {
+            parentId = "root",
+            type,
+            mimeType,
+            uploadDate,
+            userId,
+            deleted,
+            starred,
+            includeChildren = false, // Mặc định false
+        },
+        { getState, rejectWithValue }
+    ) => {
+        if (parentId && parentId !== "root" && !/^[0-9a-fA-F]{24}$/.test(parentId)) {
             return rejectWithValue("parentId không hợp lệ");
         }
         const { token } = getState().auth;
         if (!token) return rejectWithValue("No token available");
+
         try {
-            const res = await axiosInstance.get(
-                `/documents?parentId=${parentId}`,
-                { token } // Truyền token để interceptor sử dụng
-            );
+            const params = {};
+            if (parentId !== "root") params.parentId = parentId;
+            if (type) params.type = type;
+            if (mimeType) params.mimeType = mimeType;
+            if (uploadDate) params.uploadDate = uploadDate;
+            if (userId) params.userId = userId;
+            if (starred !== undefined) params.starred = starred; // Thêm tham số starred
+            if (deleted !== undefined) params.deleted = deleted; // Thêm tham số deleted
+            if (includeChildren) params.includeChildren = includeChildren;
+
+            const res = await axiosInstance.get("/documents", { params });
             return res.data.documents;
         } catch (error) {
             if (error.response?.status === 401) {
-                // Dispatch action để logout hoặc thông báo
-                return rejectWithValue(
-                    "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại"
-                );
+                return rejectWithValue("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại");
             }
-            return rejectWithValue(
-                error.response?.data?.message || "Failed to fetch documents"
-            );
+            return rejectWithValue(error.response?.data?.message || "Failed to fetch documents");
         }
     }
 );
@@ -42,19 +53,13 @@ export const uploadDocument = createAsyncThunk(
         if (!token) return rejectWithValue("No token available");
         try {
             console.log("Uploading with parentId:", formData.get("parentId"));
-            const response = await axiosInstance.post(
-                "/documents/upload",
-                formData,
-                {
-                    headers: { "Content-Type": "multipart/form-data" },
-                }
-            );
+            const response = await axiosInstance.post("/documents/upload", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
             return response.data.file; // Chỉ trả về file vừa upload
         } catch (error) {
             console.error("Upload thunk error:", error.response?.data || error);
-            return rejectWithValue(
-                error.response?.data?.message || "Failed to upload document"
-            );
+            return rejectWithValue(error.response?.data?.message || "Failed to upload document");
         }
     }
 );
@@ -72,9 +77,7 @@ export const createFolder = createAsyncThunk(
             });
             return response.data.folder;
         } catch (error) {
-            return rejectWithValue(
-                error.response?.data?.message || "Failed to create folder"
-            );
+            return rejectWithValue(error.response?.data?.message || "Failed to create folder");
         }
     }
 );
@@ -85,13 +88,66 @@ export const deleteDocument = createAsyncThunk(
     async (id, { getState, rejectWithValue }) => {
         const { token } = getState().auth;
         if (!token) return rejectWithValue("Vui lòng đăng nhập");
+
+        if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+            return rejectWithValue("ID tài liệu không hợp lệ");
+        }
+
         try {
             await axiosInstance.delete(`/documents/${id}`);
             return id;
         } catch (error) {
+            return rejectWithValue(error.response?.data?.message || "Lỗi máy chủ khi xóa");
+        }
+    }
+);
+
+// Khôi phục tài liệu
+export const restoreDocument = createAsyncThunk(
+    "documents/restoreDocument",
+    async (id, { getState, rejectWithValue }) => {
+        const { token } = getState().auth;
+        if (!token) return rejectWithValue("No token available");
+
+        try {
+            const response = await axiosInstance.patch(`/documents/${id}/restore`);
+            return response.data.document;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || "Failed to restore document");
+        }
+    }
+);
+
+// Xóa vĩnh viễn
+export const permanentlyDeleteDocument = createAsyncThunk(
+    "documents/permanentlyDeleteDocument",
+    async (id, { getState, rejectWithValue }) => {
+        const { token } = getState().auth;
+        if (!token) return rejectWithValue("No token available");
+
+        try {
+            await axiosInstance.delete(`/documents/${id}/permanent`);
+            return id;
+        } catch (error) {
             return rejectWithValue(
-                error.response?.data?.message || "Lỗi máy chủ khi xóa"
+                error.response?.data?.message || "Failed to permanently delete document"
             );
+        }
+    }
+);
+
+// Dọn sạch thùng rác
+export const emptyTrash = createAsyncThunk(
+    "documents/emptyTrash",
+    async (_, { getState, rejectWithValue }) => {
+        const { token } = getState().auth;
+        if (!token) return rejectWithValue("No token available");
+
+        try {
+            await axiosInstance.delete("/documents/trash/empty");
+            return true;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || "Failed to empty trash");
         }
     }
 );
@@ -108,9 +164,7 @@ export const renameDocument = createAsyncThunk(
             });
             return response.data.document;
         } catch (error) {
-            return rejectWithValue(
-                error.response?.data?.message || "Lỗi đổi tên không xác định"
-            );
+            return rejectWithValue(error.response?.data?.message || "Lỗi đổi tên không xác định");
         }
     }
 );
@@ -126,9 +180,7 @@ export const starDocument = createAsyncThunk(
             await dispatch(fetchDocuments({ parentId: "root" }));
             return response.data.document;
         } catch (error) {
-            return rejectWithValue(
-                error.response?.data?.message || "Failed to star document"
-            );
+            return rejectWithValue(error.response?.data?.message || "Failed to star document");
         }
     }
 );
@@ -146,9 +198,7 @@ export const moveDocument = createAsyncThunk(
             await dispatch(fetchDocuments({ parentId: "root" }));
             return response.data.document;
         } catch (error) {
-            return rejectWithValue(
-                error.response?.data?.message || "Failed to move document"
-            );
+            return rejectWithValue(error.response?.data?.message || "Failed to move document");
         }
     }
 );
@@ -175,8 +225,9 @@ const documentSlice = createSlice({
             .addCase(fetchDocuments.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            })
+            });
 
+        builder
             // Upload document
             .addCase(uploadDocument.pending, (state) => {
                 state.loading = true;
@@ -189,8 +240,9 @@ const documentSlice = createSlice({
             .addCase(uploadDocument.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            })
+            });
 
+        builder
             // Create folder
             .addCase(createFolder.pending, (state) => {
                 state.loading = true;
@@ -203,8 +255,9 @@ const documentSlice = createSlice({
             .addCase(createFolder.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            })
+            });
 
+        builder
             // Delete document
             .addCase(deleteDocument.pending, (state) => {
                 state.loading = true;
@@ -212,15 +265,56 @@ const documentSlice = createSlice({
             })
             .addCase(deleteDocument.fulfilled, (state, action) => {
                 state.loading = false;
-                state.documents = state.documents.filter(
-                    (doc) => doc._id !== action.payload
-                );
+                state.documents = state.documents.filter((doc) => doc._id !== action.payload);
             })
             .addCase(deleteDocument.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
 
+            // Restore document
+            .addCase(restoreDocument.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(restoreDocument.fulfilled, (state, action) => {
+                state.loading = false;
+                state.documents = state.documents.filter((doc) => doc._id !== action.payload._id);
+            })
+            .addCase(restoreDocument.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            // Permanently delete document
+            .addCase(permanentlyDeleteDocument.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(permanentlyDeleteDocument.fulfilled, (state, action) => {
+                state.loading = false;
+                state.documents = state.documents.filter((doc) => doc._id !== action.payload);
+            })
+            .addCase(permanentlyDeleteDocument.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            // Empty trash
+            .addCase(emptyTrash.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(emptyTrash.fulfilled, (state) => {
+                state.loading = false;
+                state.documents = [];
+            })
+            .addCase(emptyTrash.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
+
+        builder
             // Rename document
             .addCase(renameDocument.pending, (state) => {
                 state.loading = true;
@@ -228,16 +322,15 @@ const documentSlice = createSlice({
             })
             .addCase(renameDocument.fulfilled, (state, action) => {
                 state.loading = false;
-                const index = state.documents.findIndex(
-                    (doc) => doc._id === action.payload._id
-                );
+                const index = state.documents.findIndex((doc) => doc._id === action.payload._id);
                 if (index !== -1) state.documents[index] = action.payload;
             })
             .addCase(renameDocument.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            })
+            });
 
+        builder
             // Star document
             .addCase(starDocument.pending, (state) => {
                 state.loading = true;
@@ -245,16 +338,15 @@ const documentSlice = createSlice({
             })
             .addCase(starDocument.fulfilled, (state, action) => {
                 state.loading = false;
-                const index = state.documents.findIndex(
-                    (doc) => doc._id === action.payload._id
-                );
+                const index = state.documents.findIndex((doc) => doc._id === action.payload._id);
                 if (index !== -1) state.documents[index] = action.payload;
             })
             .addCase(starDocument.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            })
+            });
 
+        builder
             // Move document
             .addCase(moveDocument.pending, (state) => {
                 state.loading = true;
@@ -262,9 +354,7 @@ const documentSlice = createSlice({
             })
             .addCase(moveDocument.fulfilled, (state, action) => {
                 state.loading = false;
-                const index = state.documents.findIndex(
-                    (doc) => doc._id === action.payload._id
-                );
+                const index = state.documents.findIndex((doc) => doc._id === action.payload._id);
                 if (index !== -1) state.documents[index] = action.payload;
             })
             .addCase(moveDocument.rejected, (state, action) => {

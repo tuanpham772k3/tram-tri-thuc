@@ -1,5 +1,5 @@
 // src/components/Sidebar.jsx
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     FaHome,
     FaFileAlt,
@@ -8,6 +8,7 @@ import {
     FaTrash,
     FaCloudUploadAlt,
     FaFolderPlus,
+    FaChevronDown,
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -57,44 +58,69 @@ const Sidebar = () => {
     }, [rootFolders]);
 
     return (
-        <aside className="h-full bg-white dark:bg-gray-900 border-r dark:border-gray-800 p-4 flex flex-col shadow-sm">
-            <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="bg-blue-600 text-white w-full py-2 px-4 rounded-lg flex items-center justify-center hover:bg-blue-700 transition"
-            >
-                <FaCloudUploadAlt className="mr-2" />
-                Mới
-            </button>
-            {isMenuOpen && (
-                <div className="mt-2 bg-gray-100 dark:bg-gray-800 rounded-md overflow-hidden shadow-md">
-                    <button
-                        onClick={() => {
-                            setIsMenuOpen(false);
-                            setIsModalOpen(true);
-                        }}
-                        className="w-full px-4 py-2 flex items-center hover:bg-gray-200 dark:hover:bg-gray-700"
-                    >
-                        <FaFolderPlus className="mr-2" /> Tạo thư mục
-                    </button>
-                </div>
-            )}
+        <aside className="h-full bg-white dark:bg-gray-900 flex flex-col overflow-y-auto">
+            {/* New button with dropdown */}
+            <div className="p-4">
+                <button
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 px-4 rounded-lg flex items-center justify-center transition duration-150"
+                >
+                    <FaCloudUploadAlt className="mr-2" />
+                    Mới
+                    <FaChevronDown className="ml-2 text-xs" />
+                </button>
 
-            <nav className="mt-6 flex-1 space-y-3 text-sm font-medium">
+                {isMenuOpen && (
+                    <div className="mt-2 bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg border dark:border-gray-700 absolute z-10 w-52">
+                        <button
+                            onClick={() => {
+                                setIsMenuOpen(false);
+                                setIsModalOpen(true);
+                            }}
+                            className="w-full px-4 py-3 flex items-center text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                            <FaFolderPlus className="mr-3 text-blue-500" /> Tạo
+                            thư mục
+                        </button>
+                        <button className="w-full px-4 py-3 flex items-center text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <FaFileAlt className="mr-3 text-green-500" /> Tải
+                            tệp lên
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            {/* Navigation menu */}
+            <nav className="mt-2 flex-1 px-3">
                 <SidebarItem to="/home" icon={<FaHome />} label="Trang chủ" />
                 <SidebarItem
                     to="/documents"
                     icon={<FaFileAlt />}
                     label="Trạm của tôi"
+                    active
                 />
                 <SidebarItem to="/recent" icon={<FaClock />} label="Gần đây" />
-                <SidebarItem to="/starred" icon={<FaStar />} label="Gắn sao" />
+                <SidebarItem
+                    to="/starred"
+                    icon={<FaStar />}
+                    label="Có gắn dấu sao"
+                />
                 <SidebarItem to="/trash" icon={<FaTrash />} label="Thùng rác" />
-                <div className="mt-4">
-                    <h3 className="text-gray-700 dark:text-white font-semibold">
-                        Thư mục
-                    </h3>
+
+                <div className="mt-6 mb-2">
+                    <div className="px-3 flex items-center justify-between">
+                        <h3 className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            Thư mục của tôi
+                        </h3>
+                        <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            <FaFolderPlus size={14} />
+                        </button>
+                    </div>
+
                     {loading ? (
-                        <p className="text-gray-500">Đang tải thư mục...</p>
+                        <div className="px-3 py-2 text-gray-500 text-sm">
+                            Đang tải thư mục...
+                        </div>
                     ) : rootFolders.length ? (
                         rootFolders.map((folder) => (
                             <SidebarItem
@@ -102,29 +128,37 @@ const Sidebar = () => {
                                 to={`/documents?parentId=${folder._id}`}
                                 icon={<FaFolderPlus />}
                                 label={folder.name}
+                                indented
                             />
                         ))
                     ) : (
-                        <p className="text-gray-500">Chưa có thư mục</p>
+                        <div className="px-3 py-2 text-gray-500 text-sm">
+                            Chưa có thư mục
+                        </div>
                     )}
                 </div>
             </nav>
 
-            <div className="mt-6">
-                <div className="bg-gray-300 dark:bg-gray-700 rounded-full h-2 mb-2">
+            {/* Storage info */}
+            <div className="p-4 mt-auto border-t dark:border-gray-800">
+                <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
                     <div
                         className="bg-blue-600 h-2 rounded-full"
                         style={{ width: `${(3.5 / 15) * 100}%` }}
                     ></div>
                 </div>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
                     3.5 GB / 15 GB đã dùng
                 </p>
+                <button className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium">
+                    Mua thêm bộ nhớ
+                </button>
             </div>
 
+            {/* Create folder modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-                    <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-xl w-96">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-96 max-w-full">
                         <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
                             Tạo thư mục mới
                         </h2>
@@ -132,19 +166,19 @@ const Sidebar = () => {
                             type="text"
                             value={folderName}
                             onChange={(e) => setFolderName(e.target.value)}
-                            className="w-full px-4 py-2 mb-4 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-2 mb-4 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Nhập tên thư mục"
                         />
                         <div className="flex justify-end space-x-2">
                             <button
                                 onClick={() => setIsModalOpen(false)}
-                                className="px-4 py-2 text-gray-600 hover:text-red-500"
+                                className="px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white"
                             >
                                 Hủy
                             </button>
                             <button
                                 onClick={handleCreateFolder}
-                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
                             >
                                 Tạo
                             </button>
@@ -156,14 +190,21 @@ const Sidebar = () => {
     );
 };
 
-const SidebarItem = ({ to, icon, label }) => (
+const SidebarItem = ({ to, icon, label, active = false, indented = false }) => (
     <Link
         to={to}
-        className="flex items-center space-x-2 text-gray-700 dark:text-white hover:text-blue-600 transition"
+        className={`flex items-center space-x-3 px-3 py-2 my-1 rounded-lg transition-colors ${
+            active
+                ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium"
+                : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+        } ${indented ? "pl-6" : ""}`}
     >
-        {icon}
+        <span
+            className={`${active ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400"}`}
+        >
+            {icon}
+        </span>
         <span>{label}</span>
     </Link>
 );
-
 export default Sidebar;

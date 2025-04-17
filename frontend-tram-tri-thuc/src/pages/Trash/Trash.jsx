@@ -1,55 +1,31 @@
-// src/pages/DocumentList.jsx
 import { useEffect, useState } from "react";
-import { FaFolderPlus, FaList, FaTh } from "react-icons/fa";
-import Home from "./Home/Home";
+import { FaList, FaTh, FaTrash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import {
-    createFolder,
-    fetchDocuments,
-    moveDocument,
-} from "../redux/slices/documentSlice";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import UploadDropzone from "../components/Document/UploadDropzone";
-import DocumentItem from "../components/Document/DocumentItem";
+import Home from "../Home/Home";
+import DocumentItem from "../../components/Document/DocumentItem";
+import { fetchDocuments, emptyTrash } from "../../redux/slices/documentSlice";
 
-const DocumentList = () => {
+const Trash = () => {
     const [view, setView] = useState("list");
     const [sortBy, setSortBy] = useState("name");
     const [sortDirection, setSortDirection] = useState("asc");
-    const [isModalOpen, setIsModalOpen] = useState(false); // Modal tạo folder
-    const [folderName, setFolderName] = useState(""); // Tên folder
+    const [filterType, setFilterType] = useState("all");
+    const [filterDate, setFilterDate] = useState("all");
 
     const dispatch = useDispatch();
-    const { documents, loading, error } = useSelector(
-        (state) => state.documents
-    );
+    const { documents, loading } = useSelector((state) => state.documents);
     const { token } = useSelector((state) => state.auth);
     const navigate = useNavigate();
-    const location = useLocation();
 
-    const searchParams = new URLSearchParams(location.search);
-    const parentId =
-        searchParams.get("parentId") === "null"
-            ? "root"
-            : searchParams.get("parentId") || "root";
-
+    // Lấy danh sách tài liệu trong thùng rác
     useEffect(() => {
-        if (token && parentId) {
-            if (parentId !== "root" && !/^[0-9a-fA-F]{24}$/.test(parentId)) {
-                toast.error("parentId không hợp lệ");
-                navigate("/documents");
-                return;
-            }
-            dispatch(
-                fetchDocuments({
-                    parentId: parentId === "root" ? null : parentId,
-                    // deleted: false,
-                })
-            )
+        if (token) {
+            dispatch(fetchDocuments({ deleted: true, includeChildren: true }))
                 .unwrap()
                 .catch((error) => {
-                    console.error("Fetch error:", error);
+                    console.error("Fetch trash documents error:", error);
                     if (
                         error ===
                         "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại"
@@ -59,34 +35,79 @@ const DocumentList = () => {
                         );
                         navigate("/login");
                     } else {
-                        toast.error("Không thể tải danh sách tài liệu");
+                        toast.error("Không thể tải danh sách thùng rác");
                     }
                 });
         }
-    }, [token, dispatch, parentId, navigate]);
+    }, [token, dispatch, navigate]);
 
-    // Loại bỏ trùng lặp documents
+    // Loại bỏ trùng lặp
     const uniqueDocuments = Array.from(
         new Map(documents.map((doc) => [doc._id, doc])).values()
     );
 
-    // Sort documents
-    const sortedDocuments = [...uniqueDocuments].sort((a, b) => {
+    // Lọc theo loại tệp
+    const filteredDocuments = uniqueDocuments.filter((doc) => {
+        if (filterType === "all") return true;
+        if (filterType === "folders") return doc.type === "folder";
+        if (filterType === "pdf") return doc.mimeType === "application/pdf";
+        if (filterType === "word")
+            return (
+                doc.mimeType === "application/msword" ||
+                doc.mimeType ===
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            );
+        if (filterType === "excel")
+            return (
+                doc.mimeType === "application/vnd.ms-excel" ||
+                doc.mimeType ===
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            );
+        if (filterType === "images")
+            return (
+                doc.mimeType === "image/jpeg" || doc.mimeType === "image/png"
+            );
+        return true;
+    });
+
+    // Lọc theo ngày xóa
+    const filteredByDate = filteredDocuments.filter((doc) => {
+        if (filterDate === "all") return true;
+        const deletedAt = new Date(doc.deletedAt);
+        const today = new Date();
+        const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const oneMonthAgo = new Date(
+            today.getTime() - 30 * 24 * 60 * 60 * 1000
+        );
+
+        if (filterDate === "today")
+            return deletedAt.toDateString() === today.toDateString();
+        if (filterDate === "week") return deletedAt >= oneWeekAgo;
+        if (filterDate === "month") return deletedAt >= oneMonthAgo;
+        if (filterDate === "older") return deletedAt < oneMonthAgo;
+        return true;
+    });
+
+    // Sắp xếp
+    const sortedDocuments = [...filteredByDate].sort((a, b) => {
         if (sortBy === "name") {
             return sortDirection === "asc"
                 ? a.name.localeCompare(b.name)
                 : b.name.localeCompare(a.name);
         } else if (sortBy === "date") {
             return sortDirection === "asc"
-                ? new Date(a.uploadDate) - new Date(b.uploadDate)
-                : new Date(b.uploadDate) - new Date(a.uploadDate);
+                ? new Date(a.deletedAt) - new Date(b.deletedAt)
+                : new Date(b.deletedAt) - new Date(a.deletedAt);
         } else if (sortBy === "size") {
             return sortDirection === "asc" ? a.size - b.size : b.size - a.size;
         }
         return 0;
     });
 
-    // Toggle sort
+    const folders = sortedDocuments.filter((doc) => doc.type === "folder");
+    const files = sortedDocuments.filter((doc) => doc.type === "file");
+
+    // Toggle sắp xếp
     const handleSort = (column) => {
         if (sortBy === column) {
             setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -96,48 +117,19 @@ const DocumentList = () => {
         }
     };
 
-    const folders = sortedDocuments.filter((doc) => doc.type === "folder");
-    const files = sortedDocuments.filter((doc) => doc.type === "file");
-
-    const handleDrop = async (e, targetFolderId) => {
-        const draggedId = e.dataTransfer.getData("documentId");
-        try {
-            await dispatch(
-                moveDocument({ id: draggedId, newParentId: targetFolderId })
-            ).unwrap();
-            toast.success("Di chuyển tài liệu thành công");
-            dispatch(
-                fetchDocuments({
-                    parentId: parentId === "root" ? null : parentId,
-                })
-            );
-        } catch (error) {
-            toast.error("Di chuyển tài liệu thất bại");
-        }
-    };
-
-    // Tạo folder con
-    const handleCreateFolder = async () => {
-        if (!folderName.trim()) {
-            toast.error("Tên thư mục không được để trống");
+    // Dọn sạch thùng rác
+    const handleEmptyTrash = async () => {
+        if (
+            !window.confirm(
+                "Bạn có chắc muốn dọn sạch thùng rác? Tất cả mục sẽ bị xóa vĩnh viễn!"
+            )
+        )
             return;
-        }
         try {
-            await dispatch(
-                createFolder({
-                    name: folderName,
-                    parentId: parentId === "root" ? null : parentId,
-                })
-            ).unwrap();
-            toast.success("Tạo thư mục thành công");
-            setFolderName("");
-            setIsModalOpen(false);
+            await dispatch(emptyTrash()).unwrap();
+            toast.success("Dọn sạch thùng rác thành công");
         } catch (error) {
-            toast.error(
-                "Tạo thư mục thất bại: " +
-                    (error.message || "Lỗi không xác định")
-            );
-            console.error("Create folder error:", error);
+            toast.error(error || "Dọn sạch thùng rác thất bại");
         }
     };
 
@@ -146,15 +138,17 @@ const DocumentList = () => {
             <div className="max-w-6xl mx-auto p-6 gradient-bg rounded-lg shadow">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-xl font-bold text-gray-800 dark:text-white">
-                        Trạm của tôi
+                        Thùng rác
                     </h1>
                     <div className="flex space-x-2">
-                        <button
-                            onClick={() => setIsModalOpen(true)}
-                            className="bg-blue-600 text-white px-4 py-2 rounded flex items-center"
-                        >
-                            <FaFolderPlus className="mr-2" /> Tạo thư mục
-                        </button>
+                        {sortedDocuments.length > 0 && (
+                            <button
+                                onClick={handleEmptyTrash}
+                                className="bg-red-600 text-white px-4 py-2 rounded flex items-center hover:bg-red-700"
+                            >
+                                <FaTrash className="mr-2" /> Dọn sạch thùng rác
+                            </button>
+                        )}
                         <div className="bg-gray-200 dark:bg-gray-700 p-1 rounded-full">
                             <button
                                 onClick={() => setView("list")}
@@ -180,17 +174,48 @@ const DocumentList = () => {
                     </div>
                 </div>
 
-                <UploadDropzone parentId={parentId} />
+                {/* Ô phân loại */}
+                <div className="mb-6">
+                    <div className="flex flex-wrap gap-4">
+                        <div>
+                            <label className="text-gray-700 dark:text-gray-300 mr-2">
+                                Loại tệp:
+                            </label>
+                            <select
+                                value={filterType}
+                                onChange={(e) => setFilterType(e.target.value)}
+                                className="px-3 py-2 rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white"
+                            >
+                                <option value="all">Tất cả</option>
+                                <option value="folders">Thư mục</option>
+                                <option value="pdf">PDF</option>
+                                <option value="word">Word</option>
+                                <option value="excel">Excel</option>
+                                <option value="images">Hình ảnh</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="text-gray-700 dark:text-gray-300 mr-2">
+                                Ngày xóa:
+                            </label>
+                            <select
+                                value={filterDate}
+                                onChange={(e) => setFilterDate(e.target.value)}
+                                className="px-3 py-2 rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white"
+                            >
+                                <option value="all">Tất cả</option>
+                                <option value="today">Hôm nay</option>
+                                <option value="week">Tuần này</option>
+                                <option value="month">Tháng này</option>
+                                <option value="older">Trước đó</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
                 {loading ? (
                     <div className="flex justify-center py-10">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-                    </div>
-                ) : error ? (
-                    <div className="bg-red-50 dark:bg-red-900/20 p-8 rounded-lg text-center">
-                        <p className="text-red-600 dark:text-red-300">
-                            {error}
-                        </p>
                     </div>
                 ) : sortedDocuments.length ? (
                     view === "list" ? (
@@ -221,7 +246,7 @@ const DocumentList = () => {
                                         >
                                             <div className="flex items-center cursor-pointer">
                                                 <span className="text-gray-700 dark:text-gray-300">
-                                                    Ngày tải lên
+                                                    Ngày xóa
                                                 </span>
                                                 {sortBy === "date" && (
                                                     <span className="ml-1">
@@ -260,25 +285,8 @@ const DocumentList = () => {
                                             key={doc._id}
                                             document={doc}
                                             view="list"
-                                            onPreview={() =>
-                                                doc.type === "folder"
-                                                    ? navigate(
-                                                          `/documents?parentId=${doc._id}`
-                                                      )
-                                                    : navigate(
-                                                          `/documents/${doc._id}`
-                                                      )
-                                            }
-                                            onDoubleClick={() =>
-                                                doc.type === "folder"
-                                                    ? navigate(
-                                                          `/documents?parentId=${doc._id}`
-                                                      )
-                                                    : navigate(
-                                                          `/documents/${doc._id}`
-                                                      )
-                                            }
-                                            onDrop={handleDrop}
+                                            isTrash={true}
+                                            onDoubleClick={() => {}}
                                         />
                                     ))}
                                 </tbody>
@@ -297,12 +305,8 @@ const DocumentList = () => {
                                                 key={folder._id}
                                                 document={folder}
                                                 view="grid"
-                                                onDoubleClick={() =>
-                                                    navigate(
-                                                        `/documents?parentId=${folder._id}`
-                                                    )
-                                                }
-                                                onDrop={handleDrop}
+                                                isTrash={true}
+                                                onDoubleClick={() => {}}
                                             />
                                         ))}
                                     </div>
@@ -319,16 +323,8 @@ const DocumentList = () => {
                                                 key={file._id}
                                                 document={file}
                                                 view="grid"
-                                                onPreview={() =>
-                                                    navigate(
-                                                        `/documents/${file._id}`
-                                                    )
-                                                }
-                                                onDoubleClick={() =>
-                                                    navigate(
-                                                        `/documents/${file._id}`
-                                                    )
-                                                }
+                                                isTrash={true}
+                                                onDoubleClick={() => {}}
                                             />
                                         ))}
                                     </div>
@@ -339,40 +335,9 @@ const DocumentList = () => {
                 ) : (
                     <div className="bg-blue-50 dark:bg-blue-900/20 p-8 rounded-lg text-center mt-6">
                         <p className="text-gray-600 dark:text-gray-300">
-                            Chưa có tài liệu nào. Hãy tải lên tài liệu đầu tiên
-                            của bạn!
+                            Thùng rác trống. Các mục đã xóa sẽ xuất hiện tại
+                            đây.
                         </p>
-                    </div>
-                )}
-
-                {isModalOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-                        <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-xl w-96">
-                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
-                                Tạo thư mục mới
-                            </h2>
-                            <input
-                                type="text"
-                                value={folderName}
-                                onChange={(e) => setFolderName(e.target.value)}
-                                className="w-full px-4 py-2 mb-4 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Nhập tên thư mục"
-                            />
-                            <div className="flex justify-end space-x-2">
-                                <button
-                                    onClick={() => setIsModalOpen(false)}
-                                    className="px-4 py-2 text-gray-600 hover:text-red-500"
-                                >
-                                    Hủy
-                                </button>
-                                <button
-                                    onClick={handleCreateFolder}
-                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                                >
-                                    Tạo
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 )}
             </div>
@@ -380,4 +345,4 @@ const DocumentList = () => {
     );
 };
 
-export default DocumentList;
+export default Trash;
