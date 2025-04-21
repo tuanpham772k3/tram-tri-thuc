@@ -1,16 +1,15 @@
-// src/api/axios.js
 import axios from "axios";
-import { toast } from "react-toastify";
+import showToast from "../../utils/toast";
 
 // Base URL của backend
-const API_URL = "http://localhost:5000/api";
+const API_URL = "http://localhost:5000/api/v1";
 
 // Tạo instance axios với cấu hình mặc định
 const axiosInstance = axios.create({
-    baseURL: API_URL, // URL gốc cho tất cả request
+    baseURL: API_URL,
     timeout: 10000,
     headers: {
-        "Content-Type": "application/json", // Header mặc định
+        "Content-Type": "application/json",
     },
 });
 
@@ -19,7 +18,22 @@ axiosInstance.interceptors.request.use(
     (config) => {
         const token = config.token || localStorage.getItem("token");
         if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+            // Kiểm tra token có vẻ hợp lệ (cơ bản)
+            try {
+                const payload = JSON.parse(atob(token.split(".")[1]));
+                const now = Math.floor(Date.now() / 1000);
+                if (payload.exp < now) {
+                    localStorage.removeItem("token");
+                    showToast("error", "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
+                    if (window.location.pathname !== "/login") {
+                        window.location.href = "/login";
+                    }
+                    return Promise.reject(new Error("Token expired"));
+                }
+                config.headers.Authorization = `Bearer ${token}`;
+            } catch (error) {
+                console.error("Invalid token:", error.message);
+            }
         }
         return config;
     },
@@ -30,29 +44,21 @@ axiosInstance.interceptors.request.use(
 
 // Thêm interceptor để xử lý lỗi cho các response
 axiosInstance.interceptors.response.use(
-    (response) => response, // Trả về response nếu thành công
+    (response) => response,
     (error) => {
         const status = error.response?.status;
-        const errorMessage = error.response?.data?.message || "Có lỗi xảy ra";
-
         if (status === 401) {
             localStorage.removeItem("token");
-            toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
-
+            showToast("error", "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
             if (window.location.pathname !== "/login") {
                 window.location.href = "/login";
             }
         } else if (!error.response) {
-            toast.error("Lỗi mạng. Vui lòng kiểm tra kết nối.");
+            showToast("error", "Lỗi mạng. Vui lòng kiểm tra kết nối.");
             console.error("🔥 Lỗi mạng chi tiết:", error.message);
             console.log("👉 Request URL:", error.config?.url);
             console.log("👉 Full request config:", error.config);
-        } else {
-            toast.error(errorMessage);
-            console.error("API Error:", errorMessage);
-            console.log("👉 Response data:", error.response?.data);
         }
-        
         return Promise.reject(error);
     }
 );

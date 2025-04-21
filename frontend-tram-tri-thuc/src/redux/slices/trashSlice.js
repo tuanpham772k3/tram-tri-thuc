@@ -1,136 +1,128 @@
-/**
- * Redux slice for trash-related operations
- */
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { makeApiCall, isValidObjectId } from "../../utils/apiUtils";
-import { fetchDocuments } from "./documentSlice";
+import axiosInstance from "../../custom/Axios/AxiosCustom";
+import showToast from "../../utils/toast";
 
-/**
- * Fetch documents in trash
- * @returns {Promise<Array>} List of trashed documents
- */
+// Async thunk để fetch danh sách tài liệu trong thùng rác
 export const fetchTrash = createAsyncThunk(
     "trash/fetchTrash",
     async (_, { getState, rejectWithValue }) => {
+        const { token } = getState().auth;
+        if (!token) return rejectWithValue("No token available");
+
         try {
-            const { token } = getState().auth;
-            const data = await makeApiCall(
-                {
-                    method: "get",
-                    url: "/trash",
-                },
-                token
-            );
-            return data.documents;
+            const response = await axiosInstance.get("/trash");
+            const documents = response.data.data.documents;
+            return documents;
         } catch (error) {
-            return rejectWithValue(error.message);
+            console.error("Fetch trash error:", error.response?.data);
+            const message =
+                error.response?.data?.errors?.join(", ") ||
+                error.response?.data?.message ||
+                "Failed to fetch trash";
+            return rejectWithValue(message);
         }
     }
 );
 
-/**
- * Delete a document (move to trash)
- * @param {string} id - Document ID
- * @returns {Promise<string>} Deleted document ID
- */
+// Async thunk để xóa tài liệu (di chuyển vào thùng rác)
 export const deleteDocument = createAsyncThunk(
     "trash/deleteDocument",
-    async (id, { getState, dispatch, rejectWithValue }) => {
+    async (id, { getState, rejectWithValue }) => {
+        // Validation
+        if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+            return rejectWithValue("Invalid document ID");
+        }
+
+        const { token } = getState().auth;
+        if (!token) return rejectWithValue("Please log in");
+
         try {
-            if (!isValidObjectId(id)) {
-                return rejectWithValue("ID tài liệu không hợp lệ");
-            }
-            const { token } = getState().auth;
-            await makeApiCall(
-                {
-                    method: "delete",
-                    url: `/documents/${id}`,
-                },
-                token
-            );
-            await dispatch(fetchDocuments({ parentId: "root" }));
+            const response = await axiosInstance.delete(`/documents/${id}`);
+            showToast("success", response.data.message);
             return id;
         } catch (error) {
-            return rejectWithValue(error.message);
+            console.error("Delete document error:", error.response?.data);
+            const message =
+                error.response?.data?.errors?.join(", ") ||
+                error.response?.data?.message ||
+                "Failed to delete document";
+            return rejectWithValue(message);
         }
     }
 );
 
-/**
- * Restore a document from trash
- * @param {string} id - Document ID
- * @returns {Promise<Object>} Restored document
- */
+// Async thunk để khôi phục tài liệu
 export const restoreDocument = createAsyncThunk(
     "trash/restoreDocument",
-    async (id, { getState, dispatch, rejectWithValue }) => {
+    async (id, { getState, rejectWithValue }) => {
+        // Validation
+        if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+            return rejectWithValue("Invalid document ID");
+        }
+
+        const { token } = getState().auth;
+        if (!token) return rejectWithValue("No token available");
+
         try {
-            if (!isValidObjectId(id)) {
-                return rejectWithValue("ID tài liệu không hợp lệ");
-            }
-            const { token } = getState().auth;
-            const data = await makeApiCall(
-                {
-                    method: "patch",
-                    url: `/documents/${id}/restore`,
-                },
-                token
-            );
-            await dispatch(fetchTrash());
-            return data.document;
+            const response = await axiosInstance.patch(`/trash/${id}`);
+            showToast("success", response.data.message);
+            return response.data.data.document;
         } catch (error) {
-            return rejectWithValue(error.message);
+            console.error("Restore document error:", error.response?.data);
+            const message =
+                error.response?.data?.errors?.join(", ") ||
+                error.response?.data?.message ||
+                "Failed to restore document";
+            return rejectWithValue(message);
         }
     }
 );
 
-/**
- * Permanently delete a document
- * @param {string} id - Document ID
- * @returns {Promise<string>} Deleted document ID
- */
+// Async thunk để xóa vĩnh viễn tài liệu
 export const permanentlyDeleteDocument = createAsyncThunk(
     "trash/permanentlyDeleteDocument",
-    async (id, { getState, dispatch, rejectWithValue }) => {
+    async (id, { getState, rejectWithValue }) => {
+        // Validation
+        if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+            return rejectWithValue("Invalid document ID");
+        }
+
+        const { token } = getState().auth;
+        if (!token) return rejectWithValue("No token available");
+
         try {
-            if (!isValidObjectId(id)) {
-                return rejectWithValue("ID tài liệu không hợp lệ");
-            }
-            const { token } = getState().auth;
-            await makeApiCall(
-                {
-                    method: "delete",
-                    url: `/documents/${id}/permanent`,
-                },
-                token
-            );
-            await dispatch(fetchTrash());
+            const response = await axiosInstance.delete(`/trash/${id}`);
+            showToast("success", response.data.message);
             return id;
         } catch (error) {
-            return rejectWithValue(error.message);
+            console.error("Permanently delete document error:", error.response?.data);
+            const message =
+                error.response?.data?.errors?.join(", ") ||
+                error.response?.data?.message ||
+                "Failed to permanently delete document";
+            return rejectWithValue(message);
         }
     }
 );
 
-/**
- * Empty the trash
- * @returns {Promise<boolean>} True if successful
- */
+// Async thunk để dọn sạch thùng rác
 export const emptyTrash = createAsyncThunk(
     "trash/emptyTrash",
     async (_, { getState, rejectWithValue }) => {
+        const { token } = getState().auth;
+        if (!token) return rejectWithValue("No token available");
+
         try {
-            const { token } = getState().auth;
-            await makeApiCall(
-                {
-                    method: "delete",
-                    url: "/documents/trash/empty",
-                },
-                token
-            );
+            const response = await axiosInstance.delete("/trash");
+            showToast("success", response.data.message);
             return true;
         } catch (error) {
-            return rejectWithValue(error.message);
+            console.error("Empty trash error:", error.response?.data);
+            const message =
+                error.response?.data?.errors?.join(", ") ||
+                error.response?.data?.message ||
+                "Failed to empty trash";
+            return rejectWithValue(message);
         }
     }
 );
@@ -143,24 +135,23 @@ const trashSlice = createSlice({
         error: null,
     },
     reducers: {
-        /**
-         * Clear error state
-         */
+        // Xóa lỗi
         clearError: (state) => {
             state.error = null;
         },
     },
     extraReducers: (builder) => {
-        // Helper to handle pending state
+        // Helper để xử lý trạng thái pending
         const handlePending = (state) => {
             state.loading = true;
             state.error = null;
         };
 
-        // Helper to handle rejected state
+        // Helper để xử lý trạng thái rejected
         const handleRejected = (state, action) => {
             state.loading = false;
             state.error = action.payload;
+            showToast("error", action.payload);
         };
 
         // Fetch trash
@@ -177,17 +168,18 @@ const trashSlice = createSlice({
             .addCase(deleteDocument.pending, handlePending)
             .addCase(deleteDocument.fulfilled, (state, action) => {
                 state.loading = false;
-                state.trashDocuments = state.trashDocuments.filter(
-                    (doc) => doc._id !== action.payload
-                );
+                state.trashDocuments.push({ _id: action.payload, deleted: true });
             })
             .addCase(deleteDocument.rejected, handleRejected);
 
         // Restore document
         builder
             .addCase(restoreDocument.pending, handlePending)
-            .addCase(restoreDocument.fulfilled, (state) => {
+            .addCase(restoreDocument.fulfilled, (state, action) => {
                 state.loading = false;
+                state.trashDocuments = state.trashDocuments.filter(
+                    (doc) => doc._id !== action.payload._id
+                );
             })
             .addCase(restoreDocument.rejected, handleRejected);
 

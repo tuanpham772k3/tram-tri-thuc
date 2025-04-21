@@ -1,39 +1,47 @@
 import { Button, Card, Checkbox, Input } from "antd";
 import React from "react";
-import { useState } from "react";
 import { FaEnvelope, FaEye, FaEyeSlash, FaLock, FaUser } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { register } from "../../../redux/slices/authSlice";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 const Register = () => {
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [agree, setAgree] = useState(false);
-
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { loading, error, message } = useSelector((state) => state.auth);
+    const { loading, error } = useSelector((state) => state.auth);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (password !== confirmPassword) {
-            alert("Mật khẩu không khớp!");
-            return;
-        }
-        if (!agree) {
-            alert("Vui lòng đồng ý với điều khoản sử dụng!");
-            return;
-        }
-        await dispatch(register({ name, email, password })); // Gọi action đăng ký
-        if (message) {
-            navigate("/login"); // Điều hướng về đăng nhập sau khi đăng ký thành công
-        }
-    };
+    const formik = useFormik({
+        initialValues: {
+            name: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+            agree: false,
+        },
+        validationSchema: Yup.object({
+            name: Yup.string()
+                .min(3, "Name must be at least 3 characters")
+                .max(50, "Name must be at most 50 characters")
+                .required("Name is required"),
+            email: Yup.string().email("Invalid email address").required("Email is required"),
+            password: Yup.string()
+                .min(6, "Password must be at least 6 characters")
+                .required("Password is required"),
+            confirmPassword: Yup.string()
+                .oneOf([Yup.ref("password"), null], "Passwords must match")
+                .required("Confirm password is required"),
+            agree: Yup.boolean().oneOf([true], "You must agree to the terms of use").required(),
+        }),
+        onSubmit: async (values) => {
+            const { name, email, password } = values;
+            await dispatch(register({ name, email, password }));
+            if (!error) {
+                navigate("/login");
+            }
+        },
+    });
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -42,70 +50,98 @@ const Register = () => {
                     Tạo tài khoản để quản lý tài liệu của bạn
                 </h2>
                 {error && <p className="text-red-500 text-center">{error}</p>}
-                {message && (
-                    <p className="text-green-500 text-center">{message}</p>
-                )}
-                <form className="space-y-4" onSubmit={handleSubmit}>
-                    <Input
-                        prefix={<FaUser className="text-gray-500" />}
-                        placeholder="Họ và tên"
-                        className="h-10"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                    />
-                    <Input
-                        prefix={<FaEnvelope className="text-gray-500" />}
-                        placeholder="Email"
-                        type="email"
-                        className="h-10"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                    <Input
-                        prefix={<FaLock className="text-gray-500" />}
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Mật khẩu"
-                        className="h-10"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        suffix={
-                            <span
-                                className="cursor-pointer text-gray-500"
-                                onClick={() => setShowPassword(!showPassword)}
-                            >
-                                {showPassword ? <FaEyeSlash /> : <FaEye />}
-                            </span>
-                        }
-                        required
-                    />
-                    <Input
-                        prefix={<FaLock className="text-gray-500" />}
-                        type={showConfirmPassword ? "text" : "password"}
-                        placeholder="Xác nhận mật khẩu"
-                        className="h-10"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        suffix={
-                            <span
-                                className="cursor-pointer text-gray-500"
-                                onClick={() =>
-                                    setShowConfirmPassword(!showConfirmPassword)
-                                }
-                            >
-                                {showConfirmPassword ? (
-                                    <FaEyeSlash />
-                                ) : (
-                                    <FaEye />
-                                )}
-                            </span>
-                        }
-                        required
-                    />
+                <form className="space-y-4" onSubmit={formik.handleSubmit}>
+                    <div>
+                        <Input
+                            prefix={<FaUser className="text-gray-500" />}
+                            placeholder="Họ và tên"
+                            className="h-10"
+                            name="name"
+                            value={formik.values.name}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                        />
+                        {formik.touched.name && formik.errors.name && (
+                            <p className="text-red-500 text-xs mt-1">{formik.errors.name}</p>
+                        )}
+                    </div>
+                    <div>
+                        <Input
+                            prefix={<FaEnvelope className="text-gray-500" />}
+                            placeholder="Email"
+                            type="email"
+                            className="h-10"
+                            name="email"
+                            value={formik.values.email}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                        />
+                        {formik.touched.email && formik.errors.email && (
+                            <p className="text-red-500 text-xs mt-1">{formik.errors.email}</p>
+                        )}
+                    </div>
+                    <div>
+                        <Input
+                            prefix={<FaLock className="text-gray-500" />}
+                            type={formik.values.showPassword ? "text" : "password"}
+                            placeholder="Mật khẩu"
+                            className="h-10"
+                            name="password"
+                            value={formik.values.password}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            suffix={
+                                <span
+                                    className="cursor-pointer text-gray-500"
+                                    onClick={() =>
+                                        formik.setFieldValue(
+                                            "showPassword",
+                                            !formik.values.showPassword
+                                        )
+                                    }
+                                >
+                                    {formik.values.showPassword ? <FaEyeSlash /> : <FaEye />}
+                                </span>
+                            }
+                        />
+                        {formik.touched.password && formik.errors.password && (
+                            <p className="text-red-500 text-xs mt-1">{formik.errors.password}</p>
+                        )}
+                    </div>
+                    <div>
+                        <Input
+                            prefix={<FaLock className="text-gray-500" />}
+                            type={formik.values.showConfirmPassword ? "text" : "password"}
+                            placeholder="Xác nhận mật khẩu"
+                            className="h-10"
+                            name="confirmPassword"
+                            value={formik.values.confirmPassword}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            suffix={
+                                <span
+                                    className="cursor-pointer text-gray-500"
+                                    onClick={() =>
+                                        formik.setFieldValue(
+                                            "showConfirmPassword",
+                                            !formik.values.showConfirmPassword
+                                        )
+                                    }
+                                >
+                                    {formik.values.showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                                </span>
+                            }
+                        />
+                        {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+                            <p className="text-red-500 text-xs mt-1">
+                                {formik.errors.confirmPassword}
+                            </p>
+                        )}
+                    </div>
                     <Checkbox
-                        checked={agree}
-                        onChange={(e) => setAgree(e.target.checked)}
+                        name="agree"
+                        checked={formik.values.agree}
+                        onChange={formik.handleChange}
                         className="text-sm text-gray-600"
                     >
                         Tôi đồng ý với{" "}
@@ -113,6 +149,9 @@ const Register = () => {
                             điều khoản sử dụng
                         </a>
                     </Checkbox>
+                    {formik.touched.agree && formik.errors.agree && (
+                        <p className="text-red-500 text-xs mt-1">{formik.errors.agree}</p>
+                    )}
                     <Button
                         type="primary"
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg"

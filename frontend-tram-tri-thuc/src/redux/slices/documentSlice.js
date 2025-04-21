@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../custom/Axios/AxiosCustom";
+import showToast from "../../utils/toast";
 
 // Async thunk để fetch danh sách tài liệu
 export const fetchDocuments = createAsyncThunk(
@@ -11,15 +12,19 @@ export const fetchDocuments = createAsyncThunk(
             mimeType,
             uploadDate,
             userId,
-            deleted,
             starred,
-            includeChildren = false, // Mặc định false
+            includeChildren = false,
         },
         { getState, rejectWithValue }
     ) => {
+        // Validation
         if (parentId && parentId !== "root" && !/^[0-9a-fA-F]{24}$/.test(parentId)) {
-            return rejectWithValue("parentId không hợp lệ");
+            return rejectWithValue("Invalid parentId");
         }
+        if (type && !["file", "folder"].includes(type)) {
+            return rejectWithValue("Invalid type");
+        }
+
         const { token } = getState().auth;
         if (!token) return rejectWithValue("No token available");
 
@@ -30,17 +35,18 @@ export const fetchDocuments = createAsyncThunk(
             if (mimeType) params.mimeType = mimeType;
             if (uploadDate) params.uploadDate = uploadDate;
             if (userId) params.userId = userId;
-            if (starred !== undefined) params.starred = starred; // Thêm tham số starred
-            if (deleted !== undefined) params.deleted = deleted; // Thêm tham số deleted
+            if (starred !== undefined) params.starred = starred;
             if (includeChildren) params.includeChildren = includeChildren;
 
             const res = await axiosInstance.get("/documents", { params });
-            return res.data.documents;
+            return res.data.data.documents;
         } catch (error) {
-            if (error.response?.status === 401) {
-                return rejectWithValue("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại");
-            }
-            return rejectWithValue(error.response?.data?.message || "Failed to fetch documents");
+            console.error("Fetch documents error:", error.response?.data);
+            const message =
+                error.response?.status === 401
+                    ? "Session expired, please log in again"
+                    : error.response?.data?.message || "Failed to fetch documents";
+            return rejectWithValue(message);
         }
     }
 );
@@ -48,18 +54,25 @@ export const fetchDocuments = createAsyncThunk(
 // Async thunk để upload tài liệu
 export const uploadDocument = createAsyncThunk(
     "documents/uploadDocument",
-    async (formData, { getState, rejectWithValue }) => {
+    async ({ formData, onUploadProgress }, { getState, rejectWithValue }) => {
         const { token } = getState().auth;
         if (!token) return rejectWithValue("No token available");
+
         try {
-            console.log("Uploading with parentId:", formData.get("parentId"));
-            const response = await axiosInstance.post("/documents/upload", formData, {
+            const response = await axiosInstance.post("/documents", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
+                onUploadProgress,
             });
-            return response.data.file; // Chỉ trả về file vừa upload
+
+            showToast("success", response.data.message);
+            return response.data.data.file;
         } catch (error) {
-            console.error("Upload thunk error:", error.response?.data || error);
-            return rejectWithValue(error.response?.data?.message || "Failed to upload document");
+            console.error("Upload document error:", error.response?.data);
+            const message =
+                error.response?.data?.errors?.join(", ") ||
+                error.response?.data?.message ||
+                "Failed to upload document";
+            return rejectWithValue(message);
         }
     }
 );
@@ -68,86 +81,31 @@ export const uploadDocument = createAsyncThunk(
 export const createFolder = createAsyncThunk(
     "documents/createFolder",
     async ({ name, parentId }, { getState, rejectWithValue }) => {
+        // Validation
+        if (!name || name.trim().length < 1 || name.trim().length > 255) {
+            return rejectWithValue("Folder name must be between 1 and 255 characters");
+        }
+        if (parentId && !/^[0-9a-fA-F]{24}$/.test(parentId)) {
+            return rejectWithValue("Invalid parentId");
+        }
+
         const { token } = getState().auth;
         if (!token) return rejectWithValue("No token available");
+
         try {
-            const response = await axiosInstance.post("/documents/folder", {
-                name,
+            const response = await axiosInstance.post("/folders", {
+                name: name.trim(),
                 parentId: parentId || null,
             });
-            return response.data.folder;
+            showToast("success", response.data.message);
+            return response.data.data.folder;
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message || "Failed to create folder");
-        }
-    }
-);
-
-// Async thunk để xóa tài liệu
-export const deleteDocument = createAsyncThunk(
-    "documents/deleteDocument",
-    async (id, { getState, rejectWithValue }) => {
-        const { token } = getState().auth;
-        if (!token) return rejectWithValue("Vui lòng đăng nhập");
-
-        if (!/^[0-9a-fA-F]{24}$/.test(id)) {
-            return rejectWithValue("ID tài liệu không hợp lệ");
-        }
-
-        try {
-            await axiosInstance.delete(`/documents/${id}`);
-            return id;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || "Lỗi máy chủ khi xóa");
-        }
-    }
-);
-
-// Khôi phục tài liệu
-export const restoreDocument = createAsyncThunk(
-    "documents/restoreDocument",
-    async (id, { getState, rejectWithValue }) => {
-        const { token } = getState().auth;
-        if (!token) return rejectWithValue("No token available");
-
-        try {
-            const response = await axiosInstance.patch(`/documents/${id}/restore`);
-            return response.data.document;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || "Failed to restore document");
-        }
-    }
-);
-
-// Xóa vĩnh viễn
-export const permanentlyDeleteDocument = createAsyncThunk(
-    "documents/permanentlyDeleteDocument",
-    async (id, { getState, rejectWithValue }) => {
-        const { token } = getState().auth;
-        if (!token) return rejectWithValue("No token available");
-
-        try {
-            await axiosInstance.delete(`/documents/${id}/permanent`);
-            return id;
-        } catch (error) {
-            return rejectWithValue(
-                error.response?.data?.message || "Failed to permanently delete document"
-            );
-        }
-    }
-);
-
-// Dọn sạch thùng rác
-export const emptyTrash = createAsyncThunk(
-    "documents/emptyTrash",
-    async (_, { getState, rejectWithValue }) => {
-        const { token } = getState().auth;
-        if (!token) return rejectWithValue("No token available");
-
-        try {
-            await axiosInstance.delete("/documents/trash/empty");
-            return true;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || "Failed to empty trash");
+            console.error("Create folder error:", error.response?.data);
+            const message =
+                error.response?.data?.errors?.join(", ") ||
+                error.response?.data?.message ||
+                "Failed to create folder";
+            return rejectWithValue(message);
         }
     }
 );
@@ -156,15 +114,31 @@ export const emptyTrash = createAsyncThunk(
 export const renameDocument = createAsyncThunk(
     "documents/renameDocument",
     async ({ id, name }, { getState, rejectWithValue }) => {
+        // Validation
+        if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+            return rejectWithValue("Invalid document ID");
+        }
+        if (!name || name.trim().length < 1 || name.trim().length > 255) {
+            return rejectWithValue("Name must be between 1 and 255 characters");
+        }
+
         const { token } = getState().auth;
-        if (!token) return rejectWithValue("Vui lòng đăng nhập");
+        if (!token) return rejectWithValue("Please log in");
+
         try {
             const response = await axiosInstance.put(`/documents/${id}`, {
                 name: name.trim(),
+                id,
             });
-            return response.data.document;
+            showToast("success", response.data.message);
+            return response.data.data.document;
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message || "Lỗi đổi tên không xác định");
+            console.error("Rename document error:", error.response?.data);
+            const message =
+                error.response?.data?.errors?.join(", ") ||
+                error.response?.data?.message ||
+                "Failed to rename document";
+            return rejectWithValue(message);
         }
     }
 );
@@ -172,15 +146,28 @@ export const renameDocument = createAsyncThunk(
 // Async thunk để đánh dấu/bỏ đánh dấu sao tài liệu
 export const starDocument = createAsyncThunk(
     "documents/starDocument",
-    async (id, { getState, dispatch, rejectWithValue }) => {
+    async (id, { getState, rejectWithValue }) => {
+        // Validation
+        if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+            return rejectWithValue("Invalid document ID");
+        }
+
         const { token } = getState().auth;
         if (!token) return rejectWithValue("No token available");
+
         try {
-            const response = await axiosInstance.patch(`/documents/${id}/star`);
-            await dispatch(fetchDocuments({ parentId: "root" }));
-            return response.data.document;
+            const response = await axiosInstance.patch(`/documents/${id}/star`, {
+                id,
+            });
+            showToast("success", response.data.message);
+            return response.data.data.document;
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message || "Failed to star document");
+            console.error("Star document error:", error.response?.data);
+            const message =
+                error.response?.data?.errors?.join(", ") ||
+                error.response?.data?.message ||
+                "Failed to star document";
+            return rejectWithValue(message);
         }
     }
 );
@@ -188,20 +175,36 @@ export const starDocument = createAsyncThunk(
 // Async thunk để di chuyển tài liệu
 export const moveDocument = createAsyncThunk(
     "documents/moveDocument",
-    async ({ id, newParentId }, { getState, dispatch, rejectWithValue }) => {
+    async ({ id, newParentId }, { getState, rejectWithValue }) => {
+        // Validation
+        if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+            return rejectWithValue("Invalid document ID");
+        }
+        if (newParentId && !/^[0-9a-fA-F]{24}$/.test(newParentId)) {
+            return rejectWithValue("Invalid parentId");
+        }
+
         const { token } = getState().auth;
         if (!token) return rejectWithValue("No token available");
+
         try {
             const response = await axiosInstance.put(`/documents/${id}/move`, {
                 newParentId: newParentId || null,
             });
-            await dispatch(fetchDocuments({ parentId: "root" }));
-            return response.data.document;
+            showToast("success", response.data.message);
+            return response.data.data.document;
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message || "Failed to move document");
+            console.error("Move document error:", error.response?.data);
+            const message =
+                error.response?.data?.errors?.join(", ") ||
+                error.response?.data?.message ||
+                "Failed to move document";
+            return rejectWithValue(message);
         }
     }
 );
+
+
 
 const documentSlice = createSlice({
     name: "documents",
@@ -210,158 +213,86 @@ const documentSlice = createSlice({
         loading: false,
         error: null,
     },
-    reducers: {},
+    reducers: {
+        // Xóa lỗi
+        clearError: (state) => {
+            state.error = null;
+        },
+    },
     extraReducers: (builder) => {
+        // Helper để xử lý trạng thái pending
+        const handlePending = (state) => {
+            state.loading = true;
+            state.error = null;
+        };
+
+        // Helper để xử lý trạng thái rejected
+        const handleRejected = (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+            showToast("error", action.payload);
+        };
+
+        // Fetch documents
         builder
-            // Fetch documents
-            .addCase(fetchDocuments.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
+            .addCase(fetchDocuments.pending, handlePending)
             .addCase(fetchDocuments.fulfilled, (state, action) => {
                 state.loading = false;
                 state.documents = action.payload;
             })
-            .addCase(fetchDocuments.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-            });
+            .addCase(fetchDocuments.rejected, handleRejected);
 
+        // Upload document
         builder
-            // Upload document
-            .addCase(uploadDocument.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
+            .addCase(uploadDocument.pending, handlePending)
             .addCase(uploadDocument.fulfilled, (state, action) => {
                 state.loading = false;
-                state.documents.push(action.payload); // Thêm tài liệu mới vào state ngay lập tức
+                state.documents.push(action.payload);
             })
-            .addCase(uploadDocument.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-            });
+            .addCase(uploadDocument.rejected, handleRejected);
 
+        // Create folder
         builder
-            // Create folder
-            .addCase(createFolder.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
+            .addCase(createFolder.pending, handlePending)
             .addCase(createFolder.fulfilled, (state, action) => {
                 state.loading = false;
-                state.documents.push(action.payload); // Thêm folder mới vào state ngay lập tức
+                state.documents.push(action.payload);
             })
-            .addCase(createFolder.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-            });
+            .addCase(createFolder.rejected, handleRejected);
 
+        // Rename document
         builder
-            // Delete document
-            .addCase(deleteDocument.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(deleteDocument.fulfilled, (state, action) => {
-                state.loading = false;
-                state.documents = state.documents.filter((doc) => doc._id !== action.payload);
-            })
-            .addCase(deleteDocument.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-            })
-
-            // Restore document
-            .addCase(restoreDocument.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(restoreDocument.fulfilled, (state, action) => {
-                state.loading = false;
-                state.documents = state.documents.filter((doc) => doc._id !== action.payload._id);
-            })
-            .addCase(restoreDocument.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-            })
-
-            // Permanently delete document
-            .addCase(permanentlyDeleteDocument.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(permanentlyDeleteDocument.fulfilled, (state, action) => {
-                state.loading = false;
-                state.documents = state.documents.filter((doc) => doc._id !== action.payload);
-            })
-            .addCase(permanentlyDeleteDocument.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-            })
-
-            // Empty trash
-            .addCase(emptyTrash.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(emptyTrash.fulfilled, (state) => {
-                state.loading = false;
-                state.documents = [];
-            })
-            .addCase(emptyTrash.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-            });
-
-        builder
-            // Rename document
-            .addCase(renameDocument.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
+            .addCase(renameDocument.pending, handlePending)
             .addCase(renameDocument.fulfilled, (state, action) => {
                 state.loading = false;
                 const index = state.documents.findIndex((doc) => doc._id === action.payload._id);
                 if (index !== -1) state.documents[index] = action.payload;
             })
-            .addCase(renameDocument.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-            });
+            .addCase(renameDocument.rejected, handleRejected);
 
+        // Star document
         builder
-            // Star document
-            .addCase(starDocument.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
+            .addCase(starDocument.pending, handlePending)
             .addCase(starDocument.fulfilled, (state, action) => {
                 state.loading = false;
                 const index = state.documents.findIndex((doc) => doc._id === action.payload._id);
                 if (index !== -1) state.documents[index] = action.payload;
             })
-            .addCase(starDocument.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-            });
+            .addCase(starDocument.rejected, handleRejected);
 
+        // Move document
         builder
-            // Move document
-            .addCase(moveDocument.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
+            .addCase(moveDocument.pending, handlePending)
             .addCase(moveDocument.fulfilled, (state, action) => {
                 state.loading = false;
                 const index = state.documents.findIndex((doc) => doc._id === action.payload._id);
                 if (index !== -1) state.documents[index] = action.payload;
             })
-            .addCase(moveDocument.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-            });
+            .addCase(moveDocument.rejected, handleRejected);
+
+        
     },
 });
 
+export const { clearError } = documentSlice.actions;
 export default documentSlice.reducer;

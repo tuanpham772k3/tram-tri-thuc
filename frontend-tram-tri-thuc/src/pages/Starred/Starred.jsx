@@ -24,43 +24,41 @@ const Starred = () => {
                 .unwrap()
                 .catch((error) => {
                     console.error("Fetch starred documents error:", error);
-                    if (
-                        error ===
-                        "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại"
-                    ) {
-                        toast.error(
-                            "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại"
-                        );
+                    if (error === "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại") {
+                        toast.error("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại");
                         navigate("/login");
                     } else {
-                        toast.error(
-                            "Không thể tải danh sách tài liệu được đánh dấu sao"
-                        );
+                        toast.error("Không thể tải danh sách tài liệu được đánh dấu sao");
                     }
                 });
         }
     }, [token, dispatch, navigate]);
 
-    // Loại bỏ trùng lặp
+    // Loại bỏ trùng lặp và lọc dữ liệu không hợp lệ
     const uniqueDocuments = Array.from(
-        new Map(documents.map((doc) => [doc._id, doc])).values()
-    );
+        new Map(
+            documents
+                .filter((doc) => doc && doc._id && doc.name && doc.starred && !doc.deleted) // Đảm bảo tài liệu hợp lệ và được đánh dấu sao
+                .map((doc) => [doc._id, doc])
+        )
+    ).map(([_, doc]) => doc);
 
-    // Lọc tài liệu/thư mục được đánh dấu sao
-    const starredDocuments = uniqueDocuments.filter((doc) => doc.starred);
+    // Sắp xếp tài liệu với kiểm tra an toàn
+    const sortedDocuments = [...uniqueDocuments].sort((a, b) => {
+        if (!a || !b || !a.name || !b.name) return 0;
 
-    // Sắp xếp tài liệu
-    const sortedDocuments = [...starredDocuments].sort((a, b) => {
         if (sortBy === "name") {
             return sortDirection === "asc"
                 ? a.name.localeCompare(b.name)
                 : b.name.localeCompare(a.name);
         } else if (sortBy === "date") {
-            return sortDirection === "asc"
-                ? new Date(a.uploadDate) - new Date(b.uploadDate)
-                : new Date(b.uploadDate) - new Date(a.uploadDate);
+            const aDate = a.uploadDate ? new Date(a.uploadDate) : new Date(0);
+            const bDate = b.uploadDate ? new Date(b.uploadDate) : new Date(0);
+            return sortDirection === "asc" ? aDate - bDate : bDate - aDate;
         } else if (sortBy === "size") {
-            return sortDirection === "asc" ? a.size - b.size : b.size - a.size;
+            const aSize = a.size || 0;
+            const bSize = b.size || 0;
+            return sortDirection === "asc" ? aSize - bSize : bSize - aSize;
         }
         return 0;
     });
@@ -129,9 +127,7 @@ const Starred = () => {
                                                 </span>
                                                 {sortBy === "name" && (
                                                     <span className="ml-1">
-                                                        {sortDirection === "asc"
-                                                            ? "↑"
-                                                            : "↓"}
+                                                        {sortDirection === "asc" ? "↑" : "↓"}
                                                     </span>
                                                 )}
                                             </div>
@@ -146,9 +142,7 @@ const Starred = () => {
                                                 </span>
                                                 {sortBy === "date" && (
                                                     <span className="ml-1">
-                                                        {sortDirection === "asc"
-                                                            ? "↑"
-                                                            : "↓"}
+                                                        {sortDirection === "asc" ? "↑" : "↓"}
                                                     </span>
                                                 )}
                                             </div>
@@ -163,16 +157,12 @@ const Starred = () => {
                                                 </span>
                                                 {sortBy === "size" && (
                                                     <span className="ml-1">
-                                                        {sortDirection === "asc"
-                                                            ? "↑"
-                                                            : "↓"}
+                                                        {sortDirection === "asc" ? "↑" : "↓"}
                                                     </span>
                                                 )}
                                             </div>
                                         </th>
-                                        <th className="py-3 px-4 text-center">
-                                            Thao tác
-                                        </th>
+                                        <th className="py-3 px-4 text-center">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -183,21 +173,13 @@ const Starred = () => {
                                             view="list"
                                             onPreview={() =>
                                                 doc.type === "folder"
-                                                    ? navigate(
-                                                          `/documents?parentId=${doc._id}`
-                                                      )
-                                                    : navigate(
-                                                          `/documents/${doc._id}`
-                                                      )
+                                                    ? navigate(`/documents?parentId=${doc._id}`)
+                                                    : navigate(`/documents/${doc._id}`)
                                             }
                                             onDoubleClick={() =>
                                                 doc.type === "folder"
-                                                    ? navigate(
-                                                          `/documents?parentId=${doc._id}`
-                                                      )
-                                                    : navigate(
-                                                          `/documents/${doc._id}`
-                                                      )
+                                                    ? navigate(`/documents?parentId=${doc._id}`)
+                                                    : navigate(`/documents/${doc._id}`)
                                             }
                                         />
                                     ))}
@@ -218,9 +200,7 @@ const Starred = () => {
                                                 document={folder}
                                                 view="grid"
                                                 onDoubleClick={() =>
-                                                    navigate(
-                                                        `/documents?parentId=${folder._id}`
-                                                    )
+                                                    navigate(`/documents?parentId=${folder._id}`)
                                                 }
                                             />
                                         ))}
@@ -238,15 +218,9 @@ const Starred = () => {
                                                 key={file._id}
                                                 document={file}
                                                 view="grid"
-                                                onPreview={() =>
-                                                    navigate(
-                                                        `/documents/${file._id}`
-                                                    )
-                                                }
+                                                onPreview={() => navigate(`/documents/${file._id}`)}
                                                 onDoubleClick={() =>
-                                                    navigate(
-                                                        `/documents/${file._id}`
-                                                    )
+                                                    navigate(`/documents/${file._id}`)
                                                 }
                                             />
                                         ))}
@@ -258,8 +232,8 @@ const Starred = () => {
                 ) : (
                     <div className="bg-blue-50 dark:bg-blue-900/20 p-8 rounded-lg text-center mt-6">
                         <p className="text-gray-600 dark:text-gray-300">
-                            Chưa có tài liệu nào được đánh dấu sao. Hãy đánh dấu
-                            sao cho tài liệu hoặc thư mục yêu thích!
+                            Chưa có tài liệu nào được đánh dấu sao. Hãy đánh dấu sao cho tài liệu
+                            hoặc thư mục yêu thích!
                         </p>
                     </div>
                 )}

@@ -57,33 +57,21 @@ const Navbar = ({ isLoggedIn }) => {
                     {darkMode ? (
                         <FaSun className="text-yellow-500" size={18} />
                     ) : (
-                        <FaMoon
-                            className="text-gray-700 dark:text-gray-200"
-                            size={18}
-                        />
+                        <FaMoon className="text-gray-700 dark:text-gray-200" size={18} />
                     )}
                 </button>
 
                 <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
-                    <FaQuestionCircle
-                        className="text-gray-600 dark:text-gray-300"
-                        size={18}
-                    />
+                    <FaQuestionCircle className="text-gray-600 dark:text-gray-300" size={18} />
                 </button>
 
                 <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
-                    <FaCog
-                        className="text-gray-600 dark:text-gray-300"
-                        size={18}
-                    />
+                    <FaCog className="text-gray-600 dark:text-gray-300" size={18} />
                 </button>
 
                 <div className="relative">
                     <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative">
-                        <FaBell
-                            className="text-gray-600 dark:text-gray-300"
-                            size={18}
-                        />
+                        <FaBell className="text-gray-600 dark:text-gray-300" size={18} />
                         <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
                             3
                         </span>
@@ -98,7 +86,7 @@ const Navbar = ({ isLoggedIn }) => {
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                         >
                             <img
-                                src="https://via.placeholder.com/40"
+                                src="../../../public/images/Avatar.png"
                                 alt="Avatar"
                                 className="w-8 h-8 rounded-full border hover:ring-2 hover:ring-blue-500 cursor-pointer"
                             />

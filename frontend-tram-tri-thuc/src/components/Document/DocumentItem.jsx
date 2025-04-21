@@ -1,5 +1,4 @@
-// src/components/Document/DocumentItem.jsx
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
     FaDownload,
     FaEdit,
@@ -15,16 +14,142 @@ import {
     FaUndo,
 } from "react-icons/fa";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { useDispatch } from "react-redux";
-import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { renameDocument, fetchDocuments, starDocument } from "../../redux/slices/documentSlice";
 import {
     deleteDocument,
-    renameDocument,
-    fetchDocuments,
-    starDocument,
+    fetchTrash,
     permanentlyDeleteDocument,
     restoreDocument,
-} from "../../redux/slices/documentSlice";
+} from "../../redux/slices/trashSlice";
+import showToast from "../../utils/toast";
+
+// Sub-component cho modal đổi tên
+const RenameModal = ({ isOpen, newName, setNewName, onSave, onCancel }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-xl w-96">
+                <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+                    Đổi tên tài liệu
+                </h2>
+                <input
+                    type="text"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    className="w-full px-4 py-2 mb-4 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Nhập tên mới"
+                    autoFocus
+                />
+                <div className="flex justify-end space-x-2">
+                    <button
+                        onClick={onCancel}
+                        className="px-4 py-2 text-gray-600 hover:text-red-500"
+                    >
+                        Hủy
+                    </button>
+                    <button
+                        onClick={onSave}
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                        Lưu
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Sub-component cho các hành động
+const DocumentActions = ({
+    document,
+    isTrash,
+    onPreview,
+    onRename,
+    onStar,
+    onDelete,
+    onRestore,
+    onPermanentlyDelete,
+    view,
+}) => (
+    <div className={view === "list" ? "flex justify-center space-x-3" : "flex space-x-2"}>
+        {isTrash ? (
+            <>
+                <button
+                    onClick={onRestore}
+                    className="text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                    title="Khôi phục"
+                >
+                    <FaUndo size={16} />
+                </button>
+                <button
+                    onClick={onPermanentlyDelete}
+                    className="text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                    title="Xóa vĩnh viễn"
+                >
+                    <FaTrashAlt size={16} />
+                </button>
+            </>
+        ) : (
+            <>
+                {document.type === "file" && (
+                    <a
+                        href={document.directUrl}
+                        className="text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                        title="Tải xuống"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <FaDownload size={16} />
+                    </a>
+                )}
+                <button
+                    onClick={onDelete}
+                    className="text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                    title="Xóa"
+                >
+                    <FaTrash size={16} />
+                </button>
+                <button
+                    onClick={onRename}
+                    className="text-gray-600 dark:text-gray-300 hover:text-yellow-500 dark:hover:text-yellow-400 transition-colors"
+                    title="Đổi tên"
+                >
+                    <FaEdit size={16} />
+                </button>
+                <button
+                    onClick={onStar}
+                    className={`${
+                        document.starred
+                            ? "text-yellow-500 dark:text-yellow-400"
+                            : "text-gray-600 dark:text-gray-300 hover:text-yellow-500 dark:hover:text-yellow-400"
+                    } transition-colors`}
+                    title={document.starred ? "Bỏ đánh dấu sao" : "Đánh dấu sao"}
+                >
+                    <FaStar size={16} />
+                </button>
+                {view === "list" && (
+                    <>
+                        <button
+                            onClick={onPreview}
+                            className="text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                            title="Xem trước"
+                        >
+                            <FaEye size={16} />
+                        </button>
+                        <button
+                            className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
+                            title="Thêm"
+                        >
+                            <BsThreeDotsVertical size={16} />
+                        </button>
+                    </>
+                )}
+            </>
+        )}
+    </div>
+);
 
 const DocumentItem = ({
     document,
@@ -35,336 +160,248 @@ const DocumentItem = ({
     isTrash = false,
 }) => {
     const dispatch = useDispatch();
+    const { loading } = useSelector((state) => state.documents);
     const [isRenaming, setIsRenaming] = useState(false);
     const [newName, setNewName] = useState(document.name);
 
     // Lấy biểu tượng dựa trên loại tài liệu và kiểu MIME
-    const getIcon = (type, mimeType) => {
-        if (type === "folder")
-            return (
-                <FaFolder
-                    size={view === "list" ? 20 : 30}
-                    className="text-yellow-500"
-                />
-            );
-        switch (mimeType) {
-            case "application/pdf":
-                return (
-                    <FaFilePdf
-                        size={view === "list" ? 20 : 30}
-                        className="text-red-500"
-                    />
-                );
-            case "application/msword":
-            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-                return (
-                    <FaFileWord
-                        size={view === "list" ? 20 : 30}
-                        className="text-blue-500"
-                    />
-                );
-            case "application/vnd.ms-excel":
-            case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-                return (
-                    <FaFileExcel
-                        size={view === "list" ? 20 : 30}
-                        className="text-green-500"
-                    />
-                );
-            case "image/jpeg":
-            case "image/png":
-                return (
-                    <FaImage
-                        size={view === "list" ? 20 : 30}
-                        className="text-purple-500"
-                    />
-                );
-            default:
-                return (
-                    <FaFilePdf
-                        size={view === "list" ? 20 : 30}
-                        className="text-gray-500"
-                    />
-                );
-        }
-    };
+    const getIcon = useCallback(
+        (type, mimeType) => {
+            if (type === "folder")
+                return <FaFolder size={view === "list" ? 20 : 30} className="text-yellow-500" />;
+
+            switch (mimeType) {
+                case "application/pdf":
+                    return <FaFilePdf size={view === "list" ? 20 : 30} className="text-red-500" />;
+                case "application/msword":
+                case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                    return (
+                        <FaFileWord size={view === "list" ? 20 : 30} className="text-blue-500" />
+                    );
+                case "application/vnd.ms-excel":
+                case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+                    return (
+                        <FaFileExcel size={view === "list" ? 20 : 30} className="text-green-500" />
+                    );
+                case "image/jpeg":
+                case "image/png":
+                    return <FaImage size={view === "list" ? 20 : 30} className="text-purple-500" />;
+                default:
+                    return <FaFilePdf size={view === "list" ? 20 : 30} className="text-gray-500" />;
+            }
+        },
+        [view]
+    );
 
     // Thay đổi định dạng kích thước tệp
-    const formatFileSize = (bytes) =>
-        bytes
-            ? bytes < 1024
-                ? bytes + " B"
-                : bytes < 1024 * 1024
-                  ? (bytes / 1024).toFixed(1) + " KB"
-                  : (bytes / (1024 * 1024)).toFixed(2) + " MB"
-            : "-";
+    const formatFileSize = useCallback(
+        (bytes) =>
+            bytes
+                ? bytes < 1024
+                    ? bytes + " B"
+                    : bytes < 1024 * 1024
+                      ? (bytes / 1024).toFixed(1) + " KB"
+                      : (bytes / (1024 * 1024)).toFixed(2) + " MB"
+                : "-",
+        []
+    );
 
     // Thay đổi định dạng ngày tháng
-    const formatDate = (dateString) =>
-        new Date(dateString).toLocaleDateString("vi-VN", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-        });
+    const formatDate = useCallback(
+        (dateString) =>
+            new Date(dateString).toLocaleDateString("vi-VN", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+            }),
+        []
+    );
 
-    // xóa tạm
-    const handleDelete = async () => {
-        if (!window.confirm(`Bạn có chắc muốn xóa "${document.name}" không?`))
-            return;
+    // Xử lý xóa tạm
+    const handleDelete = useCallback(async () => {
+        if (!window.confirm(`Bạn có chắc muốn xóa "${document.name}" không?`)) return;
+
         try {
             await dispatch(deleteDocument(document._id)).unwrap();
-            toast.success("Đã chuyển vào thùng rác");
+            showToast("success", "Đã chuyển vào thùng rác");
+            dispatch(fetchDocuments({ parentId: document.parentId || null }));
         } catch (error) {
-            toast.error(error || "Xóa thất bại");
+            showToast("error", error || "Xóa thất bại");
         }
-    };
+    }, [dispatch, document._id, document.name, document.parentId]);
 
-    const handlePermanentlyDelete = async () => {
-        if (
-            !window.confirm(
-                `Bạn có chắc muốn xóa vĩnh viễn "${document.name}" không?`
-            )
-        )
-            return;
+    // Xử lý xóa vĩnh viễn
+    const handlePermanentlyDelete = useCallback(async () => {
+        if (!window.confirm(`Bạn có chắc muốn xóa vĩnh viễn "${document.name}" không?`)) return;
+
         try {
             await dispatch(permanentlyDeleteDocument(document._id)).unwrap();
-            toast.success("Xóa vĩnh viễn thành công");
+            showToast("success", "Xóa vĩnh viễn thành công");
+            dispatch(fetchTrash());
         } catch (error) {
-            toast.error(error || "Xóa vĩnh viễn thất bại");
+            showToast("error", error || "Xóa vĩnh viễn thất bại");
         }
-    };
+    }, [dispatch, document._id, document.name]);
 
-    const handleRestore = async () => {
-        if (
-            !window.confirm(
-                `Bạn có chắc muốn khôi phục "${document.name}" không?`
-            )
-        )
-            return;
+    // Xử lý khôi phục
+    const handleRestore = useCallback(async () => {
+        if (!window.confirm(`Bạn có chắc muốn khôi phục "${document.name}" không?`)) return;
+
         try {
             await dispatch(restoreDocument(document._id)).unwrap();
-            toast.success("Khôi phục thành công");
+            showToast("success", "Khôi phục thành công");
+            dispatch(fetchTrash());
         } catch (error) {
-            toast.error(error || "Khôi phục thất bại");
+            showToast("error", error || "Khôi phục thất bại");
         }
-    };
+    }, [dispatch, document._id, document.name]);
 
     // Xử lý đổi tên tài liệu
-    const handleRename = async () => {
+    const handleRename = useCallback(async () => {
         const trimmedName = newName.trim();
+        if (!trimmedName) {
+            showToast("error", "Tên không được để trống");
+            setIsRenaming(false);
+            return;
+        }
 
-        if (!trimmedName || trimmedName === document.name) {
+        if (trimmedName.length > 255) {
+            showToast("error", "Tên không được vượt quá 255 ký tự");
+            setIsRenaming(false);
+            return;
+        }
+
+        if (trimmedName === document.name) {
             setIsRenaming(false);
             return;
         }
 
         try {
-            await dispatch(
-                renameDocument({ id: document._id, name: trimmedName })
-            ).unwrap();
-
-            toast.success("Đổi tên tài liệu thành công");
+            await dispatch(renameDocument({ id: document._id, name: trimmedName })).unwrap();
+            showToast("success", "Đổi tên tài liệu thành công");
             dispatch(fetchDocuments({ parentId: document.parentId || null }));
             setIsRenaming(false);
         } catch (error) {
-            toast.error(error.message || "Đổi tên thất bại");
+            showToast("error", error || "Đổi tên thất bại");
             setIsRenaming(false);
         }
-    };
+    }, [dispatch, document._id, document.name, document.parentId, newName]);
 
     // Xử lý kéo và thả
-    const handleDragStart = (e) =>
-        e.dataTransfer.setData("documentId", document._id);
-    const handleDrop = (e) => {
-        e.preventDefault();
-        if (document.type === "folder" && onDrop) onDrop(e, document._id);
-    };
+    const handleDragStart = useCallback(
+        (e) => {
+            e.dataTransfer.setData("documentId", document._id);
+        },
+        [document._id]
+    );
+
+    const handleDrop = useCallback(
+        (e) => {
+            e.preventDefault();
+            if (document.type === "folder" && onDrop) onDrop(e, document._id);
+        },
+        [document.type, onDrop]
+    );
 
     // Xử lý đánh dấu/bỏ đánh dấu sao
-    const handleStar = async () => {
+    const handleStar = useCallback(async () => {
         try {
             await dispatch(starDocument(document._id)).unwrap();
-            toast.success(
-                document.starred
-                    ? "Bỏ đánh dấu sao thành công"
-                    : "Đánh dấu sao thành công"
+            showToast(
+                "success",
+                document.starred ? "Bỏ đánh dấu sao thành công" : "Đánh dấu sao thành công"
             );
         } catch (error) {
-            toast.error(error || "Thao tác thất bại");
+            showToast("error", error || "Thao tác thất bại");
         }
-    };
+    }, [dispatch, document._id, document.starred]);
 
-    // Giao diện chung
-    const renderActions = () => (
-        <div
-            className={
-                view === "list"
-                    ? "flex justify-center space-x-3"
-                    : "flex space-x-2"
-            }
-        >
-            {isTrash ? (
-                <>
-                    <button
-                        onClick={handleRestore}
-                        className="text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
-                        title="Khôi phục"
-                    >
-                        <FaUndo size={16} />
-                    </button>
-                    <button
-                        onClick={handlePermanentlyDelete}
-                        className="text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-                        title="Xóa vĩnh viễn"
-                    >
-                        <FaTrashAlt size={16} />
-                    </button>
-                </>
-            ) : (
-                <>
-                    {document.type === "file" && (
-                        <a
-                            href={document.directUrl}
-                            className="text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
-                            title="Tải xuống"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <FaDownload size={16} />
-                        </a>
-                    )}
-                    <button
-                        onClick={handleDelete}
-                        className="text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-                        title="Xóa"
-                    >
-                        <FaTrashAlt size={16} />
-                    </button>
-                    <button
-                        onClick={() => setIsRenaming(true)}
-                        className="text-gray-600 dark:text-gray-300 hover:text-yellow-500 dark:hover:text-yellow-400 transition-colors"
-                        title="Đổi tên"
-                    >
-                        <FaEdit size={16} />
-                    </button>
-                    <button
-                        onClick={handleStar}
-                        className={`${
-                            document.starred
-                                ? "text-yellow-500 dark:text-yellow-400"
-                                : "text-gray-600 dark:text-gray-300 hover:text-yellow-500 dark:hover:text-yellow-400"
-                        } transition-colors`}
-                        title={
-                            document.starred
-                                ? "Bỏ đánh dấu sao"
-                                : "Đánh dấu sao"
-                        }
-                    >
-                        <FaStar size={16} />
-                    </button>
-                    {view === "list" && (
-                        <>
-                            <button
-                                onClick={onPreview}
-                                className="text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
-                                title="Xem trước"
-                            >
-                                <FaEye size={16} />
-                            </button>
-                            <button
-                                className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 transition-colors"
-                                title="Thêm"
-                            >
-                                <BsThreeDotsVertical size={16} />
-                            </button>
-                        </>
-                    )}
-                </>
-            )}
-        </div>
-    );
-
-    const renderRenameModal = () => (
-        <div className="absolute inset-0 bg-white dark:bg-gray-800 p-4 flex flex-col justify-center z-10 rounded-lg shadow-lg">
-            <input
-                type="text"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                autoFocus
-            />
-            <div className="mt-2 flex justify-end space-x-2">
-                <button
-                    onClick={() => setIsRenaming(false)}
-                    className="px-3 py-1 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded"
+    return (
+        <>
+            {view === "list" ? (
+                <tr
+                    className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 relative"
+                    draggable={!isTrash}
+                    onDragStart={handleDragStart}
+                    onDrop={handleDrop}
+                    onDragOver={(e) => !isTrash && e.preventDefault()}
+                    onDoubleClick={isTrash ? () => {} : onDoubleClick}
                 >
-                    Hủy
-                </button>
-                <button
-                    onClick={handleRename}
-                    className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded"
-                >
-                    Lưu
-                </button>
-            </div>
-        </div>
-    );
-
-    return view === "list" ? (
-        <tr
-            className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 relative"
-            draggable={!isTrash}
-            onDragStart={handleDragStart}
-            onDrop={handleDrop}
-            onDragOver={(e) => !isTrash && e.preventDefault()}
-            onDoubleClick={isTrash ? () => {} : onDoubleClick}
-        >
-            <td className="py-3 px-4 flex items-center">
-                {getIcon(document.type, document.mimeType)}
-                <span className="ml-3 text-gray-800 dark:text-gray-200 truncate">
-                    {document.name}
-                </span>
-            </td>
-            <td className="py-3 px-4 text-gray-600 dark:text-gray-400">
-                {formatDate(document.deletedAt || document.uploadDate)}
-            </td>
-            <td className="py-3 px-4 text-gray-600 dark:text-gray-400">
-                {formatFileSize(document.size)}
-            </td>
-            <td className="py-3 px-4">{renderActions()}</td>
-            {isRenaming && renderRenameModal()}
-        </tr>
-    ) : (
-        <div
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden group"
-            draggable={!isTrash}
-            onDragStart={handleDragStart}
-            onDrop={handleDrop}
-            onDragOver={(e) => !isTrash && e.preventDefault()}
-            onDoubleClick={isTrash ? () => {} : onDoubleClick}
-        >
-            <div className="p-4 bg-gray-50 dark:bg-gray-700 flex items-center">
-                {getIcon(document.type, document.mimeType)}
-                <div className="ml-3 flex-1">
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white truncate">
-                        {document.name}
-                    </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {formatFileSize(document.size)} •{" "}
+                    <td className="py-3 px-4 flex items-center">
+                        {getIcon(document.type, document.mimeType)}
+                        <span className="ml-3 text-gray-800 dark:text-gray-200 truncate">
+                            {document.name}
+                        </span>
+                    </td>
+                    <td className="py-3 px-4 text-gray-600 dark:text-gray-400">
                         {formatDate(document.deletedAt || document.uploadDate)}
-                    </p>
+                    </td>
+                    <td className="py-3 px-4 text-gray-600 dark:text-gray-400">
+                        {formatFileSize(document.size)}
+                    </td>
+                    <td className="py-3 px-4">
+                        <DocumentActions
+                            document={document}
+                            isTrash={isTrash}
+                            onPreview={onPreview}
+                            onRename={() => setIsRenaming(true)}
+                            onStar={handleStar}
+                            onDelete={handleDelete}
+                            onRestore={handleRestore}
+                            onPermanentlyDelete={handlePermanentlyDelete}
+                            view={view}
+                        />
+                    </td>
+                </tr>
+            ) : (
+                <div
+                    className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden group"
+                    draggable={!isTrash}
+                    onDragStart={handleDragStart}
+                    onDrop={handleDrop}
+                    onDragOver={(e) => !isTrash && e.preventDefault()}
+                    onDoubleClick={isTrash ? () => {} : onDoubleClick}
+                >
+                    <div className="p-4 bg-gray-50 dark:bg-gray-700 flex items-center">
+                        {getIcon(document.type, document.mimeType)}
+                        <div className="ml-3 flex-1">
+                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white truncate">
+                                {document.name}
+                            </h3>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {formatFileSize(document.size)} •{" "}
+                                {formatDate(document.deletedAt || document.uploadDate)}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="aspect-square bg-gray-100 dark:bg-gray-600 flex items-center justify-center p-2">
+                        <div className="text-xs text-gray-500 dark:text-gray-300">
+                            Xem trước nội dung
+                        </div>
+                    </div>
+                    <div className="p-3 border-t dark:border-gray-700 bg-white dark:bg-gray-800 flex justify-between space-x-2">
+                        <DocumentActions
+                            document={document}
+                            isTrash={isTrash}
+                            onPreview={onPreview}
+                            onRename={() => setIsRenaming(true)}
+                            onStar={handleStar}
+                            onDelete={handleDelete}
+                            onRestore={handleRestore}
+                            onPermanentlyDelete={handlePermanentlyDelete}
+                            view={view}
+                        />
+                    </div>
                 </div>
-            </div>
-            <div className="aspect-square bg-gray-100 dark:bg-gray-600 flex items-center justify-center p-2">
-                <div className="text-xs text-gray-500 dark:text-gray-300">
-                    Xem trước nội dung
-                </div>
-            </div>
-            <div className="p-3 border-t dark:border-gray-700 bg-white dark:bg-gray-800 flex justify-between space-x-2">
-                {renderActions()}
-            </div>
-            {isRenaming && renderRenameModal()}
-        </div>
+            )}
+            <RenameModal
+                isOpen={isRenaming}
+                newName={newName}
+                setNewName={setNewName}
+                onSave={handleRename}
+                onCancel={() => setIsRenaming(false)}
+            />
+        </>
     );
 };
 
