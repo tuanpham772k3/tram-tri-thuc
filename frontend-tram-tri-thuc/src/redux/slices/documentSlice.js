@@ -6,15 +6,7 @@ import showToast from "../../utils/toast";
 export const fetchDocuments = createAsyncThunk(
     "documents/fetchDocuments",
     async (
-        {
-            parentId = "root",
-            type,
-            mimeType,
-            uploadDate,
-            userId,
-            starred,
-            includeChildren = false,
-        },
+        { parentId = "root", type, mimeType, uploadDate, userId, starred, includeChildren = false },
         { getState, rejectWithValue }
     ) => {
         // Validation
@@ -204,8 +196,6 @@ export const moveDocument = createAsyncThunk(
     }
 );
 
-
-
 const documentSlice = createSlice({
     name: "documents",
     initialState: {
@@ -289,8 +279,6 @@ const documentSlice = createSlice({
                 if (index !== -1) state.documents[index] = action.payload;
             })
             .addCase(moveDocument.rejected, handleRejected);
-
-        
     },
 });
 

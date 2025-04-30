@@ -1,6 +1,8 @@
 import { useState } from "react";
-import Navbar from "../../components/Header/Navbar";
-import Sidebar from "../../components/Sidebar/Sidebar";
+import Navbar from "../../components/Layout/Header/Navbar";
+import Sidebar from "../../components/Layout/Sidebar/Sidebar";
+import { Outlet } from "react-router-dom";
+import ModalShare from "../../components/Ui/ShareModal/ModalShare";
 
 const Home = ({ children }) => {
     const [darkMode, setDarkMode] = useState(false);
@@ -34,6 +36,11 @@ const Home = ({ children }) => {
                     </div>
 
                     {/* Mobile sidebar overlay - would need to be implemented with state to show/hide */}
+
+                    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+                        <Outlet />
+                        <ModalShare />
+                    </div>
 
                     {/* Main content */}
                     <div className="w-full md:ml-64 flex-1 overflow-auto">

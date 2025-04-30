@@ -1,131 +1,134 @@
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-// const nodemailer = require("nodemailer");
-const User = require("../models/User.model");
+const Joi = require("joi");
+const validateRequest = require("../middlewares/validateRequest");
+const AuthService = require("../services/auth.service");
 
-// // Cấu hình Nodemailer
-// const transporter = nodemailer.createTransport({
-//     service: "gmail",
-//     auth: {
-//         user: process.env.EMAIL_USER,
-//         pass: process.env.EMAIL_PASS,
-//     },
-// });
+// Validation schemas
+const registerSchema = Joi.object({
+    name: Joi.string().min(3).max(50).required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).max(100).required(),
+});
 
-// 2.1 API Đăng ký (Register)
-const register = async (req, res) => {
-    const { name, email, password } = req.body;
+const loginSchema = Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).max(100).required(),
+});
 
-    try {
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ message: "Email đã được sử dụng" });
+const forgotPasswordSchema = Joi.object({
+    email: Joi.string().email().required(),
+});
+
+const resetPasswordSchema = Joi.object({
+    token: Joi.string().required(),
+    newPassword: Joi.string().min(6).max(100).required(),
+});
+
+// Register
+const register = [
+    validateRequest(registerSchema),
+    async (req, res) => {
+        try {
+            const { name, email, password } = req.body;
+            const token = await AuthService.register({ name, email, password });
+            res.status(201).json({
+                success: true,
+                message: "Registration successful",
+                data: { token },
+            });
+        } catch (error) {
+            console.error("Server error during registration:", error.message);
+            res.status(error.message.includes("Email already in use") ? 400 : 500).json({
+                success: false,
+                message: error.message || "Server error during registration",
+            });
         }
+    },
+];
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        const user = new User({ name, email, password: hashedPassword });
-        await user.save();
-
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-            expiresIn: "1h",
-        });
-
-        res.status(201).json({ message: "Đăng ký thành công", token });
-    } catch (error) {
-        res.status(500).json({ message: "Lỗi server", error });
-    }
-};
-
-// 2.2 API Đăng nhập (Login)
-const login = async (req, res) => {
-    const { email, password } = req.body;
-
-    try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(404).json({ message: "Email không tồn tại" });
+// Login
+const login = [
+    validateRequest(loginSchema),
+    async (req, res) => {
+        try {
+            const { email, password } = req.body;
+            const token = await AuthService.login({ email, password });
+            res.json({
+                success: true,
+                message: "Login successful",
+                data: { token },
+            });
+        } catch (error) {
+            console.error("Server error during login:", error.message);
+            const status = error.message.includes("Email not found")
+                ? 404
+                : error.message.includes("Incorrect password")
+                  ? 401
+                  : 500;
+            res.status(status).json({
+                success: false,
+                message: error.message || "Server error during login",
+            });
         }
+    },
+];
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ message: "Mật khẩu không đúng" });
+// Forgot Password
+const forgotPassword = [
+    validateRequest(forgotPasswordSchema),
+    async (req, res) => {
+        try {
+            const { email } = req.body;
+            const resetToken = await AuthService.forgotPassword(email);
+            res.json({
+                success: true,
+                message: "Reset email sent (Nodemailer not configured)",
+                data: { resetToken }, // Temporary for testing
+            });
+        } catch (error) {
+            console.error("Server error during password reset request:", error.message);
+            res.status(error.message.includes("Email not found") ? 404 : 500).json({
+                success: false,
+                message: error.message || "Server error during password reset request",
+            });
         }
+    },
+];
 
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-            expiresIn: "1h",
-        });
-
-        res.json({ message: "Đăng nhập thành công", token });
-    } catch (error) {
-        res.status(500).json({ message: "Lỗi server", error });
-    }
-};
-
-// 2.4 API Quên mật khẩu (Forgot Password)
-const forgotPassword = async (req, res) => {
-    const { email } = req.body;
-
-    try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(404).json({ message: "Email không tồn tại" });
+// Reset Password
+const resetPassword = [
+    validateRequest(resetPasswordSchema),
+    async (req, res) => {
+        try {
+            const { token, newPassword } = req.body;
+            await AuthService.resetPassword({ token, newPassword });
+            res.json({
+                success: true,
+                message: "Password reset successful",
+            });
+        } catch (error) {
+            console.error("Invalid or expired token:", error.message);
+            res.status(400).json({
+                success: false,
+                message: error.message || "Invalid or expired token",
+            });
         }
+    },
+];
 
-        const resetToken = jwt.sign(
-            { userId: user._id },
-            process.env.JWT_SECRET,
-            { expiresIn: "10m" }
-        );
-
-        const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: "Đặt lại mật khẩu",
-            html: `<p>Nhấn vào <a href="${resetLink}">đây</a> để đặt lại mật khẩu. Link có hiệu lực trong 10 phút.</p>`,
-        };
-
-        await transporter.sendMail(mailOptions);
-        res.json({ message: "Email đã được gửi" });
-    } catch (error) {
-        res.status(500).json({ message: "Lỗi server", error });
-    }
-};
-
-// API Reset Password
-const resetPassword = async (req, res) => {
-    const { token, newPassword } = req.body;
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.userId);
-        if (!user) {
-            return res
-                .status(404)
-                .json({ message: "Người dùng không tồn tại" });
-        }
-
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-        user.password = hashedPassword;
-        await user.save();
-
-        res.json({ message: "Đặt lại mật khẩu thành công" });
-    } catch (error) {
-        res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
-    }
-};
-
-// 2.5 Route bảo vệ (Ví dụ)
+// Get Profile
 const getProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user).select("-password");
-        res.json(user);
+        const user = await AuthService.getProfile(req.user);
+        res.json({
+            success: true,
+            data: user,
+        });
     } catch (error) {
-        res.status(500).json({ message: "Lỗi server", error });
+        console.error("Server error while retrieving profile:", error.message);
+        res.status(404).json({
+            success: false,
+            message: error.message || "Server error while retrieving profile",
+        });
     }
 };
 

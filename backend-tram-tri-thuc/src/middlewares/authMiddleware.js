@@ -2,11 +2,14 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 
 const authMiddleware = (req, res, next) => {
+    // if (req.path.startsWith('/share/')) {
+    //     req.user = null; // Không yêu cầu token
+    //     return next();
+    // }
+
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (!token) {
-        return res
-            .status(401)
-            .json({ message: "Không có token, không được phép" });
+        return res.status(401).json({ message: "Không có token, không được phép" });
     }
 
     try {

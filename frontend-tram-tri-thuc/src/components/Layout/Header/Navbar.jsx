@@ -1,9 +1,10 @@
-// src/components/Navbar.jsx
-import { useState } from "react";
-import { FaBell, FaCog, FaMoon, FaQuestionCircle, FaSearch, FaSun } from "react-icons/fa";
+import React, { useState } from "react";
+import PropTypes from "prop-types";
+import { FaBell, FaCog, FaMoon, FaQuestionCircle, FaSun } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { logout } from "../../redux/slices/authSlice";
+import { logout } from "../../../redux/slices/authSlice";
+import SearchBar from "../../Ui/SearchBar";
 
 const Navbar = ({ isLoggedIn }) => {
     const [darkMode, setDarkMode] = useState(false);
@@ -20,13 +21,19 @@ const Navbar = ({ isLoggedIn }) => {
     const handleLogout = () => {
         dispatch(logout(token));
         navigate("/login");
+        setIsDropdownOpen(false);
+    };
+
+    const handleSearch = (query) => {
+        // TODO: Implement search functionality (e.g., dispatch action to filter documents)
+        console.log("Search query:", query);
     };
 
     return (
         <nav className="flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 h-16">
             {/* Logo */}
             <div className="flex items-center space-x-2">
-                <img src="/drive-icon.png" alt="logo" className="w-10 h-10" />
+                <img src="/drive-icon.png" alt="logo" className="w-10 h-10 rounded-full" />
                 <h1 className="text-xl font-medium text-gray-800 dark:text-white hidden sm:block">
                     Trạm Tri Thức
                 </h1>
@@ -35,16 +42,7 @@ const Navbar = ({ isLoggedIn }) => {
             {/* Search Bar */}
             {isLoggedIn && (
                 <div className="flex-1 max-w-2xl mx-4">
-                    <div className="relative">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <FaSearch className="text-gray-400" />
-                        </div>
-                        <input
-                            type="text"
-                            placeholder="Tìm kiếm tài liệu..."
-                            className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 border-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-gray-700 transition"
-                        />
-                    </div>
+                    <SearchBar placeholder="Tìm kiếm tài liệu..." onSearch={handleSearch} />
                 </div>
             )}
 
@@ -52,7 +50,8 @@ const Navbar = ({ isLoggedIn }) => {
             <div className="flex items-center space-x-1 sm:space-x-3">
                 <button
                     onClick={toggleDarkMode}
-                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                    title={darkMode ? "Chuyển sang Light Mode" : "Chuyển sang Dark Mode"}
                 >
                     {darkMode ? (
                         <FaSun className="text-yellow-500" size={18} />
@@ -61,16 +60,25 @@ const Navbar = ({ isLoggedIn }) => {
                     )}
                 </button>
 
-                <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
+                <button
+                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                    title="Hỗ trợ"
+                >
                     <FaQuestionCircle className="text-gray-600 dark:text-gray-300" size={18} />
                 </button>
 
-                <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
+                <button
+                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                    title="Cài đặt"
+                >
                     <FaCog className="text-gray-600 dark:text-gray-300" size={18} />
                 </button>
 
                 <div className="relative">
-                    <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative">
+                    <button
+                        className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition relative"
+                        title="Thông báo"
+                    >
                         <FaBell className="text-gray-600 dark:text-gray-300" size={18} />
                         <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
                             3
@@ -84,16 +92,17 @@ const Navbar = ({ isLoggedIn }) => {
                         <button
                             className="flex items-center"
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            title="Tài khoản"
                         >
                             <img
-                                src="../../../public/images/Avatar.png"
+                                src="/images/Avatar.png"
                                 alt="Avatar"
-                                className="w-8 h-8 rounded-full border hover:ring-2 hover:ring-blue-500 cursor-pointer"
+                                className="w-8 h-8 rounded-full border hover:ring-2 hover:ring-blue-500 transition"
                             />
                         </button>
 
                         {isDropdownOpen && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden z-50 border dark:border-gray-700">
+                            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden z-50 border dark:border-gray-700 transform transition-all">
                                 <div className="px-4 py-3 border-b dark:border-gray-700">
                                     <p className="text-sm font-medium text-gray-900 dark:text-white">
                                         Người dùng
@@ -104,24 +113,21 @@ const Navbar = ({ isLoggedIn }) => {
                                 </div>
                                 <Link
                                     to="/profile"
-                                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-700 dark:text-white"
+                                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-700 dark:text-white transition"
                                     onClick={() => setIsDropdownOpen(false)}
                                 >
                                     Hồ sơ
                                 </Link>
                                 <Link
                                     to="/settings"
-                                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-700 dark:text-white"
+                                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-700 dark:text-white transition"
                                     onClick={() => setIsDropdownOpen(false)}
                                 >
                                     Cài đặt
                                 </Link>
                                 <button
-                                    onClick={() => {
-                                        handleLogout();
-                                        setIsDropdownOpen(false);
-                                    }}
-                                    className="w-full text-left px-4 py-2 border-t dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 text-sm text-gray-700 dark:text-white"
+                                    onClick={handleLogout}
+                                    className="w-full text-left px-4 py-2 border-t dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 text-sm text-gray-700 dark:text-white transition"
                                 >
                                     Đăng xuất
                                 </button>
@@ -139,6 +145,10 @@ const Navbar = ({ isLoggedIn }) => {
             </div>
         </nav>
     );
+};
+
+Navbar.propTypes = {
+    isLoggedIn: PropTypes.bool.isRequired,
 };
 
 export default Navbar;

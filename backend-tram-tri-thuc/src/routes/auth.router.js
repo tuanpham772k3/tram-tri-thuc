@@ -21,7 +21,7 @@ router.post("/forgot-password", forgotPassword);
 // API Reset Password
 router.post("/reset-password", resetPassword);
 
-// 2.5 Route bảo vệ (Ví dụ)
-router.get("/home", authMiddleware, getProfile);
+// lây thông tin người dùng
+router.get("/profile", authMiddleware, getProfile);
 
 module.exports = router;

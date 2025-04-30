@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import Navbar from "../components/Header/Navbar";
+import Navbar from "../components/Layout/Header/Navbar";
 
 const Landing = () => {
     return (

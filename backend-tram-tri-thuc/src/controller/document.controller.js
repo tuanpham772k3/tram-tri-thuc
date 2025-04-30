@@ -1,176 +1,196 @@
-const Document = require("../models/Document.model");
-const drive = require("../config/googleDrive");
+const Joi = require("joi");
+const validateRequest = require("../middlewares/validateRequest");
+const DocumentService = require("../services/document.service");
 const fs = require("fs");
 
-const uploadDocument = async (req, res) => {
-    try {
-        const file = req.file;
-        const userId = req.user;
+// Validation schemas
+const folderSchema = Joi.object({
+    name: Joi.string().min(1).max(255).required(),
+    parentId: Joi.string().allow(null, "").optional(),
+});
 
-        if (!file) {
-            console.log("No file received");
-            return res.status(400).json({
+const uploadSchema = Joi.object({
+    parentId: Joi.string().allow(null, "").optional(),
+});
+
+const renameSchema = Joi.object({
+    name: Joi.string().min(1).max(255).required(),
+    id: Joi.string().required(),
+});
+
+const moveSchema = Joi.object({
+    newParentId: Joi.string().allow(null, "").optional(),
+    id: Joi.string().required(),
+});
+
+const starSchema = Joi.object({
+    id: Joi.string().required(),
+});
+
+// Create folder
+const createFolder = [
+    validateRequest(folderSchema),
+    async (req, res) => {
+        try {
+            const { name, parentId } = req.body;
+            const userId = req.user;
+            const folder = await DocumentService.createFolder({ name, parentId, userId });
+            res.json({
+                success: true,
+                message: "Folder created successfully",
+                data: { folder },
+            });
+        } catch (error) {
+            console.error("Create Folder Error:", error.message);
+            res.status(500).json({
                 success: false,
-                message: "Không có file được tải lên",
+                message: error.message || "Server error while creating folder",
             });
         }
-        console.log("File received:", file);
+    },
+];
 
-        // Upload lên Google Drive
-        console.log("Uploading to Google Drive...");
-        const driveResponse = await drive.files.create({
-            requestBody: {
-                name: file.originalname,
-                parents: ["1-fgLMBdBpSISgbSTAuLzt-5VM_-K6BB7"],
-            },
-            media: {
-                mimeType: file.mimetype,
-                body: fs.createReadStream(file.path),
-            },
-            fields: "id, webContentLink",
-        });
-        console.log("Google Drive response:", driveResponse.data);
+// Upload document
+const uploadDocument = [
+    validateRequest(uploadSchema),
+    async (req, res) => {
+        try {
+            const file = req.file;
+            const { parentId } = req.body;
+            const userId = req.user;
 
-        // Cấu hình quyền truy cập công khai để dễ dàng embed
-        await drive.permissions.create({
-            fileId: driveResponse.data.id,
-            requestBody: {
-                role: "reader",
-                type: "anyone", // Cho phép bất kỳ ai có link đều có thể xem
-            },
-        });
+            if (!userId) {
+                return res.status(401).json({
+                    success: false,
+                    message: "Authentication required",
+                });
+            }
 
-        // Chia sẻ file với tài khoản cá nhân của bạn
-        await drive.permissions.create({
-            fileId: driveResponse.data.id,
-            requestBody: {
-                role: "writer", // Hoặc 'reader' nếu chỉ cần xem
-                type: "user",
-                emailAddress: "tuanphamu23@gmail.com", // Thay bằng email của bạn
-            },
-        });
-        console.log("Uploaded file ID:", driveResponse.data.id);
+            const fileData = await DocumentService.uploadDocument({ file, parentId, userId });
+            res.json({
+                success: true,
+                message: "File uploaded successfully",
+                data: { file: fileData },
+            });
+        } catch (error) {
+            console.error("Upload Error:", error);
+            res.status(500).json({
+                success: false,
+                message: error.message || "Server error while uploading",
+            });
+        } finally {
+            if (req.file) {
+                try {
+                    await fs.promises.unlink(req.file.path);
+                    console.log("Temporary file deleted:", req.file.path);
+                } catch (unlinkError) {
+                    console.error("Error deleting temp file:", unlinkError.message);
+                }
+            }
+        }
+    },
+];
 
-        const fileUrl = `https://drive.google.com/file/d/${driveResponse.data.id}/view`;
-        const directUrl = driveResponse.data.webContentLink; // Link tải trực tiếp
-
-        // Lưu vào MongoDB
-        console.log("Saving to MongoDB...");
-        const document = new Document({
-            name: file.originalname,
-            url: fileUrl,
-            directUrl,
-            userId,
-            type: file.mimetype,
-            size: file.size,
-            driveId: driveResponse.data.id, // Lưu thêm ID để dễ xử lý
-        });
-        await document.save();
-        console.log("Saved to MongoDB");
-
-        // Xóa file tạm
-        console.log("Deleting temp file:", file.path);
-        await require("fs").promises.unlink(file.path);
-        console.log("Temp file deleted");
-
-        res.json({
-            success: true,
-            file: {
-                name: file.originalname,
-                url: fileUrl,
-                directUrl,
-                id: driveResponse.data.id,
-            },
-        });
-    } catch (error) {
-        console.error("Upload Error:", error.message, error.stack);
-        res.status(500).json({
-            success: false,
-            message: "Lỗi server khi upload",
-        });
-    }
-};
-
+// Get documents
 const getDocuments = async (req, res) => {
     try {
+        const { parentId, starred, includeChildren } = req.query;
         const userId = req.user;
-        const documents = await Document.find({ userId });
-        res.json({ success: true, documents });
+        const documents = await DocumentService.getDocuments({
+            parentId,
+            starred,
+            includeChildren,
+            userId,
+        });
+        res.json({
+            success: true,
+            message: "Documents retrieved successfully",
+            data: { documents },
+        });
     } catch (error) {
-        console.error(error);
+        console.error("Get Documents Error:", error.message);
         res.status(500).json({
             success: false,
-            message: "Lỗi server khi lấy danh sách",
+            message: "Server error while retrieving documents",
+            data: { documents: [] },
         });
     }
 };
 
-const deleteDocument = async (req, res) => {
-    try {
-        const { id } = req.params; // _id từ MongoDB
-        const userId = req.user;
-
-        // Tìm document trong MongoDB
-        const document = await Document.findOne({ _id: id, userId });
-        if (!document) {
-            return res
-                .status(404)
-                .json({ success: false, message: "Document not found" });
+// Rename document
+const renameDocument = [
+    validateRequest(renameSchema),
+    async (req, res) => {
+        try {
+            const { id, name } = req.body;
+            const userId = req.user;
+            const document = await DocumentService.renameDocument({ id, name, userId });
+            res.json({
+                success: true,
+                message: "Document renamed successfully",
+                data: { document },
+            });
+        } catch (error) {
+            console.error("Rename Document Error:", error.message);
+            res.status(500).json({
+                success: false,
+                message: error.message || "Server error while renaming",
+            });
         }
+    },
+];
 
-        // Xóa file trên Google Drive
-        await drive.files.delete({ fileId: document.driveId });
-
-        // Xóa document trong MongoDB
-        await Document.deleteOne({ _id: id });
-
-        res.json({ success: true, message: "Document deleted successfully" });
-    } catch (error) {
-        console.error("Delete Error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Error deleting document",
-        });
-    }
-};
-
-const renameDocument = async (req, res) => {
-    try {
-        const { id } = req.params; // _id từ MongoDB
-        const { name } = req.body; // Tên mới
-        const userId = req.user;
-
-        // Tìm document trong MongoDB
-        const document = await Document.findOne({ _id: id, userId });
-        if (!document) {
-            return res
-                .status(404)
-                .json({ success: false, message: "Document not found" });
+// Star document
+const starDocument = [
+    validateRequest(starSchema),
+    async (req, res) => {
+        try {
+            const { id } = req.body;
+            const userId = req.user;
+            const document = await DocumentService.starDocument({ id, userId });
+            res.json({
+                success: true,
+                message: "Document star status updated",
+                data: { document },
+            });
+        } catch (error) {
+            console.error("Star Document Error:", error.message);
+            res.status(500).json({
+                success: false,
+                message: "Server error while starring document",
+            });
         }
+    },
+];
 
-        // Cập nhật tên trên Google Drive
-        await drive.files.update({
-            fileId: document.driveId,
-            requestBody: { name },
-        });
-
-        // Cập nhật tên trong MongoDB
-        document.name = name;
-        await document.save();
-
-        res.json({ success: true, document });
-    } catch (error) {
-        console.error("Rename Error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Error renaming document",
-        });
-    }
-};
+// Move document
+const moveDocument = [
+    validateRequest(moveSchema),
+    async (req, res) => {
+        try {
+            const { id, newParentId } = req.body;
+            const userId = req.user;
+            const document = await DocumentService.moveDocument({ id, newParentId, userId });
+            res.json({
+                success: true,
+                message: "Document moved successfully",
+                data: { document },
+            });
+        } catch (error) {
+            console.error("Move Document Error:", error.message);
+            res.status(500).json({
+                success: false,
+                message: error.message || "Server error while moving document",
+            });
+        }
+    },
+];
 
 module.exports = {
+    createFolder,
     uploadDocument,
     getDocuments,
-    deleteDocument,
     renameDocument,
+    starDocument,
+    moveDocument,
 };

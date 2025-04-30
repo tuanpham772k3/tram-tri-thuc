@@ -14,9 +14,9 @@ connectDB();
 
 // Import routes
 const authRoutes = require("./routes/auth.router.js");
-app.use("/api/auth", authRoutes);
+app.use("/api/v1/auth", authRoutes);
 const documentRoutes = require("./routes/document.router.js");
-app.use("/api", documentRoutes);
+app.use("/api/v1", documentRoutes);
 
 app.get("/", (req, res) => {
     res.send("Backend API is running...");
