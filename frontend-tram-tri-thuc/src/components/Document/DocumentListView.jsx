@@ -49,6 +49,13 @@ const DocumentListView = ({
                                         )}
                                     </div>
                                 </th>
+                                <th className="py-3 px-4 text-left">
+                                    <div className="flex items-center">
+                                        <span className="text-gray-700 dark:text-gray-300">
+                                            Chủ sở hữu
+                                        </span>
+                                    </div>
+                                </th>
                                 <th className="py-3 px-4 text-left" onClick={() => onSort("date")}>
                                     <div className="flex items-center cursor-pointer">
                                         <span className="text-gray-700 dark:text-gray-300">

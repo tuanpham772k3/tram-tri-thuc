@@ -21,8 +21,10 @@ const DocumentItem = ({
     onDrop,
     view = "list",
     isTrash = false,
+    sharerInfo, // Thêm prop để nhận thông tin người chia sẻ
 }) => {
     const dispatch = useDispatch();
+    const { _id, name, type, mimeType, size, uploadDate, deletedAt, permission, userId } = document;
     const { loading } = useSelector((state) => state.documents);
     const [isRenaming, setIsRenaming] = useState(false);
     const [newName, setNewName] = useState(document.name);
@@ -145,6 +147,25 @@ const DocumentItem = ({
         [document.type, onDrop]
     );
 
+    // Sử dụng sharerInfo nếu có (cho SharedWithMePage), nếu không thì dùng userId (cho Trash hoặc các trang khác)
+    const displayInfo = sharerInfo || userId || { email: "Không xác định", avatar: null };
+    const avatar = displayInfo.avatar ? (
+        <img
+            src={displayInfo.avatar}
+            alt="Avatar"
+            className={`rounded-full ${view === "list" ? "w-6 h-6" : "w-5 h-5"} mr-1`}
+            onError={(e) => (e.target.src = "/default-avatar.png")} // Fallback avatar
+        />
+    ) : (
+        <span
+            className={`rounded-full ${
+                view === "list" ? "w-6 h-6" : "w-5 h-5"
+            } bg-gray-300 flex items-center justify-center mr-1 text-xs text-gray-700`}
+        >
+            {displayInfo.email?.charAt(0).toUpperCase() || "?"}
+        </span>
+    );
+
     return (
         <>
             {view === "list" ? (
@@ -161,6 +182,17 @@ const DocumentItem = ({
                         <span className="ml-3 text-gray-800 dark:text-gray-200 truncate">
                             {document.name}
                         </span>
+                    </td>
+                    <td className="py-3 px-4">
+                        <div className="flex items-center group relative">
+                            {avatar}
+                            <span className="truncate max-w-[150px] text-gray-600 dark:text-gray-400">
+                                {displayInfo.email}
+                            </span>
+                            <div className="absolute hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-1/2 transform -translate-x-1/2">
+                                {displayInfo.email}
+                            </div>
+                        </div>
                     </td>
                     <td className="py-3 px-4 text-gray-600 dark:text-gray-400">
                         {formatDate(document.deletedAt || document.uploadDate)}
@@ -204,6 +236,15 @@ const DocumentItem = ({
                                 {formatFileSize(document.size)} •{" "}
                                 {formatDate(document.deletedAt || document.uploadDate)}
                             </p>
+                            <div className="flex items-center mt-1 group relative">
+                                {avatar}
+                                <span className="text-xs truncate max-w-[120px] text-gray-600 dark:text-gray-400">
+                                    {displayInfo.email}
+                                </span>
+                                <div className="absolute hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8 left-1/2 transform -translate-x-1/2">
+                                    {displayInfo.email}
+                                </div>
+                            </div>
                         </div>
                         <div className="absolute right-4 top-4 opacity-0 group-hover:opacity-100 transition-opacity">
                             <ActionButtonGroup
@@ -241,12 +282,31 @@ const DocumentItem = ({
 };
 
 DocumentItem.propTypes = {
-    document: PropTypes.object.isRequired,
+    document: PropTypes.shape({
+        _id: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        type: PropTypes.oneOf(["file", "folder"]).isRequired,
+        mimeType: PropTypes.string,
+        size: PropTypes.number,
+        uploadDate: PropTypes.string,
+        deletedAt: PropTypes.string,
+        parentId: PropTypes.string,
+        starred: PropTypes.bool,
+        userId: PropTypes.shape({
+            _id: PropTypes.string,
+            email: PropTypes.string,
+            avatar: PropTypes.string,
+        }),
+    }).isRequired,
     onPreview: PropTypes.func,
     onDoubleClick: PropTypes.func.isRequired,
     onDrop: PropTypes.func,
     view: PropTypes.oneOf(["list", "grid"]),
     isTrash: PropTypes.bool,
+    sharerInfo: PropTypes.shape({
+        email: PropTypes.string,
+        avatar: PropTypes.string,
+    }),
 };
 
 export default DocumentItem;

@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { FaList, FaTh } from "react-icons/fa";
-import FilterControls from "../ui/FilterControls";
+import FilterControls from "../../ui/FilterControls";
 
 const PageHeader = ({ title, view, onViewChange, filters, onFilterChange }) => {
     return (

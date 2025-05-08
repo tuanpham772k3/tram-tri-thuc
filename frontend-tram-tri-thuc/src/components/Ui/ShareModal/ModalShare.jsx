@@ -1,12 +1,12 @@
 // frontend/src/components/ShareModal/ModalShare.js
-import React, {  useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FaInfoCircle, FaCog } from "react-icons/fa";
 import ShareLinkSection from "./ShareLinkSection";
 import PermissionSection from "./PermissionSection";
 import { closeShareModal, getPermissions, getShareLink } from "../../../redux/slices/shareSlice";
 import LoadingSpinner from "../../Common/LoadingSpinner";
-import ErrorMessage from "../../common/ErrorMessage";
+import ErrorMessage from "../../Common/ErrorMessage";
 
 const ModalShare = () => {
     const dispatch = useDispatch();
@@ -22,6 +22,13 @@ const ModalShare = () => {
     const { documents } = useSelector((state) => state.documents);
     const document = documents.find((doc) => doc._id === currentDocumentId);
     const [activeTab, setActiveTab] = useState("link");
+
+    useEffect(() => {
+        // Tự động lấy permissions khi mở modal nếu tab là permission
+        if (isShareModalOpen && activeTab === "permission" && !sharedUsers.length) {
+            dispatch(getPermissions(currentDocumentId));
+        }
+    }, [isShareModalOpen, activeTab, currentDocumentId, sharedUsers.length, dispatch]);
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);

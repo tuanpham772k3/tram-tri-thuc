@@ -20,19 +20,30 @@ const FilterControls = ({ filters, onFilterChange }) => {
                 onChange={(e) => onFilterChange("uploadDate", e.target.value)}
                 className="px-3 py-2 rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
+                <option value="">Ngày tải lên</option>
+                {/* Tạo bộ lọc ngày tải lên */}
+
+            </select>
+            <select
+                value={filters.uploadDate || ""}
+                onChange={(e) => onFilterChange("uploadDate", e.target.value)}
+                className="px-3 py-2 rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
                 <option value="">Ngày sửa đổi</option>
                 <option value="today">Hôm nay</option>
-                <option value="lastWeek">Tuần trước</option>
-                <option value="lastMonth">Tháng trước</option>
-                <option value="earlier">Đầu năm nay</option>
+                <option value="lastWeek">7 ngày qua</option>
+                <option value="lastMonth">30 ngày qua</option>
+                <option value="earlier">Năm nay 2025</option>
+                <option value="earlier">Năm nay 2024</option>
+
             </select>
             <select
                 value={filters.userId || ""}
                 onChange={(e) => onFilterChange("userId", e.target.value)}
                 className="px-3 py-2 rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-                <option value="">Người sở hữu</option>
-                <option value="tôi">Tôi</option>
+                <option value="">Người</option>
+                {/* sử dụng email để lọc người sở hữu */}
             </select>
         </div>
     );

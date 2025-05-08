@@ -1,13 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Card, Input, Checkbox } from "antd";
 import { FaEnvelope, FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../../../redux/slices/authSlice";
+import { login } from "../../redux/slices/authSlice";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
 const Login = () => {
+    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { loading, error, token } = useSelector((state) => state.auth);
@@ -37,6 +38,12 @@ const Login = () => {
             navigate("/home");
         }
     }, [token, navigate]);
+
+    // Hàm xử lý đăng nhập bằng Google
+    const handleGoogleLogin = () => {
+        setIsGoogleLoading(true);
+        window.location.href = "http://localhost:5000/api/v1/auth/google";
+    };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -109,13 +116,26 @@ const Login = () => {
                     >
                         Đăng nhập
                     </Button>
-                    <p className="text-center text-sm text-gray-600 mt-2">
-                        Chưa có tài khoản?{" "}
-                        <Link to={"/register"} className="text-blue-500">
-                            Đăng ký ngay
-                        </Link>
-                    </p>
                 </form>
+                {/* Nút đăng nhập bằng Google */}
+                <Button
+                    onClick={handleGoogleLogin}
+                    loading={isGoogleLoading}
+                    className="w-full mt-4 bg-white border border-gray-300 hover:bg-gray-100 text-gray-800 font-semibold py-2 rounded-lg flex items-center justify-center gap-2"
+                >
+                    <img
+                        src="https://developers.google.com/identity/images/g-logo.png"
+                        alt="Google Logo"
+                        className="w-5 h-5"
+                    />
+                    Đăng nhập bằng Google
+                </Button>
+                <p className="text-center text-sm text-gray-600 mt-2">
+                    Chưa có tài khoản?{" "}
+                    <Link to={"/register"} className="text-blue-500">
+                        Đăng ký ngay
+                    </Link>
+                </p>
             </Card>
         </div>
     );

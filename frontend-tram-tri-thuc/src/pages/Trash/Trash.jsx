@@ -7,7 +7,7 @@ import Home from "../Home/Home";
 import LoadingSpinner from "../../components/Common/LoadingSpinner";
 import ErrorMessage from "../../components/Common/ErrorMessage";
 import { emptyTrash, fetchTrash } from "../../redux/slices/trashSlice";
-import PageHeader from "../../components/Layout/PageHeader";
+import PageHeader from "../../components/Layout/Header/PageHeader";
 import DocumentListView from "../../components/Document/DocumentListView";
 
 const Trash = () => {

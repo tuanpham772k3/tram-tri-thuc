@@ -20,7 +20,7 @@ export const createShareLink = createAsyncThunk(
         if (!token) return rejectWithValue("No token available");
 
         try {
-            const response = await axiosInstance.post(`/documents/${documentId}/share-link`, {
+            const response = await axiosInstance.post(`/share/${documentId}/share-link`, {
                 permission,
                 expiresInDays,
             });
@@ -49,7 +49,7 @@ export const getShareLink = createAsyncThunk(
         if (!token) return rejectWithValue("No token available");
 
         try {
-            const response = await axiosInstance.get(`/documents/${documentId}/share-link`);
+            const response = await axiosInstance.get(`/share/${documentId}/share-link`);
             return response.data.data || null; // Trả về null nếu không có link
         } catch (error) {
             console.error("Get share link error:", error.response?.data);
@@ -77,7 +77,7 @@ export const deleteShareLink = createAsyncThunk(
         if (!token) return rejectWithValue("No token available");
 
         try {
-            await axiosInstance.delete(`/documents/${documentId}/share-link`);
+            await axiosInstance.delete(`/share/${documentId}/share-link`);
             showToast("success", "Xóa link chia sẻ thành công");
             return documentId;
         } catch (error) {
@@ -99,7 +99,7 @@ export const fetchSharedWithMe = createAsyncThunk(
         if (!token) return rejectWithValue("No token available");
 
         try {
-            const response = await axiosInstance.get("/documents/shared-with-me");
+            const response = await axiosInstance.get("/share/shared-with-me");
             return response.data.data;
         } catch (error) {
             console.error("Fetch shared with me error:", error.response?.data);
@@ -133,7 +133,7 @@ export const addPermission = createAsyncThunk(
         if (!token) return rejectWithValue("No token available");
 
         try {
-            const response = await axiosInstance.post(`/documents/${documentId}/permissions`, {
+            const response = await axiosInstance.post(`/share/${documentId}/permissions`, {
                 email,
                 userId,
                 permission,
@@ -163,7 +163,7 @@ export const getPermissions = createAsyncThunk(
         if (!token) return rejectWithValue("No token available");
 
         try {
-            const response = await axiosInstance.get(`/documents/${documentId}/permissions`);
+            const response = await axiosInstance.get(`/share/${documentId}/permissions`);
             return response.data.data.sharedWith;
         } catch (error) {
             console.error("Get permissions error:", error.response?.data);
@@ -189,7 +189,7 @@ export const removePermission = createAsyncThunk(
 
         try {
             const response = await axiosInstance.delete(
-                `/documents/${documentId}/permissions/${userId}`
+                `/share/${documentId}/permissions/${userId}`
             );
             showToast("success", "Xóa quyền chia sẻ thành công");
             return response.data.data.sharedWith;
@@ -214,6 +214,65 @@ export const accessSharedDocument = createAsyncThunk(
         } catch (error) {
             console.error("Access shared document error:", error.response?.data);
             const message = error.response?.data?.message || "Lỗi khi truy cập tài liệu chia sẻ";
+            return rejectWithValue({
+                message,
+                status: error.response?.status,
+            });
+        }
+    }
+);
+
+// Async thunk để lấy tài liệu được chia sẻ qua email
+export const fetchSharedDocument = createAsyncThunk(
+    "share/fetchSharedDocument",
+    async (documentId, { getState, rejectWithValue }) => {
+        if (!/^[0-9a-fA-F]{24}$/.test(documentId)) {
+            return rejectWithValue("Invalid document ID");
+        }
+
+        const { token } = getState().auth;
+        if (!token) return rejectWithValue("No token available");
+
+        try {
+            const response = await axiosInstance.get(`/share/${documentId}`);
+            return response.data.data;
+        } catch (error) {
+            console.error("Fetch shared document error:", error.response?.data);
+            const message = error.response?.data?.message || "Lỗi khi lấy tài liệu được chia sẻ";
+            return rejectWithValue({
+                message,
+                status: error.response?.status,
+            });
+        }
+    }
+);
+
+// Async thunk để chỉnh sửa tài liệu
+export const editDocument = createAsyncThunk(
+    "share/editDocument",
+    async ({ documentId, file }, { getState, rejectWithValue }) => {
+        if (!/^[0-9a-fA-F]{24}$/.test(documentId)) {
+            return rejectWithValue("Invalid document ID");
+        }
+        if (!file) {
+            return rejectWithValue("No file provided");
+        }
+
+        const { token } = getState().auth;
+        if (!token) return rejectWithValue("No token available");
+
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const response = await axiosInstance.patch(`/share/${documentId}/edit`, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            showToast("success", "Tài liệu đã được chỉnh sửa thành công");
+            return response.data.data;
+        } catch (error) {
+            console.error("Edit document error:", error.response?.data);
+            const message = error.response?.data?.message || "Lỗi khi chỉnh sửa tài liệu";
             return rejectWithValue({
                 message,
                 status: error.response?.status,
@@ -340,7 +399,35 @@ const shareSlice = createSlice({
                 state.loadingLink = false;
                 state.sharedDocuments[action.meta.arg.linkId] = action.payload;
             })
-            .addCase(accessSharedDocument.rejected, handleRejected);
+            .addCase(accessSharedDocument.rejected, handleRejected)
+
+            .addCase(fetchSharedDocument.pending, handleLinkPending)
+            .addCase(fetchSharedDocument.fulfilled, (state, action) => {
+                state.loadingLink = false;
+                const { document, permission } = action.payload;
+                state.sharedDocuments[document._id] = { document, permission };
+                const existingDoc = state.sharedWithMeDocuments.find(
+                    (doc) => doc._id === document._id
+                );
+                if (!existingDoc) {
+                    state.sharedWithMeDocuments.push(document);
+                }
+            })
+            .addCase(fetchSharedDocument.rejected, handleRejected)
+
+            .addCase(editDocument.pending, handleLinkPending)
+            .addCase(editDocument.fulfilled, (state, action) => {
+                state.loadingLink = false;
+                const { document, permission } = action.payload;
+                state.sharedDocuments[document._id] = { document, permission };
+                const index = state.sharedWithMeDocuments.findIndex(
+                    (doc) => doc._id === document._id
+                );
+                if (index !== -1) {
+                    state.sharedWithMeDocuments[index] = document;
+                }
+            })
+            .addCase(editDocument.rejected, handleRejected);
     },
 });
 

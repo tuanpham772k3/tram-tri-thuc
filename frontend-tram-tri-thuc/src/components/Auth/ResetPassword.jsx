@@ -3,7 +3,7 @@ import { Button, Card, Input } from "antd";
 import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { resetPassword } from "../../../redux/slices/authSlice";
+import { resetPassword } from "../../redux/slices/authSlice";
 
 const ResetPassword = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -29,9 +29,7 @@ const ResetPassword = () => {
                     Đặt lại mật khẩu
                 </h2>
                 {error && <p className="text-red-500 text-center">{error}</p>}
-                {message && (
-                    <p className="text-green-500 text-center">{message}</p>
-                )}
+                {message && <p className="text-green-500 text-center">{message}</p>}
                 <form className="space-y-4" onSubmit={handleSubmit}>
                     <Input
                         prefix={<FaLock className="text-gray-500" />}

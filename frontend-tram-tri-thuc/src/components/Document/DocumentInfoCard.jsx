@@ -3,7 +3,16 @@ import PropTypes from "prop-types";
 import { formatFileSize, formatDate } from "../../utils/helpers";
 import ActionButtonGroup from "./ActionButtonGroup";
 
-const DocumentInfoCard = ({ document, showActions, onPreview, onRename, onStar, onDelete }) => {
+const DocumentInfoCard = ({
+    document,
+    permission,
+    showActions,
+    onPreview,
+    onRename,
+    onStar,
+    onDelete,
+    onShare,
+}) => {
     return (
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-md">
             <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
@@ -23,6 +32,14 @@ const DocumentInfoCard = ({ document, showActions, onPreview, onRename, onStar, 
                 <p>
                     <span className="font-medium">Ngày upload:</span>{" "}
                     {formatDate(document.uploadDate)}
+                </p>
+                <p>
+                    <span className="font-medium">Quyền:</span>{" "}
+                    {permission === "owner"
+                        ? "Chủ sở hữu"
+                        : permission === "editor"
+                          ? "Người chỉnh sửa"
+                          : "Người xem"}
                 </p>
                 <p>
                     <span className="font-medium">URL:</span>{" "}

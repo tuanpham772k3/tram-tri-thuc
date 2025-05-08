@@ -25,15 +25,30 @@ const PermissionSection = ({ documentId, sharedUsers, loadingPermission }) => {
             );
             return;
         }
-        dispatch(addPermission({ documentId, email: email.trim(), permission })).then(() => {
-            setEmail("");
-        });
+        dispatch(addPermission({ documentId, email: email.trim(), permission }))
+            .unwrap()
+            .then(() => {
+                setEmail("");
+                showToast("success", "Chia sẻ tài liệu thành công");
+            })
+            .catch((error) => {
+                const errorMessage = error.includes("Google Drive")
+                    ? "Lỗi kết nối Google Drive. Vui lòng kiểm tra lại tài liệu."
+                    : error.includes("Cannot share with yourself")
+                      ? "Không thể chia sẻ với chính bạn"
+                      : "Lỗi khi chia sẻ tài liệu. Vui lòng thử lại.";
+                showToast("error", errorMessage);
+            });
     }, [dispatch, documentId, email, permission]);
 
     const handleRemovePermission = useCallback(
         (userId) => {
             if (window.confirm("Bạn có chắc muốn xóa quyền của người dùng này?")) {
-                dispatch(removePermission({ documentId, userId }));
+                dispatch(removePermission({ documentId, userId }))
+                    .unwrap()
+                    .catch((error) => {
+                        showToast("error", error || "Lỗi khi xóa quyền chia sẻ");
+                    });
             }
         },
         [dispatch, documentId]

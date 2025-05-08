@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Home from "../Home/Home";
-import PageHeader from "../../components/Layout/PageHeader";
+import PageHeader from "../../components/Layout/Header/PageHeader";
 import DocumentItem from "../../components/Document/DocumentItem";
 import LoadingSpinner from "../../components/Common/LoadingSpinner";
 import { fetchDocuments } from "../../redux/slices/documentSlice";

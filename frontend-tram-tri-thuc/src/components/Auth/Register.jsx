@@ -3,7 +3,7 @@ import React from "react";
 import { FaEnvelope, FaEye, FaEyeSlash, FaLock, FaUser } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { register } from "../../../redux/slices/authSlice";
+import { register } from "../../redux/slices/authSlice";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 

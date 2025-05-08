@@ -159,7 +159,10 @@ const trashSlice = createSlice({
             .addCase(fetchTrash.pending, handlePending)
             .addCase(fetchTrash.fulfilled, (state, action) => {
                 state.loading = false;
-                state.trashDocuments = action.payload;
+                state.trashDocuments = action.payload.map((doc) => ({
+                    ...doc,
+                    userId: doc.userId || { email: "Unknown", avatar: null }, // Fallback nếu thiếu userId
+                }));
             })
             .addCase(fetchTrash.rejected, handleRejected);
 

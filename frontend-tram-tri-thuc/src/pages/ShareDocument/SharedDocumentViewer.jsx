@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import showToast from "../../utils/toast";
 import LoadingSpinner from "../../components/Common/LoadingSpinner";
-import ErrorMessage from "../../components/common/ErrorMessage";
+import ErrorMessage from "../../components/Common/ErrorMessage";
 
 const SharedDocumentViewer = () => {
     const { linkId, secretKey } = useParams();

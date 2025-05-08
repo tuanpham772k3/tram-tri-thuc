@@ -10,7 +10,7 @@ import {
 } from "../redux/slices/documentSlice";
 import Home from "./Home/Home";
 import showToast from "../utils/toast";
-import PageHeader from "../components/Layout/PageHeader";
+import PageHeader from "../components/Layout/Header/PageHeader";
 import LoadingSpinner from "../components/Common/LoadingSpinner";
 import ErrorMessage from "../components/Common/ErrorMessage";
 import DocumentListView from "../components/Document/DocumentListView";

@@ -1,19 +1,18 @@
 import { Route, Routes } from "react-router-dom";
-import Login from "../../components/Auth/Login/Login";
-import Register from "../../components/Auth/Register/Register";
-import ForgotPassword from "../../components/Auth/ForgotPassword/ForgotPassword";
-import ResetPassword from "../../components/Auth/ResetPassword/ResetPassword";
-import Home from "../../pages/Home/Home";
 import Landing from "../../pages/Landing";
 import DocumentList from "../../pages/DocumentList";
-import DocumentDetail from "../../pages/DocumentDetail";
 import Profile from "../../pages/Profile";
 import StorageStats from "../../pages/StorageStats";
 import Recent from "../../pages/Recent/Recent";
 import Starred from "../../pages/Starred/Starred";
 import Trash from "../../pages/Trash/Trash";
-import SharedWithMePage from "../../pages/SharedWithMePage";
-import SharedDocumentViewer from "../../pages/ShareDocument/SharedDocumentViewer";
+import AuthCallback from "../../pages/AuthCallback";
+import Login from "../../components/Auth/Login";
+import Register from "../../components/Auth/Register";
+import ForgotPassword from "../../components/Auth/ForgotPassword";
+import ResetPassword from "../../components/Auth/ResetPassword";
+import SharedWithMePage from "../../pages/ShareDocument/SharedWithMePage";
+import DocumentDetailPage from "../../pages/DocumentDetailPage";
 
 const RouterCustom = () => {
     return (
@@ -24,11 +23,12 @@ const RouterCustom = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
 
             {/* Lúc đã đăng nhập */}
             <Route path="/home" element={<DocumentList />} />
             <Route path="/documents" element={<DocumentList />} />
-            <Route path="/documents/:id" element={<DocumentDetail />} />
+            {/* <Route path="/documents/:id" element={<DocumentDetail />} /> */}
             <Route path="/recent" element={<Recent />} />
             <Route path="/starred" element={<Starred />} />
             <Route path="/trash" element={<Trash />} />
@@ -36,8 +36,11 @@ const RouterCustom = () => {
             <Route path="/storage" element={<StorageStats />} />
 
             {/* Chia sẻ tài liệu */}
-            <Route path="/share/:linkId/:secretKey" element={<SharedDocumentViewer />} />
+            {/* <Route path="/share/:linkId/:secretKey" element={<SharedDocumentViewer />} /> */}
             <Route path="/shared-with-me" element={<SharedWithMePage />} />
+            <Route path="/documents/:id" element={<DocumentDetailPage />} />
+            <Route path="/share/:linkId/:secretKey" element={<DocumentDetailPage />} />
+            <Route path="/shared/:id" element={<DocumentDetailPage />} />
         </Routes>
     );
 };

@@ -85,7 +85,7 @@ export const createFolder = createAsyncThunk(
         if (!token) return rejectWithValue("No token available");
 
         try {
-            const response = await axiosInstance.post("/folders", {
+            const response = await axiosInstance.post("/documents/folders", {
                 name: name.trim(),
                 parentId: parentId || null,
             });
