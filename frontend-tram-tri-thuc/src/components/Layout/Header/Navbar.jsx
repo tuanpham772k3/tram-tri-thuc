@@ -1,133 +1,108 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
-import { FaBell, FaCog, FaMoon, FaQuestionCircle, FaSun } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { logout } from "../../../redux/slices/authSlice";
-import SearchBar from "../../Ui/SearchBar";
+import { Bell, UserCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import showToast from "../../../utils/toast";
+import { getProfile, logout } from "../../../store/slices/authSlice";
+import LoadingSpinner from "../../Common/LoadingSpinner";
 
-const Navbar = ({ isLoggedIn }) => {
-    const [darkMode, setDarkMode] = useState(false);
+export default function Navbar() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { token } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
+    const { token, isAuthenticated, user, loading } = useSelector((state) => state.auth);
 
-    const toggleDarkMode = () => {
-        setDarkMode(!darkMode);
-        document.documentElement.classList.toggle("dark");
+    const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
+    const closeDropdown = () => setIsDropdownOpen(false);
+
+    useEffect(() => {
+        if (token && !user && !loading) {
+            dispatch(getProfile());
+        }
+    }, [token, user, loading, dispatch]);
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            closeDropdown();
+        }
+    }, [isAuthenticated]);
+
+    const handleLogout = async () => {
+        try {
+            closeDropdown();
+            await dispatch(logout()).unwrap();
+            setTimeout(() => navigate("/"), 100);
+        } catch (error) {
+            showToast("error", "Đăng xuất thất bại. Vui lòng thử lại.");
+        }
     };
 
-    const handleLogout = () => {
-        dispatch(logout(token));
-        navigate("/login");
-        setIsDropdownOpen(false);
-    };
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (!event.target.closest(".dropdown-avatar")) {
+                closeDropdown();
+            }
+        };
 
-    const handleSearch = (query) => {
-        // TODO: Implement search functionality (e.g., dispatch action to filter documents)
-        console.log("Search query:", query);
-    };
+        document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
+    }, []);
 
     return (
-        <nav className="flex items-center justify-between px-4 py-2 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 h-16">
-            {/* Logo */}
-            <div className="flex items-center space-x-2">
-                <img src="/drive-icon.png" alt="logo" className="w-10 h-10 rounded-full" />
-                <h1 className="text-xl font-medium text-gray-800 dark:text-white hidden sm:block">
-                    Trạm Tri Thức
-                </h1>
-            </div>
+        <nav className="bg-white shadow-sm px-4 py-2 flex items-center justify-between sticky top-0 z-40">
+            <Link to="/" className="text-xl font-bold text-blue-600">
+                📚 DocuLib
+            </Link>
+            <div className="flex items-center gap-3">
+                <Link to="/search" className="text-gray-700 hover:text-blue-500">
+                    🔍 Tìm kiếm
+                </Link>
 
-            {/* Search Bar */}
-            {isLoggedIn && (
-                <div className="flex-1 max-w-2xl mx-4">
-                    <SearchBar placeholder="Tìm kiếm tài liệu..." onSearch={handleSearch} />
-                </div>
-            )}
-
-            {/* Right icons */}
-            <div className="flex items-center space-x-1 sm:space-x-3">
-                <button
-                    onClick={toggleDarkMode}
-                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-                    title={darkMode ? "Chuyển sang Light Mode" : "Chuyển sang Dark Mode"}
+                <Link
+                    to="/user/notifications"
+                    className="relative text-gray-600 hover:text-blue-500"
                 >
-                    {darkMode ? (
-                        <FaSun className="text-yellow-500" size={18} />
-                    ) : (
-                        <FaMoon className="text-gray-700 dark:text-gray-200" size={18} />
-                    )}
-                </button>
+                    <Bell size={20} />
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
+                </Link>
 
-                <button
-                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-                    title="Hỗ trợ"
-                >
-                    <FaQuestionCircle className="text-gray-600 dark:text-gray-300" size={18} />
-                </button>
+                {isAuthenticated ? (
+                    <div className="relative dropdown-avatar">
+                        {loading ? (
+                            <LoadingSpinner size="small" />
+                        ) : (
+                            <button
+                                onClick={toggleDropdown}
+                                className="flex items-center gap-2 text-gray-600 hover:text-blue-500"
+                                disabled={loading}
+                            >
+                                <img
+                                    src={user?.avatar?.trim() || "/assets/react.svg"}
+                                    onError={(e) => (e.currentTarget.src = "/assets/react.svg")}
+                                    alt="User Avatar"
+                                    className="w-8 h-8 rounded-full"
+                                />
+                            </button>
+                        )}
 
-                <button
-                    className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-                    title="Cài đặt"
-                >
-                    <FaCog className="text-gray-600 dark:text-gray-300" size={18} />
-                </button>
-
-                <div className="relative">
-                    <button
-                        className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition relative"
-                        title="Thông báo"
-                    >
-                        <FaBell className="text-gray-600 dark:text-gray-300" size={18} />
-                        <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
-                            3
-                        </span>
-                    </button>
-                </div>
-
-                {/* Avatar */}
-                {isLoggedIn ? (
-                    <div className="relative ml-2">
-                        <button
-                            className="flex items-center"
-                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                            title="Tài khoản"
-                        >
-                            <img
-                                src="/images/Avatar.png"
-                                alt="Avatar"
-                                className="w-8 h-8 rounded-full border hover:ring-2 hover:ring-blue-500 transition"
-                            />
-                        </button>
-
-                        {isDropdownOpen && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden z-50 border dark:border-gray-700 transform transition-all">
-                                <div className="px-4 py-3 border-b dark:border-gray-700">
-                                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                                        Người dùng
-                                    </p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                        user@example.com
-                                    </p>
+                        {isDropdownOpen && isAuthenticated && user && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg">
+                                <div className="px-4 py-2">
+                                    <p className="text-sm font-semibold">{user?.name}</p>
+                                    <p className="text-sm text-gray-500">{user?.email}</p>
                                 </div>
+                                <hr />
                                 <Link
-                                    to="/profile"
-                                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-700 dark:text-white transition"
-                                    onClick={() => setIsDropdownOpen(false)}
+                                    to="/user/profile"
+                                    onClick={closeDropdown}
+                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                 >
-                                    Hồ sơ
-                                </Link>
-                                <Link
-                                    to="/settings"
-                                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-700 dark:text-white transition"
-                                    onClick={() => setIsDropdownOpen(false)}
-                                >
-                                    Cài đặt
+                                    Hồ sơ cá nhân
                                 </Link>
                                 <button
                                     onClick={handleLogout}
-                                    className="w-full text-left px-4 py-2 border-t dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-500 text-sm text-gray-700 dark:text-white transition"
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    disabled={loading}
                                 >
                                     Đăng xuất
                                 </button>
@@ -136,19 +111,14 @@ const Navbar = ({ isLoggedIn }) => {
                     </div>
                 ) : (
                     <Link
-                        to="/login"
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                        to="/auth/login"
+                        className="flex items-center gap-2 text-gray-600 hover:text-blue-500"
                     >
-                        Đăng nhập
+                        <UserCircle size={24} />
+                        <span>Đăng nhập</span>
                     </Link>
                 )}
             </div>
         </nav>
     );
-};
-
-Navbar.propTypes = {
-    isLoggedIn: PropTypes.bool.isRequired,
-};
-
-export default Navbar;
+}

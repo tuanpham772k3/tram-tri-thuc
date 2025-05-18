@@ -1,0 +1,26 @@
+import { configureStore } from "@reduxjs/toolkit";
+import authReducer from "./slices/authSlice";
+import userReducer from "./slices/userSlice";
+import documentReducer from "./slices/documentSlice";
+import categoryReducer from "./slices/categorySlice";
+import commentReducer from "./slices/commentSlice";
+import notificationReducer from "./slices/notificationSlice";
+import downloadReducer from "./slices/downloadSlice";
+import ratingReducer from "./slices/ratingSlice";
+import adminReducer from "./slices/adminSlice";
+
+export const store = configureStore({
+    reducer: {
+        auth: authReducer,
+        user: userReducer,
+        document: documentReducer,
+        category: categoryReducer,
+        comment: commentReducer,
+        notification: notificationReducer,
+        download: downloadReducer,
+        rating: ratingReducer,
+        admin: adminReducer,
+    },
+    // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(customMiddleware),
+    // devTools: process.env.NODE_ENV !== "production",
+});

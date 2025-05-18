@@ -1,0 +1,230 @@
+{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 08:48:38"}
+{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 08:49:36"}
+{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Đặt lại mật khẩu cho Trạm Tri Thức","timestamp":"2025-05-14 08:49:39"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 6823f6768b381698a46347ed","timestamp":"2025-05-14 08:50:40","userEmail":"tuan93834@donga.edu.vn","userId":"6823f6768b381698a46347ed"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 6823f6768b381698a46347ed","timestamp":"2025-05-14 08:50:40","userEmail":"tuan93834@donga.edu.vn","userId":"6823f6768b381698a46347ed"}
+{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 09:14:46"}
+{"error":"jwt is not defined","level":"error","message":"Server error during logout:","timestamp":"2025-05-14 09:41:27"}
+{"error":"jwt is not defined","level":"error","message":"Server error during logout:","timestamp":"2025-05-14 09:42:58"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 09:44:49"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 09:47:17"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 09:48:38"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 10:09:39"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 10:31:41","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 10:31:41","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 10:31:43","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 10:31:43","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 10:31:57"}
+{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 10:32:48"}
+{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 10:32:50"}
+{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 10:32:50"}
+{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 10:41:20"}
+{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 10:41:22"}
+{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 10:41:22"}
+{"error":"Invalid or expired verification token","level":"error","message":"Error verifying email:","timestamp":"2025-05-14 10:42:26"}
+{"error":"Invalid or expired verification token","level":"error","message":"Error verifying email:","timestamp":"2025-05-14 10:42:26"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:42:31"}
+{"error":"Invalid or expired verification token","level":"error","message":"Error verifying email:","timestamp":"2025-05-14 10:42:31"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:42:42"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:42:42"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:42:49"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:42:49"}
+{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 10:44:10"}
+{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 10:44:13"}
+{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 10:44:13"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:44:23"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:44:23"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:48:13"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:48:13"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:49:14"}
+{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 10:50:00"}
+{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 10:50:03"}
+{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 10:50:03"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:50:12"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:50:12"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:51:58"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:51:58"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:51:58"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:51:58"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:52:03"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:52:03"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:52:03"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:52:03"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:52:07"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:52:07"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:52:07"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:52:07"}
+{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 11:22:05"}
+{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 11:22:08"}
+{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 11:22:08"}
+{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 11:24:15"}
+{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 11:24:17"}
+{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 11:24:17"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 11:24:25"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 11:24:25"}
+{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 11:32:17"}
+{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 11:32:20"}
+{"error":"Invalid or expired verification token","level":"error","message":"Error verifying email:","timestamp":"2025-05-14 11:32:33"}
+{"error":"Invalid or expired verification token","level":"error","message":"Error verifying email:","timestamp":"2025-05-14 11:32:33"}
+{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 11:33:50"}
+{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 11:33:52"}
+{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 11:33:52"}
+{"level":"info","message":"Refresh token revoked for user: 68241d2d51f7521eec07a2a5","timestamp":"2025-05-14 11:37:24"}
+{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 11:37:51"}
+{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 11:37:53"}
+{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 11:37:53"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 11:48:59"}
+{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 11:49:13"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 11:49:31","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 11:49:31","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 11:49:32","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 11:49:32","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
+{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 11:51:03"}
+{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 11:51:11"}
+{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 12:01:19"}
+{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 12:01:26"}
+{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 12:01:32"}
+{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 12:01:37"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:16:04"}
+{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 13:16:11"}
+{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:31:33"}
+{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 13:31:39"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:32:26","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:32:26","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:32:40","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:32:40","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:33:00","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:33:00","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
+{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:33:44"}
+{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 13:33:50"}
+{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:43:01"}
+{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 13:44:04"}
+{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:51:38"}
+{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 13:55:29"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:56:07","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:56:08","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:56:10","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:56:10","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:59:14","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:59:14","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:59:23","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:59:23","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 14:01:29"}
+{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 14:05:15"}
+{"documentId":"680c7f63ac5af8a75f8bae14","level":"info","message":"Permission added successfully","permission":"viewer","targetEmail":"tuan93834@donga.edu.vn","timestamp":"2025-05-14 14:12:20","userId":"67ec03282f78201ca32dd287"}
+{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 14:12:22"}
+{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Tài liệu \"Bắt đầu triển khai tuần sáu\" đã được chia sẻ với bạn","timestamp":"2025-05-14 14:12:24"}
+{"documentId":"680c7f63ac5af8a75f8bae14","level":"info","message":"Add permission response","targetEmail":"tuan93834@donga.edu.vn","timestamp":"2025-05-14 14:12:24","userId":"67ec03282f78201ca32dd287"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 14:12:33"}
+{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 14:12:44"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 14:12:52","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 14:12:52","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
+{"documentId":"680c7f63ac5af8a75f8bae14","level":"info","message":"Shared document accessed","permission":"viewer","timestamp":"2025-05-14 14:13:08","userId":"682420c951f7521eec07a2fc"}
+{"documentId":"680c7f63ac5af8a75f8bae14","level":"info","message":"Shared document accessed","permission":"viewer","timestamp":"2025-05-14 14:13:08","userId":"682420c951f7521eec07a2fc"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 14:13:19","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 14:13:19","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
+{"documentId":"6808db928a975e2536fc7e7a","level":"info","message":"Shared document accessed","permission":"viewer","timestamp":"2025-05-14 14:13:20","userId":"682420c951f7521eec07a2fc"}
+{"documentId":"6808db928a975e2536fc7e7a","level":"info","message":"Shared document accessed","permission":"viewer","timestamp":"2025-05-14 14:13:20","userId":"682420c951f7521eec07a2fc"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 14:13:27","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
+{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 14:13:27","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
+{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 14:13:35"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:00:48","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:00:48","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:00:55","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:00:55","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:00:55","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:00:55","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:10:57","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:10:57","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:20","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:20","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":0,"documentIds":[],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:47","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":0,"documentIds":[],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:47","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":0,"documentIds":[],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:47","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":0,"documentIds":[],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:47","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":0,"documentIds":[],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:55","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":0,"documentIds":[],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:55","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:59"}
+{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 15:12:09"}
+{"documentId":"682438f2ed6772f191276232","level":"info","message":"Permission added successfully","permission":"viewer","targetEmail":"tuanphamu23@gmail.com","timestamp":"2025-05-14 15:12:29","userId":"682420c951f7521eec07a2fc"}
+{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 15:12:30"}
+{"level":"info","message":"Gửi email thành công tới tuanphamu23@gmail.com","subject":"Tài liệu \"DO_AN_IOT.docx\" đã được chia sẻ với bạn","timestamp":"2025-05-14 15:12:33"}
+{"documentId":"682438f2ed6772f191276232","level":"info","message":"Add permission response","targetEmail":"tuanphamu23@gmail.com","timestamp":"2025-05-14 15:12:33","userId":"682420c951f7521eec07a2fc"}
+{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 15:12:42"}
+{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 15:12:50"}
+{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:12:55","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:12:55","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:58:00"}
+{"error":"Email already in use","level":"error","message":"Registration failed for tuan93834@donga.edu.vn","timestamp":"2025-05-14 16:00:46"}
+{"email":"tuan93834@donga.edu.vn","error":"Email already in use","level":"error","message":"Server error during registration:","timestamp":"2025-05-14 16:00:46"}
+{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 16:01:06"}
+{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 16:01:09"}
+{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 16:01:09"}
+{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 16:03:36","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 16:03:36","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 16:10:09"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:40:45"}
+{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:43:23","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:43:23","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentId":"682438f2ed6772f191276232","level":"info","message":"Shared document accessed","permission":"viewer","timestamp":"2025-05-15 12:43:26","userId":"67ec03282f78201ca32dd287"}
+{"documentId":"682438f2ed6772f191276232","level":"info","message":"Shared document accessed","permission":"viewer","timestamp":"2025-05-15 12:43:26","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:43:27","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:43:27","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:43:30","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:43:30","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:47:20","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:47:20","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:52:07"}
+{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-15 12:52:12"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:56:22"}
+{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-15 12:56:29"}
+{"level":"info","message":"Refresh token revoked for user: 68245bd0ed6772f19127679b","timestamp":"2025-05-15 12:56:50"}
+{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-15 12:56:55"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-15 13:08:33"}
+{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-16 19:37:53"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 20:35:52"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 20:37:45"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:00:27"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:00:47"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:01:08"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:19:37"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:21:25"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:29:20"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:29:58"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:30:34"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:58:11"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 11:05:11"}
+{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-17 15:35:32"}
+{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-17 15:35:32"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /login","timestamp":"2025-05-17 16:44:13"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 20:21:59"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 20:23:06"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 21:34:40"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 21:35:57"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 21:37:27"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 21:48:42"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 21:49:41"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 21:50:09"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 21:53:24"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /login","timestamp":"2025-05-17 22:01:10"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /login","timestamp":"2025-05-17 22:01:24"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 22:53:14"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:23:37"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:23:37"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:23:44"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:23:44"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:23:55"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:23:55"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:29:10"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:29:10"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:29:12"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:29:12"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:29:14"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:29:14"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:29:22"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:29:22"}
+{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-18 09:47:02"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:47:25"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:47:25"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:55:15"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:55:15"}

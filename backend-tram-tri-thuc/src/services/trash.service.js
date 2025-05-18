@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Document = require("../models/Document.model");
-const drive = require("../config/googleDrive");
+const drive = require("../config/googleDrive.config");
 const cron = require("node-cron");
 const { retryDriveRequest } = require("../utils/driveHelper");
 
@@ -17,12 +17,14 @@ class TrashService {
     }
 
     static async deleteFromDrive(driveId) {
-        if (driveId) {
-            await retryDriveRequest(
-                drive.files.delete({ fileId: driveId }),
-                "Failed to delete file from Google Drive"
-            );
+        if (!driveId) {
+            throw new Error("Invalid driveId");
         }
+        await retryDriveRequest(
+            drive.files.delete({ fileId: driveId }),
+            "Failed to delete file from Google Drive"
+        );
+        return { success: true };
     }
 
     static async filterDeletedDocuments(documents, userId) {
@@ -53,7 +55,9 @@ class TrashService {
     }
 
     static async getTrashItems(userId) {
-        const deletedDocuments = await Document.find({ userId, deleted: true }).lean();
+        const deletedDocuments = await Document.find({ userId, deleted: true })
+            .populate("userId", "email avatar") // Populate email và avatar từ User model
+            .lean();
         return await this.filterDeletedDocuments(deletedDocuments, userId);
     }
 
@@ -100,7 +104,14 @@ class TrashService {
             }
         }
 
-        await this.deleteFromDrive(document.driveId);
+        try {
+            await this.deleteFromDrive(document.driveId);
+        } catch (error) {
+            if (!error.message.includes("File or folder not found")) {
+                throw error;
+            }
+            // Bỏ qua nếu file không tồn tại trên Google Drive
+        }
         await Document.deleteOne({ _id: documentId, userId });
     }
 
@@ -109,7 +120,14 @@ class TrashService {
         if (document.type === "folder") {
             await this.deleteRecursive(document._id, userId);
         } else {
-            await this.deleteFromDrive(document.driveId);
+            try {
+                await this.deleteFromDrive(document.driveId);
+            } catch (error) {
+                if (!error.message.includes("File or folder not found")) {
+                    throw error;
+                }
+                // Bỏ qua nếu file không tồn tại trên Google Drive
+            }
             await Document.deleteOne({ _id: document._id, userId });
         }
     }
@@ -120,7 +138,14 @@ class TrashService {
             if (doc.type === "folder") {
                 await this.deleteRecursive(doc._id, userId);
             } else {
-                await this.deleteFromDrive(doc.driveId);
+                try {
+                    await this.deleteFromDrive(doc.driveId);
+                } catch (error) {
+                    if (!error.message.includes("File or folder not found")) {
+                        throw error;
+                    }
+                    // Bỏ qua nếu file không tồn tại trên Google Drive
+                }
                 await Document.deleteOne({ _id: doc._id, userId });
             }
         }
@@ -141,7 +166,14 @@ class TrashService {
                     if (doc.type === "folder") {
                         await this.deleteRecursive(doc._id, doc.userId);
                     } else {
-                        await this.deleteFromDrive(doc.driveId);
+                        try {
+                            await this.deleteFromDrive(doc.driveId);
+                        } catch (error) {
+                            if (!error.message.includes("File or folder not found")) {
+                                throw error;
+                            }
+                            // Bỏ qua nếu file không tồn tại trên Google Drive
+                        }
                         await Document.deleteOne({ _id: doc._id, userId: doc.userId });
                     }
                 }

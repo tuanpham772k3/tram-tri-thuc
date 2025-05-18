@@ -1,22 +1,26 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const connectDB = require("./config/db.js");
+const connectDB = require("./config/db.config.js");
 
 dotenv.config();
+
+// Import passport sau khi load biến môi trường
+const passport = require("./config/passport.config.js");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Khởi tạo Passport
+app.use(passport.initialize());
+
 // Connect to MongoDB
 connectDB();
 
 // Import routes
-const authRoutes = require("./routes/auth.router.js");
-app.use("/api/v1/auth", authRoutes);
-const documentRoutes = require("./routes/document.router.js");
-app.use("/api/v1", documentRoutes);
+const apiRoutes = require("./routers/index.js");
+app.use("/api/v1", apiRoutes);
 
 app.get("/", (req, res) => {
     res.send("Backend API is running...");

@@ -1,12 +1,12 @@
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
+const User = require("../models/User.model");
 
-const authMiddleware = (req, res, next) => {
-    // if (req.path.startsWith('/share/')) {
-    //     req.user = null; // Không yêu cầu token
-    //     return next();
-    // }
+if (!process.env.JWT_SECRET) {
+    throw new Error("Missing JWT_SECRET in environment variables");
+}
 
+const authMiddleware = async (req, res, next) => {
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (!token) {
         return res.status(401).json({ message: "Không có token, không được phép" });
@@ -14,9 +14,16 @@ const authMiddleware = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded.userId; // Gắn userId vào req
+        const user = await User.findById(decoded.userId).select("_id isActive");
+        if (!user || !user.isActive) {
+            return res
+                .status(403)
+                .json({ message: "Tài khoản không tồn tại hoặc đã bị vô hiệu hóa" });
+        }
+        req.user = user._id;
         next();
     } catch (error) {
+        console.error("Auth middleware error:", error.message);
         res.status(401).json({ message: "Token không hợp lệ" });
     }
 };

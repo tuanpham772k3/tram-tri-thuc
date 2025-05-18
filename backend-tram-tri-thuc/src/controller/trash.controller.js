@@ -1,6 +1,7 @@
 const Joi = require("joi");
 const validateRequest = require("../middlewares/validateRequest");
 const TrashService = require("../services/trash.service");
+const logger = require("../utils/logger");
 
 // Validation schemas
 const trashSchema = Joi.object({
@@ -72,16 +73,29 @@ const permanentlyDeleteDocument = async (req, res) => {
         const { id } = req.params;
         const userId = req.user;
         await TrashService.permanentlyDeleteDocument(id, userId);
+        logger.info("Document permanently deleted", { id, userId });
         return res.json({
             success: true,
             message: "Document permanently deleted",
         });
     } catch (error) {
-        console.error("Permanently Delete Document Error:", error.message);
-        return res.status(500).json({
-            success: false,
-            message: error.message || "Server error while permanently deleting document",
+        logger.error("Permanently Delete Document Error", {
+            id: req.params.id,
+            userId: req.user,
+            error: error.message,
         });
+        return res
+            .status(
+                error.message.includes("Invalid")
+                    ? 400
+                    : error.message.includes("not found")
+                      ? 404
+                      : 500
+            )
+            .json({
+                success: false,
+                message: error.message || "Server error while permanently deleting document",
+            });
     }
 };
 

@@ -10,10 +10,25 @@ const shareLinkSchema = Joi.object({
 }).strict(); // Từ chối trường thừa
 
 const permissionSchema = Joi.object({
-    email: Joi.string().email().optional(),
-    userId: Joi.string().optional(),
-    permission: Joi.string().valid("viewer", "editor").required(),
-}).or("email", "userId");
+    email: Joi.string().email().max(254).optional().messages({
+        "string.email": "Email không hợp lệ",
+        "string.max": "Email không được vượt quá 254 ký tự",
+    }),
+    userId: Joi.string()
+        .pattern(/^[0-9a-fA-F]{24}$/)
+        .optional()
+        .messages({
+            "string.pattern.base": "userId phải là ObjectId hợp lệ",
+        }),
+    permission: Joi.string().valid("viewer", "editor").required().messages({
+        "any.only": "Quyền phải là 'viewer' hoặc 'editor'",
+        "any.required": "Quyền là bắt buộc",
+    }),
+})
+    .or("email", "userId")
+    .messages({
+        "object.missing": "Phải cung cấp email hoặc userId",
+    });
 
 const removePermissionSchema = Joi.object({
     userId: Joi.string().required(),
@@ -238,6 +253,75 @@ const removePermission = [
     },
 ];
 
+const getSharedDocument = async (req, res) => {
+    try {
+        const { id: documentId } = req.params;
+        const userId = req.user;
+
+        const data = await ShareService.getSharedDocument(documentId, userId);
+
+        res.json({
+            success: true,
+            message: "Shared document accessed successfully",
+            data,
+        });
+    } catch (error) {
+        logger.error("Get Shared Document Error", {
+            documentId: req.params.id,
+            userId: req.user,
+            error: error.message,
+        });
+        res.status(
+            error.message.includes("Invalid") || error.message.includes("not found") ? 404 : 500
+        ).json({
+            success: false,
+            message: error.message || "Server error while accessing shared document",
+        });
+    }
+};
+
+const editDocument = async (req, res) => {
+    try {
+        const { id: documentId } = req.params;
+        const userId = req.user;
+        const file = req.file;
+
+        if (!file) {
+            logger.error("No file provided for edit", { documentId, userId });
+            return res.status(400).json({
+                success: false,
+                message: "Không có file được gửi lên",
+            });
+        }
+
+        const data = await ShareService.editDocument(documentId, userId, file);
+
+        logger.info("Edit document response", { documentId, userId, fileName: file.originalname });
+
+        res.json({
+            success: true,
+            message: "Tài liệu đã được chỉnh sửa thành công",
+            data,
+        });
+    } catch (error) {
+        logger.error("Edit Document Error", {
+            documentId: req.params.id,
+            userId: req.user,
+            error: error.message,
+        });
+        res.status(
+            error.message.includes("Invalid") || error.message.includes("not found")
+                ? 404
+                : error.message.includes("permission")
+                  ? 403
+                  : 400
+        ).json({
+            success: false,
+            message: error.message || "Lỗi server khi chỉnh sửa tài liệu",
+        });
+    }
+};
+
 module.exports = {
     createShareLink,
     getShareLink,
@@ -246,4 +330,6 @@ module.exports = {
     addPermission,
     getPermissions,
     removePermission,
+    getSharedDocument,
+    editDocument,
 };

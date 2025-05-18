@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
 const Document = require("../models/Document.model");
 const User = require("../models/User.model");
-const drive = require("../config/googleDrive");
+const drive = require("../config/googleDrive.config");
 const { retryDriveRequest } = require("../utils/driveHelper");
 const logger = require("../utils/logger");
+const { sendShareNotification } = require("../utils/email");
 
 class ShareService {
     static async validateDocument(documentId, userId) {
@@ -127,18 +128,27 @@ class ShareService {
                 throw new Error("User not found");
             }
 
+            const userEmail = user.email;
             // Tìm tài liệu được chia sẻ với userId hoặc email
             const documents = await Document.find({
-                $or: [
-                    { "share.sharedWith.userId": userId },
-                    { "share.sharedWith.email": user.email },
-                ],
+                "share.sharedWith": {
+                    $elemMatch: {
+                        $or: [
+                            { userId: userId ? new mongoose.Types.ObjectId(userId) : null },
+                            { email: userEmail },
+                        ],
+                    },
+                },
                 deleted: false,
-            }).select("_id name type mimeType url directUrl driveId size uploadDate starred");
+            })
+                .populate("userId", "email avatar")
+                .lean();
 
             logger.info(`Fetched shared documents for user ${userId}`, {
                 userId,
+                userEmail,
                 documentCount: documents.length,
+                documentIds: documents.map((doc) => doc._id.toString()),
             });
 
             return documents;
@@ -146,6 +156,7 @@ class ShareService {
             logger.error(`Failed to fetch shared documents for user ${userId}`, {
                 userId,
                 error: error.message,
+                stack: error.stack,
             });
             throw new Error(`Failed to fetch shared documents: ${error.message}`);
         }
@@ -153,8 +164,9 @@ class ShareService {
 
     static async addPermission(documentId, userId, { email, userId: targetUserId, permission }) {
         const document = await this.validateDocument(documentId, userId);
-
         let targetEmail = email;
+        const owner = await User.findById(userId).select("email");
+
         if (targetUserId) {
             const targetUser = await User.findById(targetUserId);
             if (!targetUser) {
@@ -167,11 +179,23 @@ class ShareService {
             throw new Error("Email or userId is required");
         }
 
+        // Kiểm tra email trùng với chủ sở hữu
+        if (targetEmail === owner.email) {
+            logger.error("Cannot share with owner", { documentId, userId, targetEmail });
+            throw new Error("Cannot share with yourself");
+        }
+
         // Kiểm tra quyền hiện có
         const existingPermission = document.share.sharedWith.find(
             (item) => item.email === targetEmail
         );
         if (existingPermission && existingPermission.permission === permission) {
+            logger.info("Permission already exists", {
+                documentId,
+                userId,
+                targetEmail,
+                permission,
+            });
             return document.share.sharedWith; // Không cần gọi Google Drive API
         }
 
@@ -186,10 +210,12 @@ class ShareService {
                             type: "user",
                             emailAddress: targetEmail,
                         },
+                        fields: "id",
                     }),
                     `Failed to share with ${targetEmail}`
                 );
-                permissionId = response.data.id;
+
+                permissionId = response.id;
             } else if (existingPermission.permission !== permission) {
                 // Cập nhật quyền nếu thay đổi
                 await retryDriveRequest(
@@ -220,13 +246,23 @@ class ShareService {
             }
 
             await document.save();
-
             logger.info("Permission added successfully", {
                 documentId,
                 userId,
                 targetEmail,
                 permission,
             });
+
+            // (Tùy chọn) Gửi email thông báo
+            try {
+                await sendShareNotification(targetEmail, document.name, permission);
+            } catch (emailError) {
+                logger.warn("Failed to send share notification", {
+                    targetEmail,
+                    documentId,
+                    error: emailError.message,
+                });
+            }
 
             return document.share.sharedWith;
         } catch (error) {
@@ -290,6 +326,195 @@ class ShareService {
                 error: error.message,
             });
             throw new Error(`Failed to remove permission: ${error.message}`);
+        }
+    }
+
+    static async getSharedDocument(documentId, userId) {
+        try {
+            if (!mongoose.Types.ObjectId.isValid(documentId)) {
+                logger.error("Invalid document ID", { documentId, userId });
+                throw new Error("Invalid document ID");
+            }
+
+            const user = await User.findById(userId).select("email");
+            if (!user) {
+                logger.error("User not found", { documentId, userId });
+                throw new Error("User not found");
+            }
+
+            const document = await Document.findOne({
+                _id: documentId,
+                deleted: false,
+                $or: [
+                    { userId }, // Owner
+                    {
+                        "share.sharedWith": {
+                            $elemMatch: {
+                                $or: [
+                                    { userId: userId ? new mongoose.Types.ObjectId(userId) : null },
+                                    { email: user.email },
+                                ],
+                            },
+                        },
+                    },
+                ],
+            })
+                .populate("userId", "email avatar")
+                .lean();
+
+            if (!document) {
+                logger.error("Document not found or not accessible", { documentId, userId });
+                throw new Error("Document not found or you don't have access");
+            }
+
+            let permission = "viewer";
+            if (document.userId && document.userId.toString() === userId) {
+                permission = "owner";
+            } else {
+                const sharedEntry = document.share.sharedWith.find(
+                    (item) =>
+                        (item.userId && item.userId.toString() === userId) ||
+                        item.email === user.email
+                );
+                permission = sharedEntry ? sharedEntry.permission : "viewer";
+            }
+
+            logger.info("Shared document accessed", { documentId, userId, permission });
+
+            return {
+                document: {
+                    _id: document._id,
+                    name: document.name,
+                    type: document.type,
+                    mimeType: document.mimeType,
+                    url: document.url,
+                    directUrl: document.directUrl,
+                    driveId: document.driveId,
+                    size: document.size,
+                    uploadDate: document.uploadDate,
+                    previewUrl: document.share.previewUrl,
+                    userId: document.userId,
+                },
+                permission,
+            };
+        } catch (error) {
+            logger.error("Failed to access shared document", {
+                documentId,
+                userId,
+                error: error.message,
+                stack: error.stack,
+            });
+            throw new Error(`Failed to access shared document: ${error.message}`);
+        }
+    }
+
+    static async editDocument(documentId, userId, file) {
+        try {
+            const document = await Document.findOne({
+                _id: documentId,
+                deleted: false,
+            });
+            if (!document) {
+                throw new Error("Document not found or has been deleted");
+            }
+
+            // Kiểm tra quyền editor hoặc owner
+            const user = await User.findById(userId).select("email");
+            if (!user) {
+                throw new Error("User not found");
+            }
+
+            const isOwner = document.userId.toString() === userId;
+            const hasEditorPermission = document.share.sharedWith.some(
+                (item) =>
+                    (item.userId?.toString() === userId || item.email === user.email) &&
+                    item.permission === "editor"
+            );
+
+            if (!isOwner && !hasEditorPermission) {
+                throw new Error("You don't have permission to edit this document");
+            }
+
+            // Upload file mới lên Google Drive
+            const fileMetadata = {
+                name: document.name,
+            };
+            const media = {
+                mimeType: file.mimetype,
+                body: require("fs").createReadStream(file.path),
+            };
+
+            const response = await retryDriveRequest(
+                drive.files.update({
+                    fileId: document.driveId,
+                    requestBody: fileMetadata,
+                    media,
+                }),
+                "Failed to update file on Google Drive"
+            );
+
+            // Cập nhật metadata trong MongoDB
+            document.mimeType = file.mimetype;
+            document.size = file.size;
+            document.url = `https://drive.google.com/file/d/${document.driveId}/view`;
+            document.directUrl = `https://drive.google.com/uc?export=download&id=${document.driveId}`;
+            document.share.previewUrl = `https://docs.google.com/viewer?url=https://drive.google.com/uc?id=${document.driveId}&embedded=true`;
+            document.uploadDate = new Date();
+
+            await document.save();
+
+            // Gửi email thông báo cho người được chia sẻ
+            try {
+                const sharedEmails = document.share.sharedWith.map((item) => item.email);
+                for (const email of sharedEmails) {
+                    await sendShareNotification(
+                        email,
+                        document.name,
+                        "updated",
+                        `Tài liệu "${document.name}" đã được cập nhật bởi ${user.email}.`
+                    );
+                }
+            } catch (emailError) {
+                logger.warn("Failed to send update notification", {
+                    documentId,
+                    userId,
+                    error: emailError.message,
+                });
+            }
+
+            logger.info("Document edited successfully", {
+                documentId,
+                userId,
+                fileName: file.originalname,
+            });
+
+            const populatedDocument = await Document.findById(documentId)
+                .populate("userId", "email avatar")
+                .lean();
+
+            return {
+                document: {
+                    _id: document._id,
+                    name: document.name,
+                    type: document.type,
+                    mimeType: document.mimeType,
+                    url: document.url,
+                    directUrl: document.directUrl,
+                    driveId: document.driveId,
+                    size: document.size,
+                    uploadDate: document.uploadDate,
+                    previewUrl: document.share.previewUrl,
+                    userId: populatedDocument.userId,
+                },
+                permission: isOwner ? "owner" : "editor",
+            };
+        } catch (error) {
+            logger.error("Failed to edit document", {
+                documentId,
+                userId,
+                error: error.message,
+            });
+            throw error;
         }
     }
 }

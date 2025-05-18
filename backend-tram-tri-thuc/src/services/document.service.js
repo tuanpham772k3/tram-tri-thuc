@@ -1,8 +1,15 @@
 const mongoose = require("mongoose");
 const Document = require("../models/Document.model");
-const drive = require("../config/googleDrive");
+const drive = require("../config/googleDrive.config");
 const fs = require("fs");
 const { retryDriveRequest } = require("../utils/driveHelper");
+let User;
+try {
+    User = require("../models/User.model");
+} catch (e) {
+    console.error("Failed to import User model:", e.message);
+    throw new Error("User model not available");
+}
 
 class DocumentService {
     static getDefaultDriveFolderId() {
@@ -145,7 +152,7 @@ class DocumentService {
             return results;
         }
 
-        const documents = await Document.find(query).lean();
+        const documents = await Document.find(query).populate("userId", "email avatar").lean();
         results.push(...documents);
         for (const doc of documents) {
             if (doc.type === "folder") {
@@ -186,7 +193,7 @@ class DocumentService {
             query.starred = starred === "true";
         }
 
-        return await Document.find(query).lean();
+        return await Document.find(query).populate("userId", "email avatar").lean();
     }
 
     static async renameDocument({ id, name, userId }) {
@@ -292,6 +299,114 @@ class DocumentService {
         await document.save();
 
         return document;
+    }
+
+    static async filterDocuments(userId, filters) {
+        const { type, mimeType, ownerEmail, from, to } = filters;
+
+        // Xây dựng query
+        const query = { deleted: false }; // Chỉ lấy tài liệu chưa bị xóa
+
+        // Kiểm tra quyền truy cập: tài liệu thuộc sở hữu hoặc được chia sẻ với người dùng hiện tại
+        if (!mongoose.isValidObjectId(userId)) {
+            throw new Error("Invalid userId format");
+        }
+
+        let currentUserEmail = null;
+        if (typeof User === "function") {
+            const currentUser = await User.findById(userId).select("email").lean();
+            if (currentUser) {
+                currentUserEmail = currentUser.email;
+            } else {
+                throw new Error("Current user not found");
+            }
+        } else {
+            throw new Error("User model is not available");
+        }
+
+        // Logic lọc theo email người sở hữu
+        if (ownerEmail) {
+            const owner = await mongoose.model("User").findOne({ email: ownerEmail });
+            if (!owner) {
+                throw new Error("Owner not found");
+            }
+
+            query.userId = owner._id; // Tài liệu thuộc sở hữu của ownerEmail
+
+            // Nếu ownerEmail không phải là email của người dùng hiện tại, yêu cầu tài liệu phải được chia sẻ
+            if (ownerEmail !== currentUserEmail) {
+                query.$and = [
+                    {
+                        $or: [
+                            { "share.sharedWith.userId": userId },
+                            { "share.sharedWith.email": currentUserEmail },
+                        ],
+                    },
+                ];
+            }
+            delete query.$or; // Xóa $or mặc định để áp dụng điều kiện mới
+        } else {
+            // Mặc định: lấy tài liệu do user sở hữu hoặc được chia sẻ với user
+            query.$or = [
+                { userId: userId },
+                { "share.sharedWith.userId": userId },
+                { "share.sharedWith.email": currentUserEmail },
+            ];
+        }
+
+        // Lọc theo loại tài liệu
+        if (type) {
+            query.type = type; // Gán trực tiếp type (folder hoặc file)
+            if (type === "file" && mimeType) {
+                // Chỉ áp dụng mimeType nếu type là file
+                switch (mimeType) {
+                    case "pdf":
+                        query.mimeType = "application/pdf";
+                        break;
+                    case "excel":
+                        query.mimeType = {
+                            $in: [
+                                "application/vnd.ms-excel",
+                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            ],
+                        };
+                        break;
+                    case "word":
+                        query.mimeType = {
+                            $in: [
+                                "application/msword",
+                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                            ],
+                        };
+                        break;
+                    case "image":
+                        query.mimeType = { $in: ["image/jpeg", "image/png"] };
+                        break;
+                    default:
+                        throw new Error("Invalid mimeType");
+                }
+            } else if (type === "file" && !mimeType) {
+                // Nếu type là file mà không có mimeType, lấy tất cả file
+                query.mimeType = { $exists: true, $ne: null };
+            }
+            // Nếu type là folder, không cần áp dụng mimeType
+        }
+
+        // Lọc theo khoảng thời gian tải lên
+        if (from || to) {
+            query.uploadDate = {};
+            if (from) {
+                query.uploadDate.$gte = new Date(from);
+            }
+            if (to) {
+                query.uploadDate.$lte = new Date(to);
+            }
+        }
+
+        // Thực hiện truy vấn
+        const documents = await Document.find(query).populate("userId", "email avatar").lean();
+
+        return documents;
     }
 }
 

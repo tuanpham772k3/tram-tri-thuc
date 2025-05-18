@@ -2,6 +2,7 @@ const Joi = require("joi");
 const validateRequest = require("../middlewares/validateRequest");
 const DocumentService = require("../services/document.service");
 const fs = require("fs");
+const logger = require("../utils/logger");
 
 // Validation schemas
 const folderSchema = Joi.object({
@@ -26,6 +27,75 @@ const moveSchema = Joi.object({
 const starSchema = Joi.object({
     id: Joi.string().required(),
 });
+
+// Validation schema cho query string
+const filterSchema = Joi.object({
+    type: Joi.string().valid("folder", "file").optional(),
+    mimeType: Joi.string()
+        .valid("pdf", "excel", "word", "image")
+        .optional()
+        .when("type", {
+            is: "file",
+            then: Joi.string().valid("pdf", "excel", "word", "image").optional(),
+            otherwise: Joi.forbidden(),
+        }),
+    ownerEmail: Joi.string().email().optional(),
+    from: Joi.date().iso().optional(),
+    to: Joi.date().iso().optional(),
+});
+
+// Middleware để validate query
+const validateFilterQuery = (req, res, next) => {
+    const { error } = filterSchema.validate(req.query);
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            message: error.details[0].message,
+        });
+    }
+    next();
+};
+
+//Update file
+const updateFile = async (req, res) => {
+    const { id: documentId } = req.params;
+    const userId = req.user;
+    const file = req.file; // Giả sử dùng multer để upload file
+
+    if (!file) {
+        return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    try {
+        const document = await Document.findOne({ _id: documentId, userId });
+        if (!document) {
+            return res.status(404).json({ message: "Document not found" });
+        }
+
+        // Cập nhật file trên Google Drive
+        const response = await retryDriveRequest(
+            drive.files.update({
+                fileId: document.driveId,
+                media: {
+                    mimeType: file.mimetype,
+                    body: require("fs").createReadStream(file.path),
+                },
+            }),
+            "Failed to update file on Google Drive"
+        );
+
+        // Cập nhật metadata trong MongoDB
+        document.url = `https://drive.google.com/file/d/${response.data.id}/view`;
+        document.directUrl = `https://drive.google.com/uc?id=${response.data.id}`;
+        document.mimeType = file.mimetype;
+        document.size = file.size;
+        await document.save();
+
+        res.json({ success: true, message: "File updated successfully", data: document });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to update file", error: error.message });
+    }
+};
 
 // Create folder
 const createFolder = [
@@ -185,12 +255,62 @@ const moveDocument = [
         }
     },
 ];
+const viewedDocument = async (req, res) => {
+    try {
+        const { id: documentId } = req.params;
+        const userId = req.user;
+        const document = await DocumentService.recordDocumentView({ documentId, userId });
+        res.json({
+            success: true,
+            message: "View recorded successfully",
+            data: { document },
+        });
+    } catch (error) {
+        console.error("Record view error:", error.message);
+        res.status(error.message.includes("not found") ? 404 : 500).json({
+            success: false,
+            message: error.message || "Server error while recording view",
+        });
+    }
+};
+
+// Controller để lọc tài liệu
+const filterDocuments = async (req, res) => {
+    try {
+        const userId = req.user; // Lấy userId từ middleware auth
+        const filters = {
+            type: req.query.type,
+            mimeType: req.query.mimeType,
+            ownerEmail: req.query.ownerEmail,
+            from: req.query.from,
+            to: req.query.to,
+        };
+
+        const documents = await DocumentService.filterDocuments(userId, filters);
+
+        return res.json({
+            success: true,
+            message: "Documents filtered successfully",
+            data: { documents },
+        });
+    } catch (error) {
+        logger.error("Filter Documents Error", { error: error.message });
+        return res.status(error.message.includes("User not found") ? 404 : 500).json({
+            success: false,
+            message: error.message || "Server error while filtering documents",
+        });
+    }
+};
 
 module.exports = {
+    updateFile,
     createFolder,
     uploadDocument,
     getDocuments,
     renameDocument,
     starDocument,
     moveDocument,
+    viewedDocument,
+    filterDocuments,
+    validateFilterQuery,
 };
