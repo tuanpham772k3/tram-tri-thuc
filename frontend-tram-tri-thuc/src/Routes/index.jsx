@@ -1,38 +1,33 @@
 import { createBrowserRouter } from "react-router-dom";
 
 // Layouts
-import AuthLayout from "../../components/Layout/AuthLayout";
-import MainLayout from "../../components/Layout/MainLayout";
-import AdminLayout from "../../components/Layout/AdminLayout";
-import UserProfilePage from "../../components/Layout/UserProfilePage";
-
+import AuthLayout from "../components/Layout/AuthLayout";
+import MainLayout from "../components/Layout/MainLayout";
+import AdminLayout from "../components/Layout/AdminLayout";
+import UserProfilePage from "../components/Layout/UserProfilePage";
 
 // Pages – Public
-import HomePage from "../../pages/Home/HomePage";
-import DocumentDetailPage from "../../pages/DocumentDetailPage";
-import CategoryPage from "../../pages/CategoryPage";
-import SearchPage from "../../pages/SearchPage";
+import HomePage from "../pages/Home/HomePage";
+import DocumentDetailPage from "../pages/DocumentDetailPage";
+import CategoryPage from "../pages/CategoryPage";
+import SearchPage from "../pages/SearchPage";
 
 // Pages – Auth
-import Login from "../../pages/Auth/Login";
-import Register from "../../pages/Auth/Register";
-import ForgotPassword from "../../pages/Auth/ForgotPassword";
-import ResetPassword from "../../pages/Auth/ResetPassword";
-import AuthCallback from "../../pages/Auth/AuthCallback";
+import Login from "../pages/Auth/Login";
+import Register from "../pages/Auth/Register";
+import ForgotPassword from "../pages/Auth/ForgotPassword";
+import ResetPassword from "../pages/Auth/ResetPassword";
 
 // Pages – User
-import MyDownloadsPage from "../../pages/user/MyDownloadsPage";
-import MyFavoritesPage from "../../pages/user/MyFavoritesPage";
-import MyViewsPage from "../../pages/user/MyViewsPage";
-import ProfileInfo from "../../pages/User/ProfileInfo";
-import NotificationPage from "../../pages/NotificationPage";
-
-
+import MyDownloadsPage from "../pages/user/MyDownloadsPage";
+import MyFavoritesPage from "../pages/user/MyFavoritesPage";
+import MyViewsPage from "../pages/user/MyViewsPage";
+import ProfileInfo from "../pages/User/ProfileInfo";
+import NotificationPage from "../pages/NotificationPage";
 
 // Pages – Uploader
-import UploadPage from "../../pages/Uploader/UploadPage";
-import MyDocumentsPage from "../../pages/Uploader/MyDocumentsPage";
-
+import UploadPage from "../pages/Uploader/UploadPage";
+import MyDocumentsPage from "../pages/Uploader/MyDocumentsPage";
 
 // Pages – Admin
 // import AdminDashboardPage from "@/pages/admin/AdminDashboardPage";
@@ -43,7 +38,6 @@ import MyDocumentsPage from "../../pages/Uploader/MyDocumentsPage";
 import ProtectedRoute from "./ProtectedRoute";
 import UploaderRoute from "./UploaderRoute";
 import AdminRoute from "./AdminRoute";
-
 
 const router = createBrowserRouter([
     {
@@ -64,7 +58,6 @@ const router = createBrowserRouter([
             { path: "register", element: <Register /> },
             { path: "forgot-password", element: <ForgotPassword /> },
             { path: "reset-password", element: <ResetPassword /> },
-            { path: "authcallback", element: <AuthCallback /> },
         ],
     },
     {

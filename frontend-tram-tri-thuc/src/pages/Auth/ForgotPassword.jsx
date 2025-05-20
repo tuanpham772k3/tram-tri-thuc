@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import showToast from "../../utils/toast";
 import FormInput from "../../components/Auth/FormInput";
-import { forgotPassword } from "../../store/slices/authSlice";
+import { forgotPasswordThunk } from "../../store/slices/authSlice";
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState("");
@@ -18,7 +18,7 @@ const ForgotPassword = () => {
             showToast("error", "Vui lòng nhập email");
             return;
         }
-        await dispatch(forgotPassword(email));
+        await dispatch(forgotPasswordThunk(email));
         if (message) {
             setEmail(""); // Xóa form sau khi gửi thành công
         }

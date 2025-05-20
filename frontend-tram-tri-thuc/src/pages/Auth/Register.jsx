@@ -1,17 +1,16 @@
-import { Button, Card, Checkbox, Input } from "antd";
-import React from "react";
-import { FaEnvelope, FaEye, FaEyeSlash, FaLock, FaUser } from "react-icons/fa";
+import { Button, Card, Checkbox } from "antd";
+import React, { useEffect } from "react";
+import { FaEnvelope, FaLock, FaUser } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import FormInput from "../../components/Auth/FormInput";
-import { register } from "../../store/slices/authSlice";
+import { registerThunk, resetAuthState } from "../../store/slices/authSlice";
 
 const Register = () => {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const { loading, error, needsVerification, message } = useSelector((state) => state.auth);
+    const { loading, error } = useSelector((state) => state.auth);
 
     const formik = useFormik({
         initialValues: {
@@ -19,8 +18,6 @@ const Register = () => {
             email: "",
             password: "",
             confirmPassword: "",
-            showPassword: false,
-            showConfirmPassword: false,
             agree: false,
         },
         validationSchema: Yup.object({
@@ -31,8 +28,8 @@ const Register = () => {
             email: Yup.string().email("Invalid email address").required("Email is required"),
             password: Yup.string()
                 .min(6, "Password must be at least 6 characters")
-                .matches(/[A-Z]/, "Mật khẩu phải chứa ít nhất 1 chữ in hoa")
-                .matches(/[0-9]/, "Mật khẩu phải chứa ít nhất 1 số")
+                .matches(/[A-Z]/, "Password must contain at least 1 uppercase letter")
+                .matches(/[0-9]/, "Password must contain at least 1 number")
                 .required("Password is required"),
             confirmPassword: Yup.string()
                 .oneOf([Yup.ref("password"), null], "Passwords must match")
@@ -41,15 +38,16 @@ const Register = () => {
         }),
         onSubmit: async (values) => {
             const { name, email, password } = values;
-            await dispatch(register({ name, email, password }));
+            await dispatch(registerThunk({ name, email, password }));
         },
     });
 
-    React.useEffect(() => {
-        if (!error && message && needsVerification) {
-            navigate("/auth/verify");
-        }
-    }, [error, message, needsVerification, navigate]);
+    // Dọn dẹp khi unmount
+    useEffect(() => {
+        return () => {
+            dispatch(resetAuthState());
+        };
+    }, [dispatch]);
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -84,9 +82,9 @@ const Register = () => {
                         className="text-sm text-gray-600"
                     >
                         Tôi đồng ý với{" "}
-                        <a href="#" className="text-blue-500">
+                        <Link to="#" className="text-blue-500">
                             điều khoản sử dụng
-                        </a>
+                        </Link>
                     </Checkbox>
                     {formik.touched.agree && formik.errors.agree && (
                         <p className="text-red-500 text-xs mt-1">{formik.errors.agree}</p>

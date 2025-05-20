@@ -1,5 +1,4 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "./slices/authSlice";
 import userReducer from "./slices/userSlice";
 import documentReducer from "./slices/documentSlice";
 import categoryReducer from "./slices/categorySlice";
@@ -8,6 +7,7 @@ import notificationReducer from "./slices/notificationSlice";
 import downloadReducer from "./slices/downloadSlice";
 import ratingReducer from "./slices/ratingSlice";
 import adminReducer from "./slices/adminSlice";
+import authReducer from "./slices/authSlice";
 
 export const store = configureStore({
     reducer: {

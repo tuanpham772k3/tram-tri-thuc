@@ -6,7 +6,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import FormInput from "../../components/Auth/FormInput";
-import { resetPassword } from "../../store/slices/authSlice";
+import { resetPasswordThunk } from "../../store/slices/authSlice";
 
 const ResetPassword = () => {
     const dispatch = useDispatch();
@@ -33,7 +33,7 @@ const ResetPassword = () => {
                 .required("Xác nhận mật khẩu là bắt buộc"),
         }),
         onSubmit: async (values) => {
-            await dispatch(resetPassword({ token, newPassword: values.newPassword }));
+            await dispatch(resetPasswordThunk({ token, newPassword: values.newPassword }));
             if (message) {
                 navigate("/auth/login");
             }

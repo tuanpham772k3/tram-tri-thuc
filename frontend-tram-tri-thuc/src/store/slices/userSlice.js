@@ -1,244 +1,258 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import showToast from "../../utils/toast";
-import axiosInstance from "../../custom/Axios/AxiosCustom";
+import customAxios from "../../utils/customAxios";
+import { loginThunk, logoutThunk } from "./authSlice";
 
-// Lấy danh sách người dùng
-export const fetchUsers = createAsyncThunk(
-    "user/fetchUsers",
-    async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
-        try {
-            const response = await axiosInstance.get("/users", { params: { page, limit } });
-            return response.data.data;
-        } catch (error) {
-            showToast("error", "Failed to fetch users");
-            return rejectWithValue(
-                error.response?.data?.error || { message: "Failed to fetch users" }
-            );
-        }
-    }
-);
-
-// Lấy thông tin cá nhân
+// Lấy danh thông tin người dùng
 export const fetchUserInfo = createAsyncThunk(
     "user/fetchUserInfo",
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.get("/users/me");
-            return response.data.data.user;
+            const response = await customAxios.get("/users/me");
+            return response.data.data;
         } catch (error) {
-            showToast("error", "Failed to fetch user info");
             return rejectWithValue(
-                error.response?.data?.error || { message: "Failed to fetch user info" }
+                error.response?.data || { message: "Lỗi khi lấy thông tin người dùng.", error }
             );
         }
     }
 );
 
-// Cập nhật thông tin cá nhân
+//  cập nhật thông tin user
 export const updateUserInfo = createAsyncThunk(
     "user/updateUserInfo",
-    async (updates, { rejectWithValue }) => {
+    async (data, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.put("/users/me", updates);
-            showToast("success", "Cập nhật thông tin thành công");
-            return response.data.data.user;
+            const allowedFields = ["name", "avatar", "email"];
+            const filteredData = {};
+            allowedFields.forEach((field) => {
+                if (data[field] !== undefined) filteredData[field] = data[field];
+            });
+
+            if (Object.keys(filteredData).length === 0) {
+                throw new Error("Không có dữ liệu hợp lệ để cập nhật");
+            }
+
+            const response = await customAxios.put("/users/me", filteredData);
+            showToast("success", response.data.message);
+            return response.data.data;
         } catch (error) {
-            showToast("error", "Cập nhật thông tin thất bại");
             return rejectWithValue(
-                error.response?.data?.error || { message: "Failed to update user info" }
+                error.response?.data || { message: "Lỗi khi cập nhật thông tin." }
             );
         }
     }
 );
 
-// Lấy lịch sử xem
+export const deleteMyAccount = createAsyncThunk(
+    "user/deleteMyAccount",
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await customAxios.delete("/users/me");
+            showToast("success", response.data.message);
+            return null;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || { message: "Lỗi khi xóa tài khoản." });
+        }
+    }
+);
+
 export const fetchUserHistory = createAsyncThunk(
     "user/fetchUserHistory",
-    async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
+    async (params = {}, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.get("/users/history", { params: { page, limit } });
+            const response = await customAxios.get("/users/me/history", { params });
             return response.data.data;
         } catch (error) {
-            showToast("error", "Failed to fetch user history");
-            return rejectWithValue(
-                error.response?.data?.error || { message: "Failed to fetch user history" }
-            );
+            return rejectWithValue(error.response?.data || { message: "Lỗi khi lấy lịch sử xem." });
         }
     }
 );
 
-// Lấy lịch sử tải
-export const fetchUserDownloads = createAsyncThunk(
-    "user/fetchUserDownloads",
-    async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
-        try {
-            const response = await axiosInstance.get("/users/downloads", {
-                params: { page, limit },
-            });
-            return response.data.data;
-        } catch (error) {
-            showToast("error", "Failed to fetch user downloads");
-            return rejectWithValue(
-                error.response?.data?.error || { message: "Failed to fetch user downloads" }
-            );
-        }
-    }
-);
-
-// Lấy danh sách yêu thích
 export const fetchUserFavorites = createAsyncThunk(
     "user/fetchUserFavorites",
-    async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
+    async (params = {}, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.get("/users/favorites", {
-                params: { page, limit },
-            });
+            const response = await customAxios.get("/users/me/favorites", { params });
             return response.data.data;
         } catch (error) {
-            showToast("error", "Failed to fetch user favorites");
             return rejectWithValue(
-                error.response?.data?.error || { message: "Failed to fetch user favorites" }
+                error.response?.data || { message: "Lỗi khi lấy danh sách yêu thích." }
             );
         }
     }
 );
 
-// Thêm/xóa yêu thích
 export const toggleFavorite = createAsyncThunk(
     "user/toggleFavorite",
     async (docId, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.patch(`/users/favorites/${docId}`);
-            return response.data.data.favoriteDocuments;
+            const response = await customAxios.patch(`/users/me/favorites/${docId}`);
+            showToast("success", response.data.message);
+            return response.data.data; // Backend trả về danh sách favorites
         } catch (error) {
-            showToast("error", "Failed to toggle favorite");
             return rejectWithValue(
-                error.response?.data?.error || { message: "Failed to toggle favorite" }
+                error.response?.data || { message: "Lỗi khi cập nhật yêu thích." }
             );
         }
     }
 );
 
+export const fetchUserDownloads = createAsyncThunk(
+    "user/fetchUserDownloads",
+    async (params = {}, { rejectWithValue }) => {
+        try {
+            const response = await customAxios.get("/users/me/downloads", { params });
+            return response.data.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || { message: "Lỗi khi lấy lịch sử tải." });
+        }
+    }
+);
+
+// Initial State
+const initialState = {
+    userInfo: null,
+    history: [],
+    favorites: [],
+    downloads: [],
+    loading: false,
+    error: null,
+    pagination: {
+        history: { totalItems: 0, totalPages: 0, currentPage: 1, limit: 10 },
+        favorites: { totalItems: 0, totalPages: 0, currentPage: 1, limit: 10 },
+        downloads: { totalItems: 0, totalPages: 0, currentPage: 1, limit: 10 },
+    },
+};
+
+// ========== Helpers ==========
+
+const handlePending = (state) => {
+    state.loading = true;
+    state.error = null;
+};
+
+const handleRejected = (state, action) => {
+    state.loading = false;
+    let errorMessage = "Đã xảy ra lỗi không xác định.";
+    if (action.payload?.status === 401) {
+        errorMessage = "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.";
+    } else if (action.payload?.status === 404) {
+        errorMessage = "Không tìm thấy tài nguyên.";
+    } else {
+        errorMessage = action.payload?.message || action.error?.message || errorMessage;
+    }
+    state.error = errorMessage;
+    console.error("API Error:", action.payload || action.error);
+    showToast("error", errorMessage);
+};
+
+// ========== Slice ==========
+
+// User Slice
 const userSlice = createSlice({
     name: "user",
-    initialState: {
-        currentUser: null,
-        list: [],
-        history: [],
-        downloads: [],
-        favorites: [],
-        pagination: {
-            history: { page: 1, limit: 10, total: 0, totalPages: 0 },
-            downloads: { page: 1, limit: 10, total: 0, totalPages: 0 },
-            favorites: { page: 1, limit: 10, total: 0, totalPages: 0 },
-        },
-        loading: false,
-        error: null,
-    },
+    initialState,
     reducers: {
-        setCurrentUser: (state, action) => {
-            state.currentUser = action.payload;
+        clearError: (state) => {
+            state.error = null;
         },
-        logoutUser: (state) => {
-            state.currentUser = null;
-            state.history = [];
-            state.downloads = [];
-            state.favorites = [];
-            state.pagination = {
-                history: { page: 1, limit: 10, total: 0, totalPages: 0 },
-                downloads: { page: 1, limit: 10, total: 0, totalPages: 0 },
-                favorites: { page: 1, limit: 10, total: 0, totalPages: 0 },
-            };
+        resetUserState: (state) => {
+            return initialState;
         },
     },
-
     extraReducers: (builder) => {
-        // fetchUsers
+        // Đồng bộ với login/logout
         builder
-            .addCase(fetchUsers.pending, (state) => {
-                state.loading = true;
-                state.error = null;
+            .addCase(loginThunk.fulfilled, (state, action) => {
+                state.userInfo = action.payload.user; // Đồng bộ userInfo ngay sau login
             })
-            .addCase(fetchUsers.fulfilled, (state, action) => {
-                state.loading = false;
-                state.list = action.payload.users;
-            })
-            .addCase(fetchUsers.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload.message;
-            })
+            .addCase(logoutThunk.fulfilled, (state) => {
+                return initialState; // Reset userSlice khi logout
+            });
 
-            // fetchUserInfo
-            .addCase(fetchUserInfo.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
+        // fetchUserInfo
+        builder
+            .addCase(fetchUserInfo.pending, handlePending)
             .addCase(fetchUserInfo.fulfilled, (state, action) => {
                 state.loading = false;
-                state.currentUser = action.payload;
+                state.userInfo = action.payload;
             })
-            .addCase(fetchUserInfo.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload.message;
-            })
+            .addCase(fetchUserInfo.rejected, handleRejected);
 
-            // fetchUserHistory
-            .addCase(fetchUserHistory.pending, (state) => {
-                state.loading = true;
-                state.error = null;
+        // updateUserInfo
+        builder
+            .addCase(updateUserInfo.pending, handlePending)
+            .addCase(updateUserInfo.fulfilled, (state, action) => {
+                state.loading = false;
+                state.userInfo = action.payload;
             })
+            .addCase(updateUserInfo.rejected, handleRejected);
+
+        // deleteMyAccount
+        builder
+            .addCase(deleteMyAccount.pending, handlePending)
+            .addCase(deleteMyAccount.fulfilled, (state) => {
+                state.loading = false;
+                state.userInfo = null;
+            })
+            .addCase(deleteMyAccount.rejected, handleRejected);
+
+        // fetchUserHistory
+        builder
+            .addCase(fetchUserHistory.pending, handlePending)
             .addCase(fetchUserHistory.fulfilled, (state, action) => {
                 state.loading = false;
-                state.history = action.payload.history;
-                state.pagination.history = action.payload.pagination;
+                state.history = action.payload.items;
+                state.pagination.history = {
+                    totalItems: action.payload.totalItems,
+                    totalPages: action.payload.totalPages,
+                    currentPage: action.payload.currentPage,
+                    limit: action.payload.limit,
+                };
             })
-            .addCase(fetchUserHistory.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload.message;
-            })
-            // fetchUserDownloads
-            .addCase(fetchUserDownloads.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(fetchUserDownloads.fulfilled, (state, action) => {
-                state.loading = false;
-                state.downloads = action.payload.downloads;
-                state.pagination.downloads = action.payload.pagination;
-            })
-            .addCase(fetchUserDownloads.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload.message;
-            })
-            // fetchUserFavorites
-            .addCase(fetchUserFavorites.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
+            .addCase(fetchUserHistory.rejected, handleRejected);
+
+        // fetchUserFavorites
+        builder
+            .addCase(fetchUserFavorites.pending, handlePending)
             .addCase(fetchUserFavorites.fulfilled, (state, action) => {
                 state.loading = false;
-                state.favorites = action.payload.favorites;
-                state.pagination.favorites = action.payload.pagination;
+                state.favorites = action.payload.items;
+                state.pagination.favorites = {
+                    totalItems: action.payload.totalItems,
+                    totalPages: action.payload.totalPages,
+                    currentPage: action.payload.currentPage,
+                    limit: action.payload.limit,
+                };
             })
-            .addCase(fetchUserFavorites.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload.message;
-            })
-            // toggleFavorite
-            .addCase(toggleFavorite.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
+            .addCase(fetchUserFavorites.rejected, handleRejected);
+
+        // toggleFavorite
+        builder
+            .addCase(toggleFavorite.pending, handlePending)
             .addCase(toggleFavorite.fulfilled, (state, action) => {
                 state.loading = false;
-                state.favorites = action.payload;
+                state.favorites = action.payload; // Backend trả về danh sách favorites đầy đủ
             })
-            .addCase(toggleFavorite.rejected, (state, action) => {
+            .addCase(toggleFavorite.rejected, handleRejected);
+
+        // fetchUserDownloads
+        builder
+            .addCase(fetchUserDownloads.pending, handlePending)
+            .addCase(fetchUserDownloads.fulfilled, (state, action) => {
                 state.loading = false;
-                state.error = action.payload.message;
-            });
+                state.downloads = action.payload.items;
+                state.pagination.downloads = {
+                    totalItems: action.payload.totalItems,
+                    totalPages: action.payload.totalPages,
+                    currentPage: action.payload.currentPage,
+                    limit: action.payload.limit,
+                };
+            })
+            .addCase(fetchUserDownloads.rejected, handleRejected);
     },
 });
 
-export const { setCurrentUser, logoutUser } = userSlice.actions;
+export const { clearError, resetUserState } = userSlice.actions;
 export default userSlice.reducer;

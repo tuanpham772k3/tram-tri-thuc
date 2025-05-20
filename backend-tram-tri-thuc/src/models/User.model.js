@@ -29,20 +29,22 @@ const userSchema = new mongoose.Schema(
             default: null,
         },
 
-        googleId: {
+        // Token để xác minh email, refresh token hoặc logout
+        token: {
             type: String,
-            unique: true,
-            sparse: true, // Cho phép null nhưng vẫn unique
+            default: null,
         },
 
-        // Thêm trường cho xác thực email
-        isEmailVerified: { type: Boolean, default: false },
-        // Thêm trường cho xác thực mật khẩu quên
-        resetToken: { type: String, default: null },
-        resetTokenExpires: { type: Date, default: null },
-        // Thêm trường cho xác thực email
-        emailVerificationToken: { type: String, default: null },
-        emailVerificationTokenExpires: { type: Date, default: null },
+        // Reset mật khẩu
+        resetToken: {
+            type: String,
+            default: null,
+        },
+        
+        resetTokenExpires: {
+            type: Date,
+            default: null,
+        },
 
         role: {
             type: String,
@@ -56,8 +58,13 @@ const userSchema = new mongoose.Schema(
             default: true,
         },
 
-        favoriteDocuments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Document" }], // Danh sách tài liệu yêu thích
-        
+        favoriteDocuments: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Document",
+            },
+        ],
+
         recentViews: [
             {
                 documentId: { type: mongoose.Schema.Types.ObjectId, ref: "Document" },

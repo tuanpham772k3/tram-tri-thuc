@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const logger = require("../utils/logger");
 const Category = require("../models/Category.model");
 
-
 // Lấy danh sách danh mục
 const getCategory = async (req, res) => {
     try {
@@ -17,6 +16,33 @@ const getCategory = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Server error while retrieving categories",
+        });
+    }
+};
+
+// Lấy chi tiết danh mục theo slug
+const getCategoryDetail = async (req, res) => {
+    try {
+        const { slug } = req.params;
+        const category = await Category.findOne({ slug }).lean();
+
+        if (!category) {
+            return res.status(404).json({
+                success: false,
+                message: "Category not found",
+            });
+        }
+
+        return res.json({
+            success: true,
+            message: "Category retrieved successfully",
+            data: category,
+        });
+    } catch (error) {
+        logger.error("Get Category Detail Error", { error: error.message });
+        return res.status(500).json({
+            success: false,
+            message: "Server error while retrieving category detail",
         });
     }
 };
@@ -96,6 +122,7 @@ const deleteCategory = async (req, res) => {
 
 module.exports = {
     getCategory,
+    getCategoryDetail,
     createCategory,
     updateCategory,
     deleteCategory,

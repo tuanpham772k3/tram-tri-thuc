@@ -1,78 +1,67 @@
 const express = require("express");
 const router = express.Router();
-const passport = require("../config/passport.config");
-const authMiddleware = require("../middlewares/authMiddleware");
-const AuthService = require("../services/auth.service");
 const {
     register,
     forgotPassword,
     resetPassword,
-    getProfile,
     login,
     refreshToken,
-    verifyEmail,
-    resendVerificationEmail,
     logout,
 } = require("../controller/auth.controller");
-const {
-    registerLimiter,
-    resendVerificationLimiter,
-    loginLimiter,
-    forgotPasswordLimiter,
-} = require("../middlewares/rateLimit");
-const { upload } = require("../middlewares/uploadMiddleware");
+const authMiddleware = require("../middlewares/authMiddleware");
+const validate = require("../middlewares/validate");
+const { body } = require("express-validator");
+const { refreshTokenLimiter, forgotPasswordLimiter, loginLimiter } = require("../config/rateLimit");
 
 // API Đăng ký
-router.post("/register", registerLimiter, register);
+router.post(
+    "/register",
+    [
+        body("name").notEmpty().trim().withMessage("Tên không được để trống"),
+        body("email").isEmail().withMessage("Email không hợp lệ"),
+        body("password").isLength({ min: 6 }).withMessage("Mật khẩu phải có ít nhất 6 ký tự"),
+        validate,
+    ],
+    register
+);
 
 // API Đăng nhập
-router.post("/login", login);
-
-// API Đăng xuất
-router.post("/logout", authMiddleware, logout);
+router.post(
+    "/login",
+    [
+        body("email").isEmail().withMessage("Email không hợp lệ"),
+        body("password").notEmpty().withMessage("Mật khẩu không được để trống"),
+        validate,
+    ],
+    // loginLimiter,
+    login
+);
 
 // API Quên mật khẩu
-router.post("/forgot-password", forgotPasswordLimiter, forgotPassword);
+router.post(
+    "/forgot-password",
+    [body("email").isEmail().withMessage("Email không hợp lệ"), validate],
+    forgotPasswordLimiter,
+    forgotPassword
+);
 
 // API Reset Password
-router.post("/reset-password", resetPassword);
+router.post(
+    "/reset-password",
+    [
+        body("token").notEmpty().withMessage("Token không được để trống"),
+        body("newPassword")
+            .isLength({ min: 6 })
+            .withMessage("Mật khẩu mới phải có ít nhất 6 ký tự"),
+        validate,
+    ],
+    resetPassword
+);
 
 // API Refresh Token
-router.post("/refresh-token", refreshToken);
+router.post("/refresh-token", refreshTokenLimiter, refreshToken);
 
-// API Xác thực email
-router.post("/verify-email", verifyEmail);
-
-// API gửi lại xác thực email
-router.post("/resend-verification", resendVerificationLimiter, resendVerificationEmail);
-
-// API Đăng nhập bằng Google
-router.get(
-    "/google",
-    passport.authenticate("google", { scope: ["profile", "email"], session: false })
-);
-
-router.get(
-    "/google/callback",
-    passport.authenticate("google", { session: false, failureRedirect: "/api/v1/auth/login" }),
-    async (req, res) => {
-        try {
-            if (!req.user) {
-                throw new Error("User not found after Google authentication");
-            }
-            const tokens = await AuthService.generateTokens(req.user._id);
-            req.user.refreshToken = tokens.refreshToken;
-            await req.user.save();
-            res.redirect(
-                `${process.env.CLIENT_URL}/auth/callback?accessToken=${tokens.accessToken}&refreshToken=${tokens.refreshToken}`
-            );
-        } catch (error) {
-            console.error("Google callback error:", error.message);
-            res.redirect(
-                `${process.env.CLIENT_URL}/login?error=${encodeURIComponent(error.message)}`
-            );
-        }
-    }
-);
+// API Logout
+router.post("/logout", authMiddleware, logout);
 
 module.exports = router;

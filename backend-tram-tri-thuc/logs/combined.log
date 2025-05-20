@@ -228,3 +228,99 @@
 {"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:47:25"}
 {"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:55:15"}
 {"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:55:15"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:00:21"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:00:21"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:08:43"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:08:43"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:16:24"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:16:24"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:29:38"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:29:38"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:32:16"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:32:16"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:34:09"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:34:09"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 13:23:29"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 13:23:29"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 13:23:37"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 13:23:37"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 13:23:38"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 13:23:38"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 13:37:18"}
+{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 13:37:18"}
+{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-18 15:57:32"}
+{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-18 15:57:35"}
+{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-18 15:57:35"}
+{"level":"info","message":"User registered: tuanphamu23@gmail.com","timestamp":"2025-05-18 16:23:50"}
+{"level":"error","message":"Login error: secretOrPrivateKey must have a value","stack":"Error: secretOrPrivateKey must have a value\n    at module.exports [as sign] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\sign.js:111:20)\n    at createAccessToken (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:9:9)\n    at exports.login (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:69:29)","timestamp":"2025-05-18 16:40:36"}
+{"level":"error","message":"Login error: secretOrPrivateKey must have a value","stack":"Error: secretOrPrivateKey must have a value\n    at module.exports [as sign] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\sign.js:111:20)\n    at createAccessToken (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:9:9)\n    at exports.login (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:69:29)","timestamp":"2025-05-18 16:47:34"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-18 16:56:46"}
+{"level":"info","message":"Password reset token created for: tuanphamu23@gmail.com","timestamp":"2025-05-18 17:01:53"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-18 17:03:37"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-18 17:06:28"}
+{"level":"info","message":"Password reset token created for: tuanphamu23@gmail.com","timestamp":"2025-05-18 17:06:42"}
+{"level":"info","message":"Password reset token created for: tuanphamu23@gmail.com","timestamp":"2025-05-18 17:07:34"}
+{"level":"info","message":"Password reset token created for: tuanphamu23@gmail.com","timestamp":"2025-05-18 17:07:42"}
+{"level":"info","message":"Password reset token created for: tuanphamu23@gmail.com","timestamp":"2025-05-18 17:09:22"}
+{"level":"info","message":"Password reset successful for: tuanphamu23@gmail.com","timestamp":"2025-05-18 17:09:39"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-18 17:09:50"}
+{"level":"error","message":"Refresh token error: secret or public key must be provided","name":"JsonWebTokenError","stack":"JsonWebTokenError: secret or public key must be provided\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:113:19\n    at getSecret (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:97:14)\n    at module.exports [as verify] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:101:10)\n    at exports.refreshToken (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:177:29)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at next (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:149:13)\n    at Route.dispatch (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:119:3)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\index.js:284:15\n    at Function.process_params (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\index.js:346:12)","timestamp":"2025-05-18 17:13:07"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-18 17:14:26"}
+{"level":"error","message":"Refresh token error: secret or public key must be provided","name":"JsonWebTokenError","stack":"JsonWebTokenError: secret or public key must be provided\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:113:19\n    at getSecret (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:97:14)\n    at module.exports [as verify] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:101:10)\n    at exports.refreshToken (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:177:29)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at next (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:149:13)\n    at Route.dispatch (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:119:3)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\index.js:284:15\n    at Function.process_params (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\index.js:346:12)","timestamp":"2025-05-18 17:14:40"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-18 19:58:54"}
+{"level":"error","message":"Refresh token error: secret or public key must be provided","name":"JsonWebTokenError","stack":"JsonWebTokenError: secret or public key must be provided\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:113:19\n    at getSecret (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:97:14)\n    at module.exports [as verify] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:101:10)\n    at exports.refreshToken (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:177:29)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at next (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:149:13)\n    at Route.dispatch (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:119:3)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\index.js:284:15\n    at Function.process_params (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\index.js:346:12)","timestamp":"2025-05-18 19:59:20"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-18 20:05:54"}
+{"level":"info","message":"Access token refreshed for userId: 6829a7263094366bee88b487","timestamp":"2025-05-18 20:06:12"}
+{"level":"info","message":"User logged out: tuanphamu23@gmail.com","timestamp":"2025-05-18 20:13:02"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-18 22:02:20"}
+{"level":"info","message":"User registered: admin123@gmail.com","timestamp":"2025-05-18 22:16:58"}
+{"level":"info","message":"User login: admin123@gmail.com | role: member","timestamp":"2025-05-18 22:17:55"}
+{"level":"info","message":"User login: admin123@gmail.com | role: admin","timestamp":"2025-05-18 22:18:27"}
+{"level":"info","message":"User registered: vyp45090@gmail.com","timestamp":"2025-05-19 10:33:11"}
+{"level":"info","message":"User login: vyp45090@gmail.com | role: member","timestamp":"2025-05-19 10:33:24"}
+{"level":"info","message":"User login: vyp45090@gmail.com | role: member","timestamp":"2025-05-19 10:35:53"}
+{"level":"info","message":"User registered: admin123@gmail.com","timestamp":"2025-05-19 16:02:40"}
+{"level":"info","message":"User login: admin123@gmail.com | role: member","timestamp":"2025-05-19 16:02:53"}
+{"error":"jwt malformed","level":"error","message":"Lỗi xác thực","timestamp":"2025-05-19 19:07:10","token":"Bearer undefined...","url":"/api/v1/users/me"}
+{"error":"jwt malformed","level":"error","message":"Lỗi xác thực","timestamp":"2025-05-19 19:07:10","token":"Bearer undefined...","url":"/api/v1/users/me"}
+{"level":"info","message":"User registered: tuanphamu23@gmail.com","timestamp":"2025-05-19 20:23:28"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 20:23:41"}
+{"level":"error","message":"Forgot password error: sendResetPasswordEmail is not defined","stack":"ReferenceError: sendResetPasswordEmail is not defined\n    at exports.forgotPassword (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:128:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-19 20:23:55"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 20:24:10"}
+{"level":"error","message":"Forgot password error: sendResetPasswordEmail is not defined","stack":"ReferenceError: sendResetPasswordEmail is not defined\n    at exports.forgotPassword (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:128:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-19 20:24:28"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 20:26:14"}
+{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-19 20:26:30"}
+{"level":"info","message":"Gửi email thành công tới tuanphamu23@gmail.com","subject":"Đặt lại mật khẩu cho Trạm Tri Thức","timestamp":"2025-05-19 20:26:33"}
+{"level":"info","message":"Password reset token created and email sent to: tuanphamu23@gmail.com","timestamp":"2025-05-19 20:26:33"}
+{"error":"jwt malformed","ip":"::1","level":"error","message":"Lỗi xác thực","timestamp":"2025-05-19 23:15:22","token":"Bearer undefined...","url":"/api/v1/users/me","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"}
+{"error":"jwt malformed","ip":"::1","level":"error","message":"Lỗi xác thực","timestamp":"2025-05-19 23:15:22","token":"Bearer undefined...","url":"/api/v1/users/me","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"}
+{"level":"info","message":"User registered: tuanphamu23@gmail.com","timestamp":"2025-05-19 23:16:50"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:16:59"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:17:10"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:22:04"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:26:42"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /refresh-token","timestamp":"2025-05-19 23:26:42"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /login","timestamp":"2025-05-19 23:26:51"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:27:17"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:35:29"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:41:41"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:49:01"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:54:23"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:54:36"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:58:51"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:59:30"}
+{"level":"warn","message":"Rate limit reached for IP ::1 on /login","timestamp":"2025-05-20 00:01:55"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-20 00:02:16"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-20 00:02:24"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-20 00:38:30"}
+{"error":"jwt expired","ip":"::1","level":"error","message":"Lỗi xác thực","timestamp":"2025-05-20 08:43:56","token":"Bearer eyJhbGciOiJIU...","url":"/api/v1/users/me","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"}
+{"error":"jwt expired","ip":"::1","level":"error","message":"Lỗi xác thực","timestamp":"2025-05-20 08:43:56","token":"Bearer eyJhbGciOiJIU...","url":"/api/v1/users/me","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"}
+{"level":"info","message":"Access token refreshed for userId: 682b59726591242199306860","timestamp":"2025-05-20 08:43:56"}
+{"level":"info","message":"User logged out: tuanphamu23@gmail.com","timestamp":"2025-05-20 08:44:11"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-20 08:52:13"}
+{"level":"info","message":"User logged out: tuanphamu23@gmail.com","timestamp":"2025-05-20 08:53:17"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-20 08:59:21"}
+{"level":"info","message":"User logged out: tuanphamu23@gmail.com","timestamp":"2025-05-20 08:59:27"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-20 09:01:17"}
+{"level":"info","message":"User logged out: tuanphamu23@gmail.com","timestamp":"2025-05-20 09:14:18"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-20 09:14:27"}

@@ -3,34 +3,48 @@ import { Bell, UserCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import showToast from "../../../utils/toast";
-import { getProfile, logout } from "../../../store/slices/authSlice";
 import LoadingSpinner from "../../Common/LoadingSpinner";
+import { logoutThunk } from "../../../store/slices/authSlice";
+import { fetchUserInfo, resetUserState } from "../../../store/slices/userSlice";
 
 export default function Navbar() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { token, isAuthenticated, user, loading } = useSelector((state) => state.auth);
+    const { isAuthenticated, loading: authLoading } = useSelector((state) => state.auth);
+    const { userInfo, loading: userLoading, error: userError } = useSelector((state) => state.user);
 
     const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
     const closeDropdown = () => setIsDropdownOpen(false);
 
+    // Lấy thông tin người dùng khi đã đăng nhập
     useEffect(() => {
-        if (token && !user && !loading) {
-            dispatch(getProfile());
+        if (isAuthenticated) {
+            dispatch(fetchUserInfo());
         }
-    }, [token, user, loading, dispatch]);
+    }, [dispatch, isAuthenticated]);
 
+    // Xử lý lỗi khi lấy thông tin người dùng
+    useEffect(() => {
+        if (userError) {
+            showToast("error", userError);
+        }
+    }, [userError]);
+
+    // Đóng dropdown khi không đăng nhập
     useEffect(() => {
         if (!isAuthenticated) {
             closeDropdown();
+            dispatch(resetUserState()); // Reset user state khi đăng xuất
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, dispatch]);
 
+    // Xử lý đăng xuất
     const handleLogout = async () => {
         try {
             closeDropdown();
-            await dispatch(logout()).unwrap();
+            await dispatch(logoutThunk()).unwrap();
+            showToast("success", "Đăng xuất thành công.");
             setTimeout(() => navigate("/"), 100);
         } catch (error) {
             showToast("error", "Đăng xuất thất bại. Vui lòng thử lại.");
@@ -68,28 +82,34 @@ export default function Navbar() {
 
                 {isAuthenticated ? (
                     <div className="relative dropdown-avatar">
-                        {loading ? (
+                        {authLoading || userLoading ? (
                             <LoadingSpinner size="small" />
                         ) : (
                             <button
                                 onClick={toggleDropdown}
                                 className="flex items-center gap-2 text-gray-600 hover:text-blue-500"
-                                disabled={loading}
+                                disabled={authLoading || userLoading}
                             >
                                 <img
-                                    src={user?.avatar?.trim() || "/assets/react.svg"}
-                                    onError={(e) => (e.currentTarget.src = "/assets/react.svg")}
+                                    src={userInfo?.avatar || "/src/assets/default-avatar.png"}
+                                    onError={(e) =>
+                                        (e.currentTarget.src = "/src/assets/default-avatar.png")
+                                    }
                                     alt="User Avatar"
                                     className="w-8 h-8 rounded-full"
                                 />
                             </button>
                         )}
 
-                        {isDropdownOpen && isAuthenticated && user && (
+                        {isDropdownOpen && isAuthenticated && userInfo && (
                             <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg">
                                 <div className="px-4 py-2">
-                                    <p className="text-sm font-semibold">{user?.name}</p>
-                                    <p className="text-sm text-gray-500">{user?.email}</p>
+                                    <p className="text-sm font-semibold">
+                                        {userInfo.name || "Người dùng"}
+                                    </p>
+                                    <p className="text-sm text-gray-500">
+                                        {userInfo.email || "Không có email"}
+                                    </p>
                                 </div>
                                 <hr />
                                 <Link
@@ -102,7 +122,7 @@ export default function Navbar() {
                                 <button
                                     onClick={handleLogout}
                                     className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                    disabled={loading}
+                                    disabled={authLoading || userLoading}
                                 >
                                     Đăng xuất
                                 </button>

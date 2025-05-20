@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addCommentLocal, fetchCommentsByDocument } from "../../store/slices/commentSlice";
-import { fetchUsers } from "../../store/slices/userSlice";
 
 export default function CommentSection({ documentId }) {
     const dispatch = useDispatch();
@@ -10,14 +9,14 @@ export default function CommentSection({ documentId }) {
     const comments = byDocument[documentId] || [];
     const [newComment, setNewComment] = useState("");
 
-    useEffect(() => {
-        if (!byDocument[documentId]) {
-            dispatch(fetchCommentsByDocument(documentId));
-        }
-        if (users.length === 0) {
-            dispatch(fetchUsers());
-        }
-    }, [dispatch, documentId, byDocument, users.length]);
+    // useEffect(() => {
+    //     if (!byDocument[documentId]) {
+    //         dispatch(fetchCommentsByDocument(documentId));
+    //     }
+    //     if (users.length === 0) {
+    //         dispatch(fetchUsers());
+    //     }
+    // }, [dispatch, documentId, byDocument, users.length]);
 
     const handleAddComment = (e) => {
         e.preventDefault();

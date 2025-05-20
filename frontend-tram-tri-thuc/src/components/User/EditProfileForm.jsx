@@ -1,34 +1,28 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect, useMemo } from "react";
-import { clearUpdateSuccess, updateUserInfo } from "../../store/slices/authSlice";
+import { updateUserInfo } from "../../store/slices/userSlice";
 
 const EditProfileForm = () => {
     const dispatch = useDispatch();
-    const { user, loading, error, updateSuccess } = useSelector((state) => state.auth);
+    const { userInfo, loading: userLoading, error: userError } = useSelector((state) => state.user);
+
     const initialFormData = useMemo(
         () => ({
-            name: user?.name || "",
-            avatar: user?.avatar || "",
+            name: userInfo?.name || "",
+            avatar: userInfo?.avatar || "",
         }),
-        [user]
+        [userInfo]
     );
     const [formData, setFormData] = useState(initialFormData);
     const [formErrors, setFormErrors] = useState({ name: "", avatar: "" });
-    const [avatarPreview, setAvatarPreview] = useState(user?.avatar || "");
-
-    // Reset updateSuccess sau khi hiển thị
-    useEffect(() => {
-        if (updateSuccess) {
-            dispatch(clearUpdateSuccess());
-        }
-    }, [updateSuccess, dispatch]);
+    const [avatarPreview, setAvatarPreview] = useState(userInfo?.avatar || "");
 
     // Reset form khi user thay đổi
     useEffect(() => {
         setFormData(initialFormData);
-        setAvatarPreview(user?.avatar || "");
+        setAvatarPreview(userInfo?.avatar || "");
         setFormErrors({ name: "", avatar: "" });
-    }, [initialFormData, user]);
+    }, [initialFormData, userInfo]);
 
     const validateForm = () => {
         let isValid = true;
@@ -57,7 +51,7 @@ const EditProfileForm = () => {
 
     const handleReset = () => {
         setFormData(initialFormData);
-        setAvatarPreview(user?.avatar || "");
+        setAvatarPreview(userInfo?.avatar || "");
         setFormErrors({ name: "", avatar: "" });
     };
 
@@ -73,23 +67,18 @@ const EditProfileForm = () => {
             <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-2">Thông tin người dùng</h3>
                 <div className="flex items-center gap-4">
-                    {user?.avatar ? (
-                        <img
-                            src={user.avatar}
-                            alt="Avatar"
-                            className="w-16 h-16 rounded-full object-cover"
-                        />
-                    ) : (
-                        <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-gray-500">No Avatar</span>
-                        </div>
-                    )}
+                    <img
+                        src={userInfo?.avatar || "/src/assets/default-avatar.png"}
+                        alt="Avatar"
+                        className="w-16 h-16 rounded-full object-cover"
+                    />
+
                     <div>
                         <p className="text-gray-700">
-                            <strong>Email:</strong> {user?.email || "N/A"}
+                            <strong>Email:</strong> {userInfo?.email || "N/A"}
                         </p>
                         <p className="text-gray-700">
-                            <strong>Vai trò:</strong> {user?.role || "N/A"}
+                            <strong>Vai trò:</strong> {userInfo?.role || "N/A"}
                         </p>
                     </div>
                 </div>
@@ -145,23 +134,25 @@ const EditProfileForm = () => {
                     )}
                 </div>
 
-                {error && (
+                {userError && (
                     <p className="text-red-500 text-sm">
-                        {error.message || error.errors?.join(", ") || "Lỗi không xác định"}
+                        {userError.message ||
+                            userError.userError?.join(", ") ||
+                            "Lỗi không xác định"}
                     </p>
                 )}
 
                 <div className="flex gap-4">
                     <button
                         type="submit"
-                        disabled={loading}
+                        disabled={userLoading}
                         className={`px-4 py-2 rounded-md text-white ${
-                            loading
+                            userLoading
                                 ? "bg-blue-400 cursor-not-allowed"
                                 : "bg-blue-600 hover:bg-blue-700"
                         } transition-colors`}
                     >
-                        {loading ? (
+                        {userLoading ? (
                             <span className="flex items-center">
                                 <svg
                                     className="animate-spin h-5 w-5 mr-2 text-white"
