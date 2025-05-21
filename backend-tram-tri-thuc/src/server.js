@@ -6,9 +6,6 @@ const connectDB = require("./config/db.config.js");
 
 dotenv.config();
 
-// Import passport sau khi load biến môi trường
-// const passport = require("./config/passport.config.js");
-
 // Cấu hình CORS
 const corsOptions = {
     origin: process.env.CLIENT_URL || "http://localhost:5173", // Origin của frontend
@@ -21,10 +18,7 @@ const app = express();
 
 // Log request để debug
 app.use((req, res, next) => {
-    console.log(`Request: ${req.method} ${req.url} from ${req.headers.origin}`);
-    if (req.method === "OPTIONS") {
-        console.log("Preflight headers:", req.headers);
-    }
+    logger.info(`Request: ${req.method} ${req.originalUrl} from ${req.user?.email || "anonymous"}`);
     next();
 });
 
@@ -42,14 +36,12 @@ app.options("*", cors(corsOptions)); // Xử lý preflight request
 app.use(cookieParser());
 app.use(express.json());
 
-// Khởi tạo Passport
-// app.use(passport.initialize());
-
 // Connect to MongoDB
 connectDB();
 
 // Import routes
 const apiRoutes = require("./routers/index.js");
+const logger = require("./utils/logger.js");
 app.use("/api/v1", apiRoutes);
 
 app.get("/", (req, res) => {

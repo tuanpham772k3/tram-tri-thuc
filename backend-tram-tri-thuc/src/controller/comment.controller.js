@@ -1,5 +1,4 @@
 const Comment = require('../models/Comments.model'); // Đảm bảo đã có model Comment
-const Document = require('../models/Document.model'); // Nếu cần kiểm tra tài liệu
 const mongoose = require('mongoose');
 
 // Thêm bình luận mới

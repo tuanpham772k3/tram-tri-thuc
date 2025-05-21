@@ -1,129 +1,119 @@
 const mongoose = require("mongoose");
+const Category = require("../models/category.model");
+const Document = require("../models/document.model");
 const logger = require("../utils/logger");
-const Category = require("../models/Category.model");
+const slugify = require("slugify");
+const { getPagination, getPagingData } = require("../utils/paginate");
 
-// Lấy danh sách danh mục
-const getCategory = async (req, res) => {
+// GET /api/categories
+exports.getCategories = async (req, res) => {
     try {
-        const categories = await Category.find().lean();
-        return res.json({
-            success: true,
-            message: "Categories retrieved successfully",
-            data: categories,
-        });
+        const { page, limit, skip } = getPagination(req.query);
+        const categories = await Category.find()
+            .select("name slug description createdAt")
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean();
+        const total = await Category.countDocuments();
+        const pagingData = getPagingData(categories, total, page, limit);
+
+        res.status(200).json({ success: true, data: pagingData });
     } catch (error) {
-        logger.error("Get Category Error", { error: error.message });
-        return res.status(500).json({
-            success: false,
-            message: "Server error while retrieving categories",
-        });
+        logger.error("Get categories error:", error);
+        res.status(500).json({ success: false, message: "Không thể lấy danh sách danh mục." });
     }
 };
 
-// Lấy chi tiết danh mục theo slug
-const getCategoryDetail = async (req, res) => {
+// GET /api/categories/:slug
+exports.getCategoryBySlug = async (req, res) => {
     try {
-        const { slug } = req.params;
-        const category = await Category.findOne({ slug }).lean();
-
+        const category = await Category.findOne({ slug: req.params.slug })
+            .select("name slug description createdAt")
+            .lean();
         if (!category) {
-            return res.status(404).json({
-                success: false,
-                message: "Category not found",
-            });
+            return res.status(404).json({ success: false, message: "Danh mục không tồn tại." });
         }
-
-        return res.json({
-            success: true,
-            message: "Category retrieved successfully",
-            data: category,
-        });
+        res.status(200).json({ success: true, data: category });
     } catch (error) {
-        logger.error("Get Category Detail Error", { error: error.message });
-        return res.status(500).json({
-            success: false,
-            message: "Server error while retrieving category detail",
-        });
+        logger.error("Get category by slug error:", error);
+        res.status(500).json({ success: false, message: "Không thể lấy thông tin danh mục." });
     }
 };
 
-// Tạo danh mục mới
-const createCategory = async (req, res) => {
+// POST /api/categories
+exports.createCategory = async (req, res) => {
     try {
-        const { name, slug, description } = req.body;
+        const { name, description } = req.body;
+        let { slug } = req.body;
+        slug = slugify(slug || name, { lower: true, strict: true });
+
         const category = new Category({ name, slug, description });
         await category.save();
-        return res.status(201).json({
+
+        logger.info(`Category created by ${req.user.email}: ${name}`);
+        res.status(201).json({
             success: true,
-            message: "Category created successfully",
+            message: "Tạo danh mục thành công.",
             data: category,
         });
     } catch (error) {
-        logger.error("Create Category Error", { error: error.message });
-        return res.status(500).json({
-            success: false,
-            message: "Server error while creating category",
-        });
+        logger.error("Create category error:", error);
+        res.status(500).json({ success: false, message: "Không thể tạo danh mục." });
     }
 };
 
-// Cập nhật danh mục
-const updateCategory = async (req, res) => {
+// PATCH /api/categories/:id
+exports.updateCategory = async (req, res) => {
     try {
-        const { id } = req.params;
+        const category = await Category.findById(req.params.id);
+        if (!category) {
+            return res.status(404).json({ success: false, message: "Danh mục không tồn tại." });
+        }
+
         const updates = req.body;
-        const category = await Category.findByIdAndUpdate(id, updates, {
-            new: true,
-            runValidators: true,
-        }).lean();
-        if (!category) {
-            return res.status(404).json({
-                success: false,
-                message: "Category not found",
-            });
+        if (updates.name) {
+            updates.slug = slugify(updates.slug || updates.name, { lower: true, strict: true });
         }
-        return res.json({
+
+        Object.assign(category, updates);
+        await category.save();
+
+        logger.info(`Category updated by ${req.user.email}: ${category.name}`);
+        res.status(200).json({
             success: true,
-            message: "Category updated successfully",
+            message: "Cập nhật danh mục thành công.",
             data: category,
         });
     } catch (error) {
-        logger.error("Update Category Error", { error: error.message });
-        return res.status(500).json({
-            success: false,
-            message: "Server error while updating category",
-        });
+        logger.error("Update category error:", error);
+        res.status(500).json({ success: false, message: "Không thể cập nhật danh mục." });
     }
 };
 
-// Xoá danh mục
-const deleteCategory = async (req, res) => {
+// DELETE /api/categories/:id
+exports.deleteCategory = async (req, res) => {
     try {
-        const { id } = req.params;
-        const category = await Category.findByIdAndDelete(id).lean();
+        const category = await Category.findById(req.params.id);
         if (!category) {
-            return res.status(404).json({
+            return res.status(404).json({ success: false, message: "Danh mục không tồn tại." });
+        }
+
+        const documentCount = await Document.countDocuments({ categoryId: req.params.id });
+        if (documentCount > 0) {
+            return res.status(400).json({
                 success: false,
-                message: "Category not found",
+                message: "Không thể xóa danh mục vì có tài liệu liên quan.",
             });
         }
-        return res.json({
-            success: true,
-            message: "Category deleted successfully",
-        });
-    } catch (error) {
-        logger.error("Delete Category Error", { error: error.message });
-        return res.status(500).json({
-            success: false,
-            message: "Server error while deleting category",
-        });
-    }
-};
 
-module.exports = {
-    getCategory,
-    getCategoryDetail,
-    createCategory,
-    updateCategory,
-    deleteCategory,
+        await Category.deleteOne({ _id: req.params.id });
+
+        logger.info(`Category deleted by ${req.user.email}: ${category.name}`);
+        res.status(200).json({ success: true, message: "Xóa danh mục thành công." });
+    } catch (error) {
+        await session.abortTransaction();
+        logger.error("Delete category error:", error);
+        res.status(500).json({ success: false, message: "Không thể xóa danh mục." });
+    }
 };

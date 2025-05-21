@@ -1,326 +1,89 @@
-{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 08:48:38"}
-{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 08:49:36"}
-{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Đặt lại mật khẩu cho Trạm Tri Thức","timestamp":"2025-05-14 08:49:39"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 6823f6768b381698a46347ed","timestamp":"2025-05-14 08:50:40","userEmail":"tuan93834@donga.edu.vn","userId":"6823f6768b381698a46347ed"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 6823f6768b381698a46347ed","timestamp":"2025-05-14 08:50:40","userEmail":"tuan93834@donga.edu.vn","userId":"6823f6768b381698a46347ed"}
-{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 09:14:46"}
-{"error":"jwt is not defined","level":"error","message":"Server error during logout:","timestamp":"2025-05-14 09:41:27"}
-{"error":"jwt is not defined","level":"error","message":"Server error during logout:","timestamp":"2025-05-14 09:42:58"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 09:44:49"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 09:47:17"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 09:48:38"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 10:09:39"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 10:31:41","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 10:31:41","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 10:31:43","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 10:31:43","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 10:31:57"}
-{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 10:32:48"}
-{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 10:32:50"}
-{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 10:32:50"}
-{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 10:41:20"}
-{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 10:41:22"}
-{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 10:41:22"}
-{"error":"Invalid or expired verification token","level":"error","message":"Error verifying email:","timestamp":"2025-05-14 10:42:26"}
-{"error":"Invalid or expired verification token","level":"error","message":"Error verifying email:","timestamp":"2025-05-14 10:42:26"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:42:31"}
-{"error":"Invalid or expired verification token","level":"error","message":"Error verifying email:","timestamp":"2025-05-14 10:42:31"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:42:42"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:42:42"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:42:49"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:42:49"}
-{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 10:44:10"}
-{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 10:44:13"}
-{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 10:44:13"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:44:23"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:44:23"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:48:13"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:48:13"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:49:14"}
-{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 10:50:00"}
-{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 10:50:03"}
-{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 10:50:03"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:50:12"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:50:12"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:51:58"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:51:58"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:51:58"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:51:58"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:52:03"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:52:03"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:52:03"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:52:03"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:52:07"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:52:07"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:52:07"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 10:52:07"}
-{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 11:22:05"}
-{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 11:22:08"}
-{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 11:22:08"}
-{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 11:24:15"}
-{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 11:24:17"}
-{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 11:24:17"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 11:24:25"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /verify-email","timestamp":"2025-05-14 11:24:25"}
-{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 11:32:17"}
-{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 11:32:20"}
-{"error":"Invalid or expired verification token","level":"error","message":"Error verifying email:","timestamp":"2025-05-14 11:32:33"}
-{"error":"Invalid or expired verification token","level":"error","message":"Error verifying email:","timestamp":"2025-05-14 11:32:33"}
-{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 11:33:50"}
-{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 11:33:52"}
-{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 11:33:52"}
-{"level":"info","message":"Refresh token revoked for user: 68241d2d51f7521eec07a2a5","timestamp":"2025-05-14 11:37:24"}
-{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 11:37:51"}
-{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 11:37:53"}
-{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 11:37:53"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 11:48:59"}
-{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 11:49:13"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 11:49:31","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 11:49:31","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 11:49:32","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 11:49:32","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
-{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 11:51:03"}
-{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 11:51:11"}
-{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 12:01:19"}
-{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 12:01:26"}
-{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 12:01:32"}
-{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 12:01:37"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:16:04"}
-{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 13:16:11"}
-{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:31:33"}
-{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 13:31:39"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:32:26","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:32:26","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:32:40","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:32:40","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:33:00","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:33:00","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
-{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:33:44"}
-{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 13:33:50"}
-{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:43:01"}
-{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 13:44:04"}
-{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 13:51:38"}
-{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 13:55:29"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:56:07","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:56:08","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:56:10","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:56:10","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:59:14","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:59:14","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:59:23","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 13:59:23","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 14:01:29"}
-{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 14:05:15"}
-{"documentId":"680c7f63ac5af8a75f8bae14","level":"info","message":"Permission added successfully","permission":"viewer","targetEmail":"tuan93834@donga.edu.vn","timestamp":"2025-05-14 14:12:20","userId":"67ec03282f78201ca32dd287"}
-{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 14:12:22"}
-{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Tài liệu \"Bắt đầu triển khai tuần sáu\" đã được chia sẻ với bạn","timestamp":"2025-05-14 14:12:24"}
-{"documentId":"680c7f63ac5af8a75f8bae14","level":"info","message":"Add permission response","targetEmail":"tuan93834@donga.edu.vn","timestamp":"2025-05-14 14:12:24","userId":"67ec03282f78201ca32dd287"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 14:12:33"}
-{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 14:12:44"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 14:12:52","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 14:12:52","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
-{"documentId":"680c7f63ac5af8a75f8bae14","level":"info","message":"Shared document accessed","permission":"viewer","timestamp":"2025-05-14 14:13:08","userId":"682420c951f7521eec07a2fc"}
-{"documentId":"680c7f63ac5af8a75f8bae14","level":"info","message":"Shared document accessed","permission":"viewer","timestamp":"2025-05-14 14:13:08","userId":"682420c951f7521eec07a2fc"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 14:13:19","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 14:13:19","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
-{"documentId":"6808db928a975e2536fc7e7a","level":"info","message":"Shared document accessed","permission":"viewer","timestamp":"2025-05-14 14:13:20","userId":"682420c951f7521eec07a2fc"}
-{"documentId":"6808db928a975e2536fc7e7a","level":"info","message":"Shared document accessed","permission":"viewer","timestamp":"2025-05-14 14:13:20","userId":"682420c951f7521eec07a2fc"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 14:13:27","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
-{"documentCount":2,"documentIds":["6808db928a975e2536fc7e7a","680c7f63ac5af8a75f8bae14"],"level":"info","message":"Fetched shared documents for user 682420c951f7521eec07a2fc","timestamp":"2025-05-14 14:13:27","userEmail":"tuan93834@donga.edu.vn","userId":"682420c951f7521eec07a2fc"}
-{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 14:13:35"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:00:48","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:00:48","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:00:55","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:00:55","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:00:55","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:00:55","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:10:57","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:10:57","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:20","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["681c62194c71ba35af10f194"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:20","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":0,"documentIds":[],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:47","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":0,"documentIds":[],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:47","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":0,"documentIds":[],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:47","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":0,"documentIds":[],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:47","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":0,"documentIds":[],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:55","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":0,"documentIds":[],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:55","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:11:59"}
-{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 15:12:09"}
-{"documentId":"682438f2ed6772f191276232","level":"info","message":"Permission added successfully","permission":"viewer","targetEmail":"tuanphamu23@gmail.com","timestamp":"2025-05-14 15:12:29","userId":"682420c951f7521eec07a2fc"}
-{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 15:12:30"}
-{"level":"info","message":"Gửi email thành công tới tuanphamu23@gmail.com","subject":"Tài liệu \"DO_AN_IOT.docx\" đã được chia sẻ với bạn","timestamp":"2025-05-14 15:12:33"}
-{"documentId":"682438f2ed6772f191276232","level":"info","message":"Add permission response","targetEmail":"tuanphamu23@gmail.com","timestamp":"2025-05-14 15:12:33","userId":"682420c951f7521eec07a2fc"}
-{"level":"info","message":"Refresh token revoked for user: 682420c951f7521eec07a2fc","timestamp":"2025-05-14 15:12:42"}
-{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-14 15:12:50"}
-{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:12:55","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:12:55","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 15:58:00"}
-{"error":"Email already in use","level":"error","message":"Registration failed for tuan93834@donga.edu.vn","timestamp":"2025-05-14 16:00:46"}
-{"email":"tuan93834@donga.edu.vn","error":"Email already in use","level":"error","message":"Server error during registration:","timestamp":"2025-05-14 16:00:46"}
-{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-14 16:01:06"}
-{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-14 16:01:09"}
-{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-14 16:01:09"}
-{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 16:03:36","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-14 16:03:36","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-14 16:10:09"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:40:45"}
-{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:43:23","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:43:23","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentId":"682438f2ed6772f191276232","level":"info","message":"Shared document accessed","permission":"viewer","timestamp":"2025-05-15 12:43:26","userId":"67ec03282f78201ca32dd287"}
-{"documentId":"682438f2ed6772f191276232","level":"info","message":"Shared document accessed","permission":"viewer","timestamp":"2025-05-15 12:43:26","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:43:27","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:43:27","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:43:30","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:43:30","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:47:20","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"documentCount":1,"documentIds":["682438f2ed6772f191276232"],"level":"info","message":"Fetched shared documents for user 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:47:20","userEmail":"tuanphamu23@gmail.com","userId":"67ec03282f78201ca32dd287"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:52:07"}
-{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-15 12:52:12"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-15 12:56:22"}
-{"email":"tuan93834@donga.edu.vn","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-15 12:56:29"}
-{"level":"info","message":"Refresh token revoked for user: 68245bd0ed6772f19127679b","timestamp":"2025-05-15 12:56:50"}
-{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-15 12:56:55"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-15 13:08:33"}
-{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-16 19:37:53"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 20:35:52"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 20:37:45"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:00:27"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:00:47"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:01:08"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:19:37"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:21:25"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:29:20"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:29:58"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:30:34"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-16 21:58:11"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 11:05:11"}
-{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-17 15:35:32"}
-{"email":"tuanphamu23@gmail.com","level":"info","message":"Google OAuth: User authenticated","timestamp":"2025-05-17 15:35:32"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /login","timestamp":"2025-05-17 16:44:13"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 20:21:59"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 20:23:06"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 21:34:40"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 21:35:57"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 21:37:27"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 21:48:42"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 21:49:41"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 21:50:09"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 21:53:24"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /login","timestamp":"2025-05-17 22:01:10"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /login","timestamp":"2025-05-17 22:01:24"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-17 22:53:14"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:23:37"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:23:37"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:23:44"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:23:44"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:23:55"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:23:55"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:29:10"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:29:10"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:29:12"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:29:12"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:29:14"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:29:14"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:29:22"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:29:22"}
-{"level":"info","message":"Refresh token revoked for user: 67ec03282f78201ca32dd287","timestamp":"2025-05-18 09:47:02"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:47:25"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:47:25"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:55:15"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 09:55:15"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:00:21"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:00:21"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:08:43"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:08:43"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:16:24"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:16:24"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:29:38"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:29:38"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:32:16"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:32:16"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:34:09"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 10:34:09"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 13:23:29"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 13:23:29"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 13:23:37"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 13:23:37"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 13:23:38"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 13:23:38"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 13:37:18"}
-{"error":"Cannot read properties of undefined (reading 'filter')","level":"error","message":"Get User Downloads Error","timestamp":"2025-05-18 13:37:18"}
-{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-18 15:57:32"}
-{"level":"info","message":"Gửi email thành công tới tuan93834@donga.edu.vn","subject":"Xác thực email cho Trạm Tri Thức","timestamp":"2025-05-18 15:57:35"}
-{"level":"info","message":"User registered successfully: tuan93834@donga.edu.vn","timestamp":"2025-05-18 15:57:35"}
-{"level":"info","message":"User registered: tuanphamu23@gmail.com","timestamp":"2025-05-18 16:23:50"}
-{"level":"error","message":"Login error: secretOrPrivateKey must have a value","stack":"Error: secretOrPrivateKey must have a value\n    at module.exports [as sign] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\sign.js:111:20)\n    at createAccessToken (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:9:9)\n    at exports.login (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:69:29)","timestamp":"2025-05-18 16:40:36"}
-{"level":"error","message":"Login error: secretOrPrivateKey must have a value","stack":"Error: secretOrPrivateKey must have a value\n    at module.exports [as sign] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\sign.js:111:20)\n    at createAccessToken (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:9:9)\n    at exports.login (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:69:29)","timestamp":"2025-05-18 16:47:34"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-18 16:56:46"}
-{"level":"info","message":"Password reset token created for: tuanphamu23@gmail.com","timestamp":"2025-05-18 17:01:53"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-18 17:03:37"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-18 17:06:28"}
-{"level":"info","message":"Password reset token created for: tuanphamu23@gmail.com","timestamp":"2025-05-18 17:06:42"}
-{"level":"info","message":"Password reset token created for: tuanphamu23@gmail.com","timestamp":"2025-05-18 17:07:34"}
-{"level":"info","message":"Password reset token created for: tuanphamu23@gmail.com","timestamp":"2025-05-18 17:07:42"}
-{"level":"info","message":"Password reset token created for: tuanphamu23@gmail.com","timestamp":"2025-05-18 17:09:22"}
-{"level":"info","message":"Password reset successful for: tuanphamu23@gmail.com","timestamp":"2025-05-18 17:09:39"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-18 17:09:50"}
-{"level":"error","message":"Refresh token error: secret or public key must be provided","name":"JsonWebTokenError","stack":"JsonWebTokenError: secret or public key must be provided\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:113:19\n    at getSecret (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:97:14)\n    at module.exports [as verify] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:101:10)\n    at exports.refreshToken (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:177:29)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at next (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:149:13)\n    at Route.dispatch (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:119:3)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\index.js:284:15\n    at Function.process_params (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\index.js:346:12)","timestamp":"2025-05-18 17:13:07"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-18 17:14:26"}
-{"level":"error","message":"Refresh token error: secret or public key must be provided","name":"JsonWebTokenError","stack":"JsonWebTokenError: secret or public key must be provided\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:113:19\n    at getSecret (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:97:14)\n    at module.exports [as verify] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:101:10)\n    at exports.refreshToken (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:177:29)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at next (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:149:13)\n    at Route.dispatch (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:119:3)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\index.js:284:15\n    at Function.process_params (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\index.js:346:12)","timestamp":"2025-05-18 17:14:40"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-18 19:58:54"}
-{"level":"error","message":"Refresh token error: secret or public key must be provided","name":"JsonWebTokenError","stack":"JsonWebTokenError: secret or public key must be provided\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:113:19\n    at getSecret (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:97:14)\n    at module.exports [as verify] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\jsonwebtoken\\verify.js:101:10)\n    at exports.refreshToken (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:177:29)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at next (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:149:13)\n    at Route.dispatch (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:119:3)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\index.js:284:15\n    at Function.process_params (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\index.js:346:12)","timestamp":"2025-05-18 19:59:20"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-18 20:05:54"}
-{"level":"info","message":"Access token refreshed for userId: 6829a7263094366bee88b487","timestamp":"2025-05-18 20:06:12"}
-{"level":"info","message":"User logged out: tuanphamu23@gmail.com","timestamp":"2025-05-18 20:13:02"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-18 22:02:20"}
-{"level":"info","message":"User registered: admin123@gmail.com","timestamp":"2025-05-18 22:16:58"}
-{"level":"info","message":"User login: admin123@gmail.com | role: member","timestamp":"2025-05-18 22:17:55"}
-{"level":"info","message":"User login: admin123@gmail.com | role: admin","timestamp":"2025-05-18 22:18:27"}
-{"level":"info","message":"User registered: vyp45090@gmail.com","timestamp":"2025-05-19 10:33:11"}
-{"level":"info","message":"User login: vyp45090@gmail.com | role: member","timestamp":"2025-05-19 10:33:24"}
-{"level":"info","message":"User login: vyp45090@gmail.com | role: member","timestamp":"2025-05-19 10:35:53"}
-{"level":"info","message":"User registered: admin123@gmail.com","timestamp":"2025-05-19 16:02:40"}
-{"level":"info","message":"User login: admin123@gmail.com | role: member","timestamp":"2025-05-19 16:02:53"}
-{"error":"jwt malformed","level":"error","message":"Lỗi xác thực","timestamp":"2025-05-19 19:07:10","token":"Bearer undefined...","url":"/api/v1/users/me"}
-{"error":"jwt malformed","level":"error","message":"Lỗi xác thực","timestamp":"2025-05-19 19:07:10","token":"Bearer undefined...","url":"/api/v1/users/me"}
-{"level":"info","message":"User registered: tuanphamu23@gmail.com","timestamp":"2025-05-19 20:23:28"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 20:23:41"}
-{"level":"error","message":"Forgot password error: sendResetPasswordEmail is not defined","stack":"ReferenceError: sendResetPasswordEmail is not defined\n    at exports.forgotPassword (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:128:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-19 20:23:55"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 20:24:10"}
-{"level":"error","message":"Forgot password error: sendResetPasswordEmail is not defined","stack":"ReferenceError: sendResetPasswordEmail is not defined\n    at exports.forgotPassword (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\auth.controller.js:128:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-19 20:24:28"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 20:26:14"}
-{"level":"info","message":"Kết nối SMTP xác minh thành công cho tuanphamu23@gmail.com","timestamp":"2025-05-19 20:26:30"}
-{"level":"info","message":"Gửi email thành công tới tuanphamu23@gmail.com","subject":"Đặt lại mật khẩu cho Trạm Tri Thức","timestamp":"2025-05-19 20:26:33"}
-{"level":"info","message":"Password reset token created and email sent to: tuanphamu23@gmail.com","timestamp":"2025-05-19 20:26:33"}
-{"error":"jwt malformed","ip":"::1","level":"error","message":"Lỗi xác thực","timestamp":"2025-05-19 23:15:22","token":"Bearer undefined...","url":"/api/v1/users/me","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"}
-{"error":"jwt malformed","ip":"::1","level":"error","message":"Lỗi xác thực","timestamp":"2025-05-19 23:15:22","token":"Bearer undefined...","url":"/api/v1/users/me","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"}
-{"level":"info","message":"User registered: tuanphamu23@gmail.com","timestamp":"2025-05-19 23:16:50"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:16:59"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:17:10"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:22:04"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:26:42"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /refresh-token","timestamp":"2025-05-19 23:26:42"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /login","timestamp":"2025-05-19 23:26:51"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:27:17"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:35:29"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:41:41"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:49:01"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:54:23"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:54:36"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:58:51"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-19 23:59:30"}
-{"level":"warn","message":"Rate limit reached for IP ::1 on /login","timestamp":"2025-05-20 00:01:55"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-20 00:02:16"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-20 00:02:24"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-20 00:38:30"}
-{"error":"jwt expired","ip":"::1","level":"error","message":"Lỗi xác thực","timestamp":"2025-05-20 08:43:56","token":"Bearer eyJhbGciOiJIU...","url":"/api/v1/users/me","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"}
-{"error":"jwt expired","ip":"::1","level":"error","message":"Lỗi xác thực","timestamp":"2025-05-20 08:43:56","token":"Bearer eyJhbGciOiJIU...","url":"/api/v1/users/me","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"}
-{"level":"info","message":"Access token refreshed for userId: 682b59726591242199306860","timestamp":"2025-05-20 08:43:56"}
-{"level":"info","message":"User logged out: tuanphamu23@gmail.com","timestamp":"2025-05-20 08:44:11"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-20 08:52:13"}
-{"level":"info","message":"User logged out: tuanphamu23@gmail.com","timestamp":"2025-05-20 08:53:17"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-20 08:59:21"}
-{"level":"info","message":"User logged out: tuanphamu23@gmail.com","timestamp":"2025-05-20 08:59:27"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-20 09:01:17"}
-{"level":"info","message":"User logged out: tuanphamu23@gmail.com","timestamp":"2025-05-20 09:14:18"}
-{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-20 09:14:27"}
+{"level":"info","message":"Category deleted by admin123@gmail.com: Kỹ thuật phần cứng","timestamp":"2025-05-21 01:57:20"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-21 02:03:15"}
+{"level":"warn","message":"Access denied for non-admin user","timestamp":"2025-05-21 02:04:11","user":{"_id":"682b59726591242199306860","email":"tuanphamu23@gmail.com","role":"member"}}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-21 08:43:03"}
+{"error":"jwt expired","ip":"::1","level":"error","message":"Authentication error","timestamp":"2025-05-21 08:53:50","url":"/api/v1/users/me","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"}
+{"error":"jwt expired","ip":"::1","level":"error","message":"Authentication error","timestamp":"2025-05-21 08:53:50","url":"/api/v1/users/me","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"}
+{"level":"info","message":"Access token refreshed for userId: 682c02b3bdef5dcb9f3fc632","timestamp":"2025-05-21 08:53:50"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-21 09:25:06"}
+{"level":"error","message":"Download document error: Download is not defined","stack":"ReferenceError: Download is not defined\n    at exports.downloadDocument (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\document.controller.js:107:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-21 09:25:47"}
+{"level":"error","message":"Download document error: Download is not defined","stack":"ReferenceError: Download is not defined\n    at exports.downloadDocument (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\document.controller.js:107:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-21 09:27:40"}
+{"level":"info","message":"User login: uploader123@gmail.com | role: uploader","timestamp":"2025-05-21 09:31:27"}
+{"level":"error","message":"Upload document error: Document validation failed: fileName: Path `fileName` is required.","stack":"ValidationError: Document validation failed: fileName: Path `fileName` is required.\n    at Document.invalidate (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\document.js:3343:32)\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\document.js:3104:17\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\schemaType.js:1407:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)","timestamp":"2025-05-21 09:32:31"}
+{"level":"error","message":"Update document error: Document validation failed: fileName: Path `fileName` is required.","stack":"ValidationError: Document validation failed: fileName: Path `fileName` is required.\n    at Document.invalidate (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\document.js:3343:32)\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\document.js:3104:17\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\schemaType.js:1407:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)","timestamp":"2025-05-21 09:38:50"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Delete document error: The \"path\" argument must be of type string. Received undefined","stack":"TypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string. Received undefined\n    at Object.join (node:path:460:7)\n    at exports.deleteDocument (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\document.controller.js:282:31)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-21 09:40:46"}
+{"level":"info","message":"User login: uploader123@gmail.com | role: uploader","timestamp":"2025-05-21 09:40:58"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Delete document error: The \"path\" argument must be of type string. Received undefined","stack":"TypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string. Received undefined\n    at Object.join (node:path:460:7)\n    at exports.deleteDocument (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\document.controller.js:282:31)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-21 09:41:46"}
+{"level":"info","message":"User login: admin123@gmail.com | role: admin","timestamp":"2025-05-21 09:43:53"}
+{"_message":"Document validation failed","errors":{"fileName":{"kind":"required","message":"Path `fileName` is required.","name":"ValidatorError","path":"fileName","properties":{"message":"Path `fileName` is required.","path":"fileName","type":"required"}}},"level":"error","message":"Approve document error: Document validation failed: fileName: Path `fileName` is required.","stack":"ValidationError: Document validation failed: fileName: Path `fileName` is required.\n    at Document.invalidate (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\document.js:3343:32)\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\document.js:3104:17\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\schemaType.js:1407:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)","timestamp":"2025-05-21 09:44:58"}
+{"_message":"Document validation failed","errors":{"fileName":{"kind":"required","message":"Path `fileName` is required.","name":"ValidatorError","path":"fileName","properties":{"message":"Path `fileName` is required.","path":"fileName","type":"required"}}},"level":"error","message":"Approve document error: Document validation failed: fileName: Path `fileName` is required.","stack":"ValidationError: Document validation failed: fileName: Path `fileName` is required.\n    at Document.invalidate (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\document.js:3343:32)\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\document.js:3104:17\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\schemaType.js:1407:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)","timestamp":"2025-05-21 09:45:42"}
+{"level":"info","message":"User login: uploader123@gmail.com | role: uploader","timestamp":"2025-05-21 09:50:23"}
+{"level":"error","message":"Upload document error: Document validation failed: fileName: Path `fileName` is required.","stack":"ValidationError: Document validation failed: fileName: Path `fileName` is required.\n    at Document.invalidate (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\document.js:3343:32)\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\document.js:3104:17\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\schemaType.js:1407:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)","timestamp":"2025-05-21 09:50:49"}
+{"level":"error","message":"Upload document error: Document validation failed: fileName: Path `fileName` is required.","stack":"ValidationError: Document validation failed: fileName: Path `fileName` is required.\n    at Document.invalidate (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\document.js:3343:32)\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\document.js:3104:17\n    at D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\mongoose\\lib\\schemaType.js:1407:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)","timestamp":"2025-05-21 09:52:38"}
+{"level":"info","message":"Document uploaded by uploader123@gmail.com: Học Node.js","timestamp":"2025-05-21 10:10:24"}
+{"level":"error","message":"Download document error: Download is not defined","stack":"ReferenceError: Download is not defined\n    at exports.downloadDocument (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\document.controller.js:107:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-21 10:11:52"}
+{"level":"error","message":"Download document error: The \"path\" argument must be of type string. Received undefined","stack":"TypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string. Received undefined\n    at Object.join (node:path:460:7)\n    at exports.downloadDocument (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\document.controller.js:118:31)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-21 10:15:57"}
+{"level":"error","message":"Download document error: The \"path\" argument must be of type string. Received undefined","stack":"TypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string. Received undefined\n    at Object.join (node:path:460:7)\n    at exports.downloadDocument (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\document.controller.js:118:31)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-21 10:20:05"}
+{"error":"jwt expired","ip":"::1","level":"error","message":"Authentication error","timestamp":"2025-05-21 10:26:16","url":"/api/v1/documents/download/682d442088fe039bbfa288c2","userAgent":"PostmanRuntime/7.44.0"}
+{"level":"info","message":"User login: uploader123@gmail.com | role: uploader","timestamp":"2025-05-21 10:26:27"}
+{"error":"jwt expired","ip":"::1","level":"error","message":"Authentication error","timestamp":"2025-05-21 10:26:52","url":"/api/v1/documents/download/682d442088fe039bbfa288c2","userAgent":"PostmanRuntime/7.44.0"}
+{"error":"jwt expired","ip":"::1","level":"error","message":"Authentication error","timestamp":"2025-05-21 10:30:12","url":"/api/v1/documents/download/682d442088fe039bbfa288c2","userAgent":"PostmanRuntime/7.44.0"}
+{"error":"jwt expired","ip":"::1","level":"error","message":"Authentication error","timestamp":"2025-05-21 10:40:34","url":"/api/v1/documents/download/682d442088fe039bbfa288c2","userAgent":"PostmanRuntime/7.44.0"}
+{"level":"info","message":"User login: tuanphamu23@gmail.com | role: member","timestamp":"2025-05-21 10:41:48"}
+{"level":"info","message":"Document found: 682c25ce2d6ea23007292c75","timestamp":"2025-05-21 11:07:24"}
+{"level":"error","message":"Download document error: The \"path\" argument must be of type string. Received undefined","stack":"TypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string. Received undefined\n    at Object.join (node:path:460:7)\n    at exports.downloadDocument (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\document.controller.js:131:31)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-21 11:07:24"}
+{"level":"info","message":"Document found: 682d442088fe039bbfa288c2","timestamp":"2025-05-21 11:19:03"}
+{"level":"warn","message":"Access denied to document: 682d442088fe039bbfa288c2","timestamp":"2025-05-21 11:19:03","user":{"_id":"682b59726591242199306860","email":"tuanphamu23@gmail.com","role":"member"}}
+{"level":"info","message":"Document found: 682d442088fe039bbfa288c2","timestamp":"2025-05-21 11:20:00"}
+{"level":"info","message":"User login: uploader123@gmail.com | role: uploader","timestamp":"2025-05-21 11:21:15"}
+{"level":"info","message":"Document uploaded by uploader123@gmail.com: Học ReactJS.js","timestamp":"2025-05-21 11:23:45"}
+{"level":"error","message":"Get my documents error: Types is not defined","stack":"ReferenceError: Types is not defined\n    at exports.getMyDocuments (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\document.controller.js:226:9)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at next (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:149:13)\n    at isUploader (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\middlewares\\isUploader.js:12:16)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at next (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:149:13)\n    at authMiddleware (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\middlewares\\authMiddleware.js:46:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-21 11:31:29"}
+{"level":"info","message":"Request: GET /api/v1/documents/me from anonymous","timestamp":"2025-05-21 11:35:14"}
+{"level":"error","message":"Get my documents error: Types is not defined","stack":"ReferenceError: Types is not defined\n    at exports.getMyDocuments (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\document.controller.js:226:9)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at next (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:149:13)\n    at isUploader (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\middlewares\\isUploader.js:12:16)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at next (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:149:13)\n    at authMiddleware (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\middlewares\\authMiddleware.js:46:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-21 11:35:14"}
+{"level":"info","message":"Request: GET /api/v1/documents/me from anonymous","timestamp":"2025-05-21 11:35:31"}
+{"level":"error","message":"Get my documents error: Types is not defined","stack":"ReferenceError: Types is not defined\n    at exports.getMyDocuments (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\document.controller.js:226:9)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at next (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:149:13)\n    at isUploader (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\middlewares\\isUploader.js:12:16)\n    at Layer.handle [as handle_request] (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\layer.js:95:5)\n    at next (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\node_modules\\express\\lib\\router\\route.js:149:13)\n    at authMiddleware (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\middlewares\\authMiddleware.js:46:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-21 11:35:31"}
+{"level":"info","message":"Request: GET /api/v1/documents/me from anonymous","timestamp":"2025-05-21 11:37:51"}
+{"level":"info","message":"Đang lấy tài liệu cho người dùng","timestamp":"2025-05-21 11:37:51","userId":"682c02b3bdef5dcb9f3fc632"}
+{"level":"info","message":"Request: PATCH /api/v1/documents/682d442088fe039bbfa288c2 from anonymous","timestamp":"2025-05-21 11:41:14"}
+{"level":"info","message":"Request: DELETE /api/v1/documents/682d555146f7fdb91a52b5fe from anonymous","timestamp":"2025-05-21 11:43:12"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Delete document error: The \"path\" argument must be of type string. Received undefined","stack":"TypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string. Received undefined\n    at Object.join (node:path:460:7)\n    at exports.deleteDocument (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\document.controller.js:302:31)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-21 11:43:12"}
+{"level":"info","message":"Request: DELETE /api/v1/documents/682d555146f7fdb91a52b5fe from anonymous","timestamp":"2025-05-21 11:43:35"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Delete document error: The \"path\" argument must be of type string. Received undefined","stack":"TypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string. Received undefined\n    at Object.join (node:path:460:7)\n    at exports.deleteDocument (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\document.controller.js:302:31)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-21 11:43:36"}
+{"level":"info","message":"Request: DELETE /api/v1/documents/682d555146f7fdb91a52b5fe from anonymous","timestamp":"2025-05-21 14:05:50"}
+{"error":"jwt expired","ip":"::1","level":"error","message":"Authentication error","timestamp":"2025-05-21 14:05:50","url":"/api/v1/documents/682d555146f7fdb91a52b5fe","userAgent":"PostmanRuntime/7.44.0"}
+{"level":"info","message":"Request: POST /api/v1/auth/login from anonymous","timestamp":"2025-05-21 14:05:58"}
+{"level":"info","message":"User login: uploader123@gmail.com | role: uploader","timestamp":"2025-05-21 14:05:59"}
+{"level":"info","message":"Request: DELETE /api/v1/documents/682d555146f7fdb91a52b5fe from anonymous","timestamp":"2025-05-21 14:06:32"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Delete document error: The \"path\" argument must be of type string. Received undefined","stack":"TypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string. Received undefined\n    at Object.join (node:path:460:7)\n    at exports.deleteDocument (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\document.controller.js:302:31)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-21 14:06:32"}
+{"level":"info","message":"Request: DELETE /api/v1/documents/682d555146f7fdb91a52b5fe from anonymous","timestamp":"2025-05-21 14:09:38"}
+{"level":"error","message":"Delete document error: The \"path\" argument must be of type string. Received undefined","stack":"TypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string. Received undefined\n    at Object.join (node:path:460:7)\n    at exports.deleteDocument (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\document.controller.js:302:31)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-21 14:09:38"}
+{"level":"info","message":"Request: DELETE /api/v1/documents/682d555146f7fdb91a52b5fe from anonymous","timestamp":"2025-05-21 14:32:29"}
+{"level":"error","message":"Delete document error: document.remove is not a function","stack":"TypeError: document.remove is not a function\n    at exports.deleteDocument (D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\src\\controller\\document.controller.js:313:24)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-05-21 14:32:29"}
+{"level":"info","message":"Request: POST /api/v1/documents from anonymous","timestamp":"2025-05-21 14:33:31"}
+{"level":"info","message":"Request: POST /api/v1/documents from anonymous","timestamp":"2025-05-21 14:53:45"}
+{"level":"info","message":"Document uploaded by uploader123@gmail.com: Học ReactJS.js","timestamp":"2025-05-21 14:53:46"}
+{"level":"info","message":"Request: POST /api/v1/documents from anonymous","timestamp":"2025-05-21 14:54:54"}
+{"level":"info","message":"Document uploaded by uploader123@gmail.com: Học Node.js","timestamp":"2025-05-21 14:54:54"}
+{"level":"info","message":"Request: DELETE /api/v1/documents/682d86ce223b9671689c707b from anonymous","timestamp":"2025-05-21 14:55:23"}
+{"level":"info","message":"Deleted file: D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\uploads\\1747814094577-833768421-ST21A1B_PhamAnhTuan_CV.pdf","timestamp":"2025-05-21 14:55:23"}
+{"level":"info","message":"Deleted thumbnail: D:\\DoAn\\quan-ly-thu-vien-online\\backend-tram-tri-thuc\\Uploads\\1747814094581-804031384-images.png","timestamp":"2025-05-21 14:55:23"}
+{"level":"info","message":"Document deleted by uploader123@gmail.com: Học Node.js","timestamp":"2025-05-21 14:55:23"}
+{"level":"info","message":"Request: POST /api/v1/documents from anonymous","timestamp":"2025-05-21 14:56:09"}
+{"level":"info","message":"Document uploaded by uploader123@gmail.com: Học Node.js","timestamp":"2025-05-21 14:56:09"}
+{"level":"info","message":"Request: POST /api/v1/auth/login from anonymous","timestamp":"2025-05-21 15:13:04"}
+{"level":"info","message":"User login: admin123@gmail.com | role: admin","timestamp":"2025-05-21 15:13:05"}
+{"level":"info","message":"Request: GET /api/v1/documents/feature/682d8689223b9671689c7076 from anonymous","timestamp":"2025-05-21 15:14:07"}
+{"level":"info","message":"Request: GET /api/v1/documents/feature/682d8689223b9671689c7076 from anonymous","timestamp":"2025-05-21 15:16:21"}
+{"level":"info","message":"Request: GET /api/v1/documents/feature/682d8719223b9671689c7083 from anonymous","timestamp":"2025-05-21 15:16:56"}
+{"level":"info","message":"Request: GET /api/v1/documents/feature/682d8719223b9671689c7083 from anonymous","timestamp":"2025-05-21 15:18:30"}
+{"level":"info","message":"Request: GET /api/v1/documents/feature/682d8719223b9671689c7083 from anonymous","timestamp":"2025-05-21 15:19:53"}
+{"level":"info","message":"Request: PATCH /api/v1/documents/feature/682d8719223b9671689c7083 from anonymous","timestamp":"2025-05-21 15:21:45"}
+{"level":"info","message":"Document featured by admin123@gmail.com: Học Node.js","timestamp":"2025-05-21 15:21:45"}
+{"level":"info","message":"Request: PATCH /api/v1/documents/approve/682d8719223b9671689c7083 from anonymous","timestamp":"2025-05-21 15:23:28"}
+{"level":"info","message":"Document approved by admin123@gmail.com: Học Node.js","timestamp":"2025-05-21 15:23:28"}
+{"level":"info","message":"Request: GET /api/v1/documents/featured?page=1&limit=6 from anonymous","timestamp":"2025-05-21 15:24:26"}
+{"level":"info","message":"Request: GET /api/v1/documents/featured?page=1&limit=6 from anonymous","timestamp":"2025-05-21 15:26:12"}
+{"level":"info","message":"Request: POST /api/v1/auth/login from anonymous","timestamp":"2025-05-21 15:27:15"}
+{"level":"info","message":"User login: uploader123@gmail.com | role: uploader","timestamp":"2025-05-21 15:27:15"}
+{"level":"info","message":"Request: GET /api/v1/documents/featured?page=1&limit=6 from anonymous","timestamp":"2025-05-21 15:27:39"}
+{"level":"info","message":"Request: GET /api/v1/documents/featured?page=1&limit=6 from anonymous","timestamp":"2025-05-21 15:44:46"}

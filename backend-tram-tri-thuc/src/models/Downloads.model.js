@@ -1,13 +1,29 @@
 const mongoose = require("mongoose");
-const { Schema } = mongoose;
 
-const DownloadSchema = new Schema({
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    documentId: { type: Schema.Types.ObjectId, ref: "Document", required: true },
-    downloadedAt: { type: Date, default: Date.now },
-    ipAddress: { type: String, required: false },
-});
+const downloadSchema = new mongoose.Schema(
+    {
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        documentId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Document",
+            required: true,
+        },
+        downloadedAt: {
+            type: Date,
+            required: true,
+        },
+        ipAddress: {
+            type: String,
+        },
+        deviceInfo: {
+            type: String,
+        },
+    },
+    { timestamps: true }
+);
 
-const Download = mongoose.model("Download", DownloadSchema);
-
-module.exports = Download;
+module.exports = mongoose.model("Download", downloadSchema);

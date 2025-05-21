@@ -11,7 +11,7 @@ const {
 const authMiddleware = require("../middlewares/authMiddleware");
 const validate = require("../middlewares/validate");
 const { body } = require("express-validator");
-const { refreshTokenLimiter, forgotPasswordLimiter, loginLimiter } = require("../config/rateLimit");
+const { forgotPasswordLimiter, loginLimiter } = require("../middlewares/rateLimit");
 
 // API Đăng ký
 router.post(
@@ -33,7 +33,7 @@ router.post(
         body("password").notEmpty().withMessage("Mật khẩu không được để trống"),
         validate,
     ],
-    // loginLimiter,
+    loginLimiter,
     login
 );
 
@@ -59,7 +59,7 @@ router.post(
 );
 
 // API Refresh Token
-router.post("/refresh-token", refreshTokenLimiter, refreshToken);
+router.post("/refresh-token", refreshToken);
 
 // API Logout
 router.post("/logout", authMiddleware, logout);

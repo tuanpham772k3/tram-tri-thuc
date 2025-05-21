@@ -1,7 +1,11 @@
+// frontend/src/components/Pagination.js
 import PropTypes from "prop-types";
 
 const Pagination = ({ page, totalPages, onNext, onPrev, onPageChange, isLoading }) => {
-    const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+    const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1).slice(
+        Math.max(0, page - 3),
+        page + 2
+    ); // Giới hạn số trang hiển thị
 
     return (
         <div className="mt-4 flex justify-center gap-4 flex-wrap">

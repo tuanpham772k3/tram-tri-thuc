@@ -1,31 +1,33 @@
+import { useEffect } from "react";
 import { NavLink } from "react-router-dom";
-
-// Hàm tạo slug đơn giản
-const toSlug = (name) =>
-    name
-        .normalize("NFD") // bỏ dấu tiếng Việt
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .replace(/\s+/g, "-");
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCategories } from "../../store/slices/categorySlice";
 
 export default function CategorySidebar() {
-    const categories = ["Toán", "Văn", "Hóa học", "Vật lý", "Lịch sử"];
+    const dispatch = useDispatch();
+    const { categories, loading, error } = useSelector((state) => state.categories);
+
+    useEffect(() => {
+        dispatch(fetchCategories());
+    }, [dispatch]);
 
     return (
         <div className="p-4 border rounded">
             <h4 className="font-semibold mb-3">📁 Danh mục</h4>
+            {loading && <p>Đang tải...</p>}
+            {error && <p className="text-red-500">{error}</p>}
             <ul className="space-y-2">
                 {categories.map((cat) => (
-                    <li key={cat}>
+                    <li key={cat._id}>
                         <NavLink
-                            to={`/category/${toSlug(cat)}`}
+                            to={`/category/${cat.slug}`}
                             className={({ isActive }) =>
                                 `block px-2 py-1 rounded hover:bg-gray-100 ${
                                     isActive ? "font-semibold text-blue-600" : ""
                                 }`
                             }
                         >
-                            {cat}
+                            {cat.name}
                         </NavLink>
                     </li>
                 ))}

@@ -13,8 +13,8 @@ export const store = configureStore({
     reducer: {
         auth: authReducer,
         user: userReducer,
-        document: documentReducer,
-        category: categoryReducer,
+        documents: documentReducer,
+        categories: categoryReducer,
         comment: commentReducer,
         notification: notificationReducer,
         download: downloadReducer,

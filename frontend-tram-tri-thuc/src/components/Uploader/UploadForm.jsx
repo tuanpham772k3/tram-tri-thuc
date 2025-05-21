@@ -1,63 +1,96 @@
-import { useState } from "react";
+// frontend/src/components/Uploader/UploadForm.js
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCategories } from "../../store/slices/categorySlice";
+import { uploadDocument } from "../../store/slices/documentSlice";
 
-const UploadForm = () => {
+export default function UploadForm() {
+    const dispatch = useDispatch();
+    const { categories } = useSelector((state) => state.categories);
+    const { loading, error } = useSelector((state) => state.documents);
     const [formData, setFormData] = useState({
         title: "",
         description: "",
         categoryId: "",
-        tags: "",
+        tag: "",
         file: null,
+        thumbnail: null,
     });
 
-    const handleChange = (e) => {
-        const { name, value, files } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: files ? files[0] : value,
-        }));
-    };
+    useEffect(() => {
+        dispatch(fetchCategories());
+    }, [dispatch]);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // TODO: Gọi API đăng tài liệu
-        console.log(formData);
+        const data = new FormData();
+        data.append("title", formData.title);
+        data.append("description", formData.description);
+        data.append("categoryId", formData.categoryId);
+        data.append("tag", formData.tag);
+        if (formData.file) data.append("file", formData.file);
+        if (formData.thumbnail) data.append("thumbnail", formData.thumbnail);
+
+        dispatch(uploadDocument(data));
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4 max-w-xl">
+        <form onSubmit={handleSubmit} className="space-y-4">
+            {error && <p className="text-red-500">{error}</p>}
             <input
-                name="title"
+                type="text"
                 placeholder="Tiêu đề"
                 value={formData.title}
-                onChange={handleChange}
-                className="input w-full"
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="w-full p-2 border rounded"
+                required
             />
             <textarea
-                name="description"
                 placeholder="Mô tả"
                 value={formData.description}
-                onChange={handleChange}
-                className="textarea w-full"
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="w-full p-2 border rounded"
             />
+            <select
+                value={formData.categoryId}
+                onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                className="w-full p-2 border rounded"
+                required
+            >
+                <option value="">Chọn danh mục</option>
+                {categories.map((cat) => (
+                    <option key={cat._id} value={cat._id}>
+                        {cat.name}
+                    </option>
+                ))}
+            </select>
             <input
-                name="tags"
-                placeholder="Thẻ (cách nhau bởi dấu phẩy)"
-                value={formData.tags}
-                onChange={handleChange}
-                className="input w-full"
+                type="text"
+                placeholder="Tags (cách nhau bằng dấu phẩy)"
+                value={formData.tag}
+                onChange={(e) => setFormData({ ...formData, tag: e.target.value })}
+                className="w-full p-2 border rounded"
             />
             <input
                 type="file"
-                name="file"
-                accept=".pdf,.doc,.ppt"
-                onChange={handleChange}
-                className="file-input"
+                accept=".pdf,.jpg,.png"
+                onChange={(e) => setFormData({ ...formData, file: e.target.files[0] })}
+                className="w-full p-2 border rounded"
+                required
             />
-            <button type="submit" className="btn btn-primary">
-                Tải lên
+            <input
+                type="file"
+                accept=".jpg,.png"
+                onChange={(e) => setFormData({ ...formData, thumbnail: e.target.files[0] })}
+                className="w-full p-2 border rounded"
+            />
+            <button
+                type="submit"
+                disabled={loading}
+                className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
+            >
+                {loading ? "Đang tải..." : "Tải lên"}
             </button>
         </form>
     );
-};
-
-export default UploadForm;
+}
