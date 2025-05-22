@@ -1,9 +1,9 @@
-const userService = require("../services/user.service");
+const UserService = require("../services/user.service");
 const logger = require("../utils/logger");
 
 async function getUsers(req, res) {
     try {
-        const users = await userService.getUsers(req.query);
+        const users = await UserService.getUsers(req.query);
         return res.status(200).json({
             success: true,
             status: 200,
@@ -22,7 +22,7 @@ async function getUsers(req, res) {
 
 async function getUserInfo(req, res) {
     try {
-        const user = await userService.getUserInfo(req.user._id);
+        const user = await UserService.getUserInfo(req.user._id);
         return res.status(200).json({
             success: true,
             status: 200,
@@ -41,7 +41,7 @@ async function getUserInfo(req, res) {
 
 async function updateUserInfo(req, res) {
     try {
-        const user = await userService.updateUserInfo(req.user._id, req.body);
+        const user = await UserService.updateUserInfo(req.user._id, req.body);
         return res.status(200).json({
             success: true,
             status: 200,
@@ -60,7 +60,7 @@ async function updateUserInfo(req, res) {
 
 async function deleteMyAccount(req, res) {
     try {
-        await userService.deleteMyAccount(req.user._id);
+        await UserService.deleteMyAccount(req.user._id);
         return res.status(200).json({
             success: true,
             status: 200,
@@ -79,7 +79,7 @@ async function deleteMyAccount(req, res) {
 
 async function getUserHistory(req, res) {
     try {
-        const history = await userService.getUserHistory(req.user._id, req.query);
+        const history = await UserService.getUserHistory(req.user._id, req.query);
         return res.status(200).json({
             success: true,
             status: 200,
@@ -98,7 +98,7 @@ async function getUserHistory(req, res) {
 
 async function getUserFavorites(req, res) {
     try {
-        const favorites = await userService.getUserFavorites(req.user._id, req.query);
+        const favorites = await UserService.getUserFavorites(req.user._id, req.query);
         return res.status(200).json({
             success: true,
             status: 200,
@@ -118,7 +118,7 @@ async function getUserFavorites(req, res) {
 async function toggleFavorite(req, res) {
     try {
         const { docId } = req.params;
-        const result = await userService.toggleFavorite(req.user._id, docId);
+        const result = await UserService.toggleFavorite(req.user._id, docId);
         return res.status(200).json({
             success: true,
             status: 200,
@@ -137,7 +137,7 @@ async function toggleFavorite(req, res) {
 
 async function getUserDownloads(req, res) {
     try {
-        const downloads = await userService.getUserDownloads(req.user._id, req.query);
+        const downloads = await UserService.getUserDownloads(req.user._id, req.query);
         return res.status(200).json({
             success: true,
             status: 200,

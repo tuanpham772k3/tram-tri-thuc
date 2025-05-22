@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { deleteDocument, fetchMyDocuments } from "../../store/slices/documentSlice";
+import { clearError, deleteDocument, fetchMyDocuments } from "../../store/slices/documentSlice";
 import showToast from "../../utils/toast";
 
 export default function MyDocumentsPage() {
@@ -22,6 +22,7 @@ export default function MyDocumentsPage() {
         } else {
             dispatch(fetchMyDocuments());
         }
+        return () => dispatch(clearError()); // Xóa lỗi khi unmount
     }, [dispatch, navigate, userInfo]);
 
     useEffect(() => {
@@ -60,7 +61,8 @@ export default function MyDocumentsPage() {
                                         Đăng ngày: {new Date(doc.createdAt).toLocaleDateString()}
                                     </p>
                                     <p className="text-sm">
-                                        Trạng thái: {doc.isApproved ? "Đã duyệt" : "Chờ duyệt"}
+                                        Trạng thái:{" "}
+                                        {doc.status === "approved" ? "Đã duyệt" : "Chờ duyệt"}
                                     </p>
                                 </div>
                                 <div className="flex gap-2">

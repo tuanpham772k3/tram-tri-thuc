@@ -86,7 +86,9 @@ exports.getDocumentBySlug = async (req, res) => {
             .lean();
 
         if (!document) {
-            return res.status(404).json({ success: false, message: "Tài liệu không tồn tại." });
+            return res
+                .status(404)
+                .json({ success: false, message: "Tài liệu không tồn tại hoặc không công khai." });
         }
 
         await Document.findOneAndUpdate({ slug: req.params.slug }, { $inc: { viewCount: 1 } });

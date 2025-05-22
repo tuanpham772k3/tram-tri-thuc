@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "../../store/slices/categorySlice";
-import { uploadDocument } from "../../store/slices/documentSlice";
+import { clearError, uploadDocument } from "../../store/slices/documentSlice";
+import showToast from "../../utils/toast";
 
 export default function UploadForm() {
     const dispatch = useDispatch();
@@ -18,7 +19,8 @@ export default function UploadForm() {
     });
 
     useEffect(() => {
-        dispatch(fetchCategories());
+        dispatch(fetchCategories({ page: 1, limit: 100 })); // Lấy tất cả danh mục
+        return () => dispatch(clearError()); // Xóa lỗi khi unmount
     }, [dispatch]);
 
     const handleSubmit = async (e) => {
@@ -31,11 +33,24 @@ export default function UploadForm() {
         if (formData.file) data.append("file", formData.file);
         if (formData.thumbnail) data.append("thumbnail", formData.thumbnail);
 
-        dispatch(uploadDocument(data));
+        try {
+            await dispatch(uploadDocument(data)).unwrap();
+            showToast("success", "Tải tài liệu thành công!");
+            setFormData({
+                title: "",
+                description: "",
+                categoryId: "",
+                tag: "",
+                file: null,
+                thumbnail: null,
+            });
+        } catch (err) {
+            showToast("error", "Không thể tải tài liệu");
+        }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 max-w-xl">
             {error && <p className="text-red-500">{error}</p>}
             <input
                 type="text"
@@ -73,7 +88,7 @@ export default function UploadForm() {
             />
             <input
                 type="file"
-                accept=".pdf,.jpg,.png"
+                accept=".pdf"
                 onChange={(e) => setFormData({ ...formData, file: e.target.files[0] })}
                 className="w-full p-2 border rounded"
                 required

@@ -5,20 +5,20 @@ import { useDispatch, useSelector } from "react-redux";
 import DownloadButton from "../components/Document/DownloadButton";
 import CommentSection from "../components/Document/CommentSection";
 import RatingStars from "../components/Document/RatingStars";
-import { fetchDocumentById } from "../store/slices/documentSlice";
+import { fetchDocumentBySlug } from "../store/slices/documentSlice";
 
 export default function DocumentDetailPage() {
-    const { id } = useParams();
+    const { slug } = useParams();
     const dispatch = useDispatch();
     const { currentDocument, loading, error } = useSelector((state) => state.documents);
 
     useEffect(() => {
-        dispatch(fetchDocumentById(id));
-    }, [dispatch, id]);
+        dispatch(fetchDocumentBySlug(slug));
+    }, [dispatch, slug]);
 
-    if (loading) return <p>Đang tải...</p>;
-    if (error) return <p className="text-red-500">{error}</p>;
-    if (!currentDocument) return <p>Tài liệu không tồn tại.</p>;
+    if (loading) return <p className="p-6">Đang tải...</p>;
+    if (error) return <p className="p-6 text-red-500">{error}</p>;
+    if (!currentDocument) return <p className="p-6">Tài liệu không tồn tại.</p>;
 
     return (
         <div className="p-6">
@@ -28,9 +28,9 @@ export default function DocumentDetailPage() {
                 {new Date(currentDocument.createdAt).toLocaleDateString()}
             </p>
             <RatingStars rating={currentDocument.rating || 0} />
-            <DownloadButton documentId={id} />
+            <DownloadButton documentId={slug} />
             <hr className="my-4" />
-            <CommentSection documentId={id} />
+            <CommentSection documentId={slug} />
         </div>
     );
 }

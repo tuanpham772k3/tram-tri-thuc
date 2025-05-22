@@ -60,7 +60,7 @@ router.get(
     "/:id",
     [param("id").isMongoId().withMessage("Invalid document ID"), validate],
     async (req, res, next) => {
-        req.document = await require("../models/document.model").findById(req.params.id);
+        req.document = await require("../models/Document.model").findById(req.params.id);
         next();
     },
     checkDocumentStatus,
@@ -78,7 +78,7 @@ router.get(
         validate,
     ],
     async (req, res, next) => {
-        req.document = await require("../models/document.model").findOne({ slug: req.params.slug });
+        req.document = await require("../models/Document.model").findOne({ slug: req.params.slug });
         next();
     },
     checkDocumentStatus,

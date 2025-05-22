@@ -38,6 +38,7 @@ import MyDocumentsPage from "../pages/Uploader/MyDocumentsPage";
 import ProtectedRoute from "./ProtectedRoute";
 import UploaderRoute from "./UploaderRoute";
 import AdminRoute from "./AdminRoute";
+import EditDocumentForm from "../components/Uploader/EditDocumentForm";
 
 const router = createBrowserRouter([
     {
@@ -45,7 +46,7 @@ const router = createBrowserRouter([
         element: <MainLayout />,
         children: [
             { index: true, element: <HomePage /> },
-            { path: "document/:id", element: <DocumentDetailPage /> },
+            { path: "documents/:slug", element: <DocumentDetailPage /> },
             { path: "category/:slug", element: <CategoryPage /> },
             { path: "search", element: <SearchPage /> },
         ],
@@ -91,6 +92,7 @@ const router = createBrowserRouter([
         children: [
             { path: "upload", element: <UploadPage /> },
             { path: "my-documents", element: <MyDocumentsPage /> },
+            { path: "edit-document/:documentId", element: <EditDocumentForm /> },
         ],
     },
     // {

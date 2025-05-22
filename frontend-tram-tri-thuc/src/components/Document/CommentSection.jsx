@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addCommentLocal, fetchCommentsByDocument } from "../../store/slices/commentSlice";
+import { addCommentLocal} from "../../store/slices/commentSlice";
 
 export default function CommentSection({ documentId }) {
     const dispatch = useDispatch();

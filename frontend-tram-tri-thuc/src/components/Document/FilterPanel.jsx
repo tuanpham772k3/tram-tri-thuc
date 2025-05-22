@@ -3,8 +3,8 @@ import { useState } from "react";
 
 export default function FilterPanel({ onFilterChange }) {
     const [filters, setFilters] = useState({
-        format: "",
-        createdAt: "",
+        search: "",
+        sort: "createdAt:desc",
     });
 
     const handleChange = (key, value) => {
@@ -17,23 +17,22 @@ export default function FilterPanel({ onFilterChange }) {
         <div className="p-3 border rounded mb-4">
             <h4 className="font-semibold mb-2">🎛 Bộ lọc nâng cao</h4>
             <div className="space-y-2">
-                <select
+                <input
+                    type="text"
+                    placeholder="Tìm kiếm tài liệu..."
+                    value={filters.search}
+                    onChange={(e) => handleChange("search", e.target.value)}
                     className="w-full border rounded px-2 py-1"
-                    value={filters.format}
-                    onChange={(e) => handleChange("format", e.target.value)}
-                >
-                    <option value="">Loại tài liệu</option>
-                    <option value="pdf">PDF</option>
-                    <option value="docx">Word</option>
-                </select>
+                />
                 <select
+                    value={filters.sort}
+                    onChange={(e) => handleChange("sort", e.target.value)}
                     className="w-full border rounded px-2 py-1"
-                    value={filters.createdAt}
-                    onChange={(e) => handleChange("createdAt", e.target.value)}
                 >
-                    <option value="">Thời gian</option>
-                    <option value="2024">2024</option>
-                    <option value="2023">2023</option>
+                    <option value="createdAt:desc">Mới nhất</option>
+                    <option value="createdAt:asc">Cũ nhất</option>
+                    <option value="views:desc">Xem nhiều nhất</option>
+                    <option value="downloads:desc">Tải nhiều nhất</option>
                 </select>
             </div>
         </div>

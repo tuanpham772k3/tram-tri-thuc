@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Download } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { downloadDocument } from "../../store/slices/documentSlice";
+import showToast from "../../utils/toast";
 
 export default function DownloadButton({ documentId }) {
     const dispatch = useDispatch();
@@ -11,7 +12,12 @@ export default function DownloadButton({ documentId }) {
 
     const handleDownload = async () => {
         setIsDownloading(true);
-        await dispatch(downloadDocument(documentId));
+        try {
+            await dispatch(downloadDocument(documentId)).unwrap();
+            showToast("success", "Tải tài liệu thành công!");
+        } catch (err) {
+            showToast("error", "Không thể tải tài liệu");
+        }
         setIsDownloading(false);
     };
 

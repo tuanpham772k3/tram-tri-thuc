@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import customAxios from "../../utils/customAxios";
 
-// Lấy danh sách tất cả danh mục
+// Lấy danh sách tất cả danh mục với phân trang
 export const fetchCategories = createAsyncThunk(
     "categories/fetchCategories",
-    async (_, { rejectWithValue }) => {
+    async (params = {}, { rejectWithValue }) => {
         try {
-            const response = await customAxios.get("/categories");
-            return response.data.data;
+            const response = await customAxios.get("/categories", { params });
+            return response.data.data; // { totalItems, totalPages, currentPage, items }
         } catch (error) {
             return rejectWithValue(
                 error.response?.data?.message || "Không thể lấy danh sách danh mục"
@@ -22,7 +22,7 @@ export const fetchCategoryBySlug = createAsyncThunk(
     async (slug, { rejectWithValue }) => {
         try {
             const response = await customAxios.get(`/categories/${slug}`);
-            return response.data.data;
+            return response.data.data; // category
         } catch (error) {
             return rejectWithValue(
                 error.response?.data?.message || "Không thể lấy chi tiết danh mục"
@@ -37,7 +37,7 @@ export const createCategory = createAsyncThunk(
     async (data, { rejectWithValue }) => {
         try {
             const response = await customAxios.post("/categories", data);
-            return response.data.data;
+            return response.data.data; // category
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || "Không thể tạo danh mục");
         }
@@ -50,7 +50,7 @@ export const updateCategory = createAsyncThunk(
     async ({ id, data }, { rejectWithValue }) => {
         try {
             const response = await customAxios.patch(`/categories/${id}`, data);
-            return response.data.data;
+            return response.data.data; // category
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || "Không thể cập nhật danh mục");
         }
@@ -63,34 +63,27 @@ export const deleteCategory = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             await customAxios.delete(`/categories/${id}`);
-            return id;
+            return id; // Trả về id để xóa trong state
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || "Không thể xóa danh mục");
         }
     }
 );
 
-// ========== Helpers ==========
-
-const handlePending = (state) => {
-    state.loading = true;
-    state.error = null;
-};
-
-const handleRejected = (state, action) => {
-    state.loading = false;
-    state.error = action.payload || "Đã xảy ra lỗi không xác định";
-};
-
 // ========== Slice ==========
 
 const categorySlice = createSlice({
     name: "categories",
     initialState: {
-        categories: [],
-        currentCategory: null,
+        categories: [], // Danh sách danh mục
+        currentCategory: null, // Chi tiết danh mục hiện tại
         loading: false,
         error: null,
+        pagination: {
+            totalItems: 0,
+            totalPages: 0,
+            currentPage: 1,
+        },
     },
     reducers: {
         clearError: (state) => {
@@ -98,12 +91,27 @@ const categorySlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        // fetchCategories
+        const handlePending = (state) => {
+            state.loading = true;
+            state.error = null;
+        };
+
+        const handleRejected = (state, action) => {
+            state.loading = false;
+            state.error = action.payload || "Đã xảy ra lỗi không xác định";
+        };
+
         builder
+            // fetchCategories
             .addCase(fetchCategories.pending, handlePending)
             .addCase(fetchCategories.fulfilled, (state, action) => {
                 state.loading = false;
-                state.categories = action.payload;
+                state.categories = action.payload.items;
+                state.pagination = {
+                    totalItems: action.payload.totalItems,
+                    totalPages: action.payload.totalPages,
+                    currentPage: action.payload.currentPage,
+                };
             })
             .addCase(fetchCategories.rejected, handleRejected)
             // fetchCategoryBySlug
@@ -118,6 +126,7 @@ const categorySlice = createSlice({
             .addCase(createCategory.fulfilled, (state, action) => {
                 state.loading = false;
                 state.categories.push(action.payload);
+                state.pagination.totalItems += 1;
             })
             .addCase(createCategory.rejected, handleRejected)
             // updateCategory
@@ -140,6 +149,7 @@ const categorySlice = createSlice({
                 if (state.currentCategory?._id === action.payload) {
                     state.currentCategory = null;
                 }
+                state.pagination.totalItems -= 1;
             })
             .addCase(deleteCategory.rejected, handleRejected);
     },
