@@ -24,60 +24,13 @@ const userSchema = new mongoose.Schema(
             },
         },
 
-        avatar: {
-            type: String,
-            default: null,
-        },
-
-        // Token để xác minh email, refresh token hoặc logout
-        token: {
-            type: String,
-            default: null,
-        },
-
-        // Reset mật khẩu
-        resetToken: {
-            type: String,
-            default: null,
-        },
-        
-        resetTokenExpires: {
-            type: Date,
-            default: null,
-        },
-
-        role: {
-            type: String,
-            enum: ["admin", "uploader", "member"],
-            default: "member",
-        },
-
-        // Trạng thái hoạt động
-        isActive: {
-            type: Boolean,
-            default: true,
-        },
-
-        favoriteDocuments: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Document",
-            },
-        ],
-
-        recentViews: [
-            {
-                documentId: { type: mongoose.Schema.Types.ObjectId, ref: "Document" },
-                viewedAt: { type: Date, default: Date.now },
-            },
-        ],
-
-        downloadHistory: [
-            {
-                documentId: { type: mongoose.Schema.Types.ObjectId, ref: "Document" },
-                downloadedAt: { type: Date, default: Date.now },
-            },
-        ],
+        avatar: { type: String, default: null },
+        token: { type: String, default: null }, // Token để xác minh email, refresh token hoặc logout
+        resetToken: { type: String, default: null }, // Reset mật khẩu
+        resetTokenExpires: { type: Date, default: null },
+        role: { type: String, enum: ["admin", "uploader", "member"], default: "member" },
+        isActive: { type: Boolean, default: true }, // Trạng thái hoạt động
+        favoriteDocuments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Document" }], // Danh sách tài liệu yêu thích
     },
     { timestamps: true }
 );

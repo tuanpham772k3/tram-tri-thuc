@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
 const User = require("../models/user.model");
+const Rating = require("../models/Rating.model");
+const Document = require("../models/Document.model");
+const ViewHistory = require("../models/ViewHistory.model");
+const Downloads = require("../models/Download.model");
 const logger = require("../utils/logger");
 const { getPagination, getPagingData } = require("../utils/paginate");
 
@@ -47,6 +51,16 @@ class UserService {
                 if (updateData[field] !== undefined) filteredData[field] = updateData[field];
             });
 
+            if (filteredData.email) {
+                const existingUser = await User.findOne({
+                    email: filteredData.email,
+                    _id: { $ne: userId },
+                });
+                if (existingUser) {
+                    throw new Error("Email đã được sử dụng.");
+                }
+            }
+
             const user = await User.findByIdAndUpdate(userId, filteredData, {
                 new: true,
                 runValidators: true,
@@ -63,10 +77,27 @@ class UserService {
 
     static async deleteMyAccount(userId) {
         try {
-            const user = await User.findByIdAndDelete(userId);
+            const user = await User.findById(userId);
             if (!user) {
                 throw new Error("Không tìm thấy người dùng");
             }
+
+            // Soft delete tài liệu
+            await Document.updateMany(
+                { uploaderId: userId },
+                { isPublic: false, status: "rejected" }
+            );
+
+            // Soft delete bình luận
+            await Comment.updateMany({ userId }, { isDeleted: true });
+
+            // Xóa đánh giá
+            await Rating.deleteMany({ userId });
+
+            // Xóa user
+            await User.deleteOne({ _id: userId });
+
+            logger.info(`Account deleted for userId: ${userId}`);
             return;
         } catch (error) {
             logger.error("Lỗi deleteMyAccount:", error);
@@ -78,17 +109,15 @@ class UserService {
         try {
             const { page, limit, skip } = getPagination(queryParams);
 
-            const user = await User.findById(userId).select("recentViews");
-            if (!user) throw new Error("Không tìm thấy người dùng");
+            const history = await ViewHistory.find({ userId })
+                .populate("documentId", "title slug")
+                .sort({ viewedAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean();
 
-            const total = user.recentViews.length;
-
-            // Phân trang mảng recentViews trong code (MongoDB không hỗ trợ phân trang mảng con trực tiếp)
-            const pagedViews = user.recentViews
-                .sort((a, b) => b.viewedAt - a.viewedAt)
-                .slice(skip, skip + limit);
-
-            return getPagingData(pagedViews, total, page, limit);
+            const total = await ViewHistory.countDocuments({ userId });
+            return getPagingData(history, total, page, limit);
         } catch (error) {
             logger.error("Lỗi getUserHistory:", error);
             throw error;
@@ -130,6 +159,11 @@ class UserService {
                 throw new Error("ID tài liệu không hợp lệ");
             }
 
+            const document = await Document.findById(docId);
+            if (!document || document.status !== "approved") {
+                throw new Error("Tài liệu không tồn tại hoặc chưa được duyệt.");
+            }
+
             const user = await User.findById(userId);
             if (!user) throw new Error("Không tìm thấy người dùng");
 
@@ -158,16 +192,15 @@ class UserService {
         try {
             const { page, limit, skip } = getPagination(queryParams);
 
-            const user = await User.findById(userId).select("downloadHistory");
-            if (!user) throw new Error("Không tìm thấy người dùng");
+            const downloads = await Downloads.find({ userId })
+                .populate("documentId", "title slug")
+                .sort({ downloadedAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean();
 
-            const total = user.downloadHistory.length;
-
-            const pagedDownloads = user.downloadHistory
-                .sort((a, b) => b.downloadedAt - a.downloadedAt)
-                .slice(skip, skip + limit);
-
-            return getPagingData(pagedDownloads, total, page, limit);
+            const total = await Downloads.countDocuments({ userId });
+            return getPagingData(downloads, total, page, limit);
         } catch (error) {
             logger.error("Lỗi getUserDownloads:", error);
             throw error;

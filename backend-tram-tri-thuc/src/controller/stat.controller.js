@@ -1,7 +1,7 @@
 const Document = require("../models/Document.model");
 const User = require("../models/User.model");
 const Rating = require("../models/Rating.model");
-const Comment = require("../models/Comments.model");
+const Comment = require("../models/Comment.model");
 
 // Tổng quan hệ thống
 exports.getOverview = async (req, res) => {

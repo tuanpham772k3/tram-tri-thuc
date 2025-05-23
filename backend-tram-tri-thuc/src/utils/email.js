@@ -1,108 +1,32 @@
 const nodemailer = require("nodemailer");
 const logger = require("./logger");
 
-// Tạo transporter dùng chung cho tất cả email
-const createTransporter = () => {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        throw new Error("Thiếu biến môi trường EMAIL_USER hoặc EMAIL_PASS");
-    }
+const transporter = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+        user: process.env.EMAIL_USER, // Ví dụ: your-email@gmail.com
+        pass: process.env.EMAIL_PASS, // App Password từ Gmail
+    },
+});
 
-    return nodemailer.createTransport({
-        service: "Gmail",
-        pool: true, // Sử dụng connection pool để tối ưu
-        maxConnections: 5, // Giới hạn số kết nối đồng thời
-        maxMessages: 100, // Giới hạn số email mỗi kết nối
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
-};
-
-// Hàm chung để gửi email
-const sendEmail = async ({ to, subject, html }) => {
-    const transporter = createTransporter();
-
+exports.sendResetPasswordEmail = async (email, resetLink) => {
     try {
-        // Kiểm tra kết nối SMTP trước khi gửi
-        await transporter.verify();
-        logger.info(`Kết nối SMTP xác minh thành công cho ${process.env.EMAIL_USER}`);
-
-        // Gửi email
         await transporter.sendMail({
-            from: `"Trạm Tri Thức" <${process.env.EMAIL_USER}>`,
-            to,
-            subject,
-            html,
+            from: `"Thư viện tài liệu" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: "Đặt lại mật khẩu",
+            html: `
+                <p>Xin chào,</p>
+                <p>Bạn đã yêu cầu đặt lại mật khẩu. Vui lòng nhấn vào liên kết dưới đây để tiếp tục:</p>
+                <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Đặt lại mật khẩu</a>
+                <p>Liên kết này sẽ hết hạn sau 10 phút.</p>
+                <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>
+                <p>Trân trọng,<br>Đội ngũ Thư viện tài liệu</p>
+            `,
         });
-
-        logger.info(`Gửi email thành công tới ${to}`, { subject });
+        logger.info(`Reset password email sent to: ${email}`);
     } catch (error) {
-        logger.error(`Gửi email thất bại tới ${to}`, {
-            subject,
-            error: error.message,
-            smtpCode: error.code,
-            smtpResponse: error.response,
-        });
-        throw new Error(`Gửi email thất bại: ${error.message}`);
+        logger.error(`Error sending reset password email: ${error.message}`);
+        throw new Error("Không thể gửi email đặt lại mật khẩu.");
     }
-};
-
-// Gửi email xác minh tài khoản
-const sendVerificationEmail = async (email, token) => {
-    const link = `${process.env.CLIENT_URL}/verify?token=${token}`;
-    const html = `
-        <h3>Xin chào!</h3>
-        <p>Vui lòng <a href="${link}">nhấn vào đây</a> để xác thực email của bạn.</p>
-        <p>Link sẽ hết hạn sau 24 giờ.</p>
-        <p>Trân trọng,<br/>Trạm Tri Thức</p>
-    `;
-
-    await sendEmail({
-        to: email,
-        subject: "Xác thực email cho Trạm Tri Thức",
-        html,
-    });
-};
-
-// Gửi email đặt lại mật khẩu
-const sendResetPasswordEmail = async (email, resetLink) => {
-    const html = `
-        <h3>Xin chào!</h3>
-        <p>Vui lòng <a href="${resetLink}">nhấn vào đây</a> để đặt lại mật khẩu của bạn.</p>
-        <p>Link sẽ hết hạn sau 10 phút.</p>
-        <p>Trân trọng,<br/>Trạm Tri Thức</p>
-    `;
-
-    await sendEmail({
-        to: email,
-        subject: "Đặt lại mật khẩu cho Trạm Tri Thức",
-        html,
-    });
-};
-
-// Gửi thông báo chia sẻ tài liệu
-const sendShareNotification = async (to, documentName, permission, customMessage = null) => {
-    const permissionText = permission === "editor" ? "Chỉnh sửa" : "Chỉ xem";
-    const message =
-        customMessage ||
-        `Tài liệu <b>${documentName}</b> đã được chia sẻ với bạn với quyền <b>${permissionText}</b>.`;
-    const html = `
-        <h3>Xin chào!</h3>
-        <p>${message}</p>
-        <p>Truy cập <a href="${process.env.CLIENT_URL}/shared-with-me">Trạm Tri Thức</a> để xem tài liệu.</p>
-        <p>Trân trọng,<br/>Trạm Tri Thức</p>
-    `;
-
-    await sendEmail({
-        to,
-        subject: `Tài liệu "${documentName}" đã được chia sẻ với bạn`,
-        html,
-    });
-};
-
-module.exports = {
-    sendVerificationEmail,
-    sendResetPasswordEmail,
-    sendShareNotification,
 };

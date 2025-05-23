@@ -16,7 +16,6 @@ import SearchPage from "../pages/SearchPage";
 import Login from "../pages/Auth/Login";
 import Register from "../pages/Auth/Register";
 import ForgotPassword from "../pages/Auth/ForgotPassword";
-import ResetPassword from "../pages/Auth/ResetPassword";
 
 // Pages – User
 import MyDownloadsPage from "../pages/user/MyDownloadsPage";
@@ -39,6 +38,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import UploaderRoute from "./UploaderRoute";
 import AdminRoute from "./AdminRoute";
 import EditDocumentForm from "../components/Uploader/EditDocumentForm";
+import ResetPassword from "../pages/Auth/ResetPassword";
 
 const router = createBrowserRouter([
     {

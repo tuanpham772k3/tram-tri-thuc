@@ -117,7 +117,7 @@ async function getUserFavorites(req, res) {
 
 async function toggleFavorite(req, res) {
     try {
-        const { docId } = req.params;
+        const { id: docId } = req.params;
         const result = await UserService.toggleFavorite(req.user._id, docId);
         return res.status(200).json({
             success: true,

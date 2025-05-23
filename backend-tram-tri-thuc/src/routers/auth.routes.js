@@ -41,7 +41,7 @@ router.post(
 router.post(
     "/forgot-password",
     [body("email").isEmail().withMessage("Email không hợp lệ"), validate],
-    forgotPasswordLimiter,
+    // forgotPasswordLimiter,
     forgotPassword
 );
 

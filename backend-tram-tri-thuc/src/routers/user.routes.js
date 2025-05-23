@@ -12,6 +12,8 @@ const {
     getUserDownloads,
     deleteMyAccount,
 } = require("../controller/user.controller");
+const { param } = require("express-validator");
+const validate = require("../middlewares/validate");
 
 // Lấy danh sách người dùng(admin)
 router.get("/", authMiddleware, isAdmin, getUsers);
@@ -35,6 +37,11 @@ router.get("/me/downloads", authMiddleware, getUserDownloads);
 router.get("/me/favorites", authMiddleware, getUserFavorites);
 
 // Thêm/xoá tài liệu yêu thích
-router.patch("/me/favorites/:docId", authMiddleware, toggleFavorite);
+router.post(
+    "/documents/:id/favorite",
+    authMiddleware,
+    [param("id").isMongoId().withMessage("ID tài liệu không hợp lệ"), validate],
+    toggleFavorite
+);
 
 module.exports = router;

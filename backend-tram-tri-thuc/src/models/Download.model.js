@@ -14,16 +14,22 @@ const downloadSchema = new mongoose.Schema(
         },
         downloadedAt: {
             type: Date,
-            required: true,
+            default: Date.now,
         },
         ipAddress: {
             type: String,
+            required: true,
         },
         deviceInfo: {
             type: String,
+            required: true,
         },
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+
+        indexes: [{ key: { userId: 1, documentId: 1 } }, { key: { downloadedAt: -1 } }],
+    }
 );
 
 module.exports = mongoose.model("Download", downloadSchema);

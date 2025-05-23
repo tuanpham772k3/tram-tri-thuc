@@ -1,6 +1,6 @@
 const Document = require("../models/Document.model");
 const Category = require("../models/category.model");
-const Download = require("../models/Downloads.model");
+const Download = require("../models/Download.model");
 const logger = require("../utils/logger");
 const slugify = require("slugify");
 const fs = require("fs");
@@ -92,6 +92,13 @@ exports.getDocumentBySlug = async (req, res) => {
         }
 
         await Document.findOneAndUpdate({ slug: req.params.slug }, { $inc: { viewCount: 1 } });
+        if (req.user) {
+            await ViewHistory.create({
+                userId: req.user._id,
+                documentId: req.params.id,
+                viewedAt: new Date(),
+            });
+        }
         res.status(200).json({ success: true, data: document });
     } catch (error) {
         logger.error("Get document by slug error:", error);

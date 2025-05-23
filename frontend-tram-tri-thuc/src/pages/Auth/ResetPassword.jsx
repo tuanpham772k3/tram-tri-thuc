@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { Button, Card, Input } from "antd";
-import { FaEye, FaEyeSlash, FaLock } from "react-icons/fa";
+import { FaLock } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import * as Yup from "yup";
-import { useFormik } from "formik";
 import FormInput from "../../components/Auth/FormInput";
 import { resetPasswordThunk } from "../../store/slices/authSlice";
+import showToast from "../../utils/toast";
+import { useFormik } from "formik";
 
 const ResetPassword = () => {
     const dispatch = useDispatch();
@@ -14,6 +15,9 @@ const ResetPassword = () => {
     const { loading, error, message } = useSelector((state) => state.auth);
     const [searchParams] = useSearchParams();
     const token = searchParams.get("token");
+
+    // Log để debug
+    console.log("ResetPassword rendered", { token, loading, error });
 
     const formik = useFormik({
         initialValues: {
@@ -76,6 +80,12 @@ const ResetPassword = () => {
                     >
                         Cập nhật mật khẩu
                     </Button>
+                    <p className="text-center text-sm text-gray-600 mt-2">
+                        Bạn đã đổi mật khẩu thành công?{" "}
+                        <Link to={"/auth/login"} className="text-blue-500">
+                            Đăng nhập ngay
+                        </Link>
+                    </p>
                 </form>
             </Card>
         </div>

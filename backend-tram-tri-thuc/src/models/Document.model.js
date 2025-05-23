@@ -1,49 +1,45 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const DocumentSchema = new mongoose.Schema({
-    title: { type: String, required: true, trim: true, maxlength: 200 },
-    description: { type: String, maxlength: 1000 },
-    fileUrl: { type: String, required: true },
-    fileName: { type: String, required: true },
-    mimeType: {
-        type: String,
-        required: true,
-        enum: [
-            "application/pdf",
-            "image/jpeg",
-            "image/png",
-            "application/msword",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "application/vnd.ms-powerpoint",
-            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-            "application/zip",
-        ],
+const DocumentSchema = new mongoose.Schema(
+    {
+        title: { type: String, required: true, trim: true, maxlength: 200 },
+        description: { type: String, maxlength: 1000 },
+        fileUrl: { type: String, required: true },
+        fileName: { type: String, required: true },
+        mimeType: {
+            type: String,
+            required: true,
+            enum: [
+                "application/pdf",
+                "image/jpeg",
+                "image/png",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "application/vnd.ms-powerpoint",
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                "application/zip",
+            ],
+        },
+        status: {
+            type: String,
+            enum: ["pending", "approved", "rejected"],
+            default: "pending",
+        },
+        format: { type: String, enum: ["pdf", "docx", "pptx", "zip"], required: true },
+        size: { type: Number, required: true },
+        slug: { type: String, required: true, unique: true },
+        thumbnailUrl: { type: String },
+        tags: [{ type: String, trim: true, maxlength: 50 }],
+        uploaderId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        categoryId: { type: Schema.Types.ObjectId, ref: "Category", required: true },
+        isPublic: { type: Boolean, default: true },
+        isFeatured: { type: Boolean, default: false },
+        viewCount: { type: Number, default: 0 },
+        downloadCount: { type: Number, default: 0 },
     },
-    status: {
-        type: String,
-        enum: ["pending", "approved", "rejected"],
-        default: "pending",
-    },
-    format: { type: String, enum: ["pdf", "docx", "pptx", "zip"], required: true },
-    size: { type: Number, required: true },
-    slug: { type: String, required: true, unique: true },
-    thumbnailUrl: { type: String },
-    tags: [{ type: String, trim: true, maxlength: 50 }],
-    uploaderId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    categoryId: { type: Schema.Types.ObjectId, ref: "Category", required: true },
-    isPublic: { type: Boolean, default: true },
-    isFeatured: { type: Boolean, default: false },
-    viewCount: { type: Number, default: 0 },
-    downloadCount: { type: Number, default: 0 },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
-});
-
-DocumentSchema.pre("save", function (next) {
-    this.updatedAt = new Date();
-    next();
-});
+    { timestamps: true }
+);
 
 DocumentSchema.index({ title: "text", description: "text", tags: "text" });
 DocumentSchema.index({

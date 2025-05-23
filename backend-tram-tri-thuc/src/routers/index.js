@@ -6,25 +6,24 @@ const documentRoutes = require("./document.routes");
 const authRoutes = require("./auth.routes");
 const usersRoutes = require("./user.routes");
 const categoryRoutes = require("./category.routes");
-const commentRoutes = require("./comment.routes");
-const ratingRoutes = require("./rating.routes");
+const ratingCommentRoutes = require("./ratingComment.routes");
 const statRoutes = require("./stat.routes");
 const notificationRoutes = require("./notification.routes");
 const searchRoutes = require("./search.routes");
-// const adminRoutes = require("./admin.routes");
-
+const userHistoryRoutes = require("./userHistory.routes");
 
 // router.use("/admin", adminRoutes);
 router.use("/auth", authRoutes);
-router.use("/users", usersRoutes);
-router.use("/documents", documentRoutes);
-// router.use("/share", shareRoutes);
 router.use("/categories", categoryRoutes);
-router.use("/comments", commentRoutes);
-router.use("/ratings", ratingRoutes);
-router.use("/stats", statRoutes);
+router.use("/documents", documentRoutes);
 router.use("/notifications", notificationRoutes);
+router.use("/", ratingCommentRoutes);
 router.use("/search", searchRoutes);
+// router.use("/share", shareRoutes);
+router.use("/stats", statRoutes);
+router.use("/users", usersRoutes);
+router.use("/", userHistoryRoutes);
+
 
 
 module.exports = router;

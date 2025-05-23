@@ -28,8 +28,6 @@
         "react-router-dom": "^7.4.1",
         "react-toastify": "^11.0.5",
         "react-tooltip": "^5.28.1",
-        "react-treeview": "^0.4.7",
-        "recharts": "^2.15.1",
         "redux": "^5.0.1",
         "winston": "^3.17.0",
         "yup": "^1.6.1"

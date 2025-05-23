@@ -9,7 +9,9 @@ const StatsSchema = new Schema({
     totalDownloads: { type: Number, required: true }, // Tổng số lượt tải xuống
     topDocuments: [{ type: Schema.Types.ObjectId, ref: "Document" }], // Danh sách tài liệu nổi bật
     topUsers: [{ type: Schema.Types.ObjectId, ref: "User" }], // Danh sách người dùng nổi bật
-});
+}
+
+);
 
 const Stats = mongoose.model("Stats", StatsSchema);
 

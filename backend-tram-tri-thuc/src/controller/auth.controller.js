@@ -58,6 +58,13 @@ exports.login = async (req, res) => {
             });
         }
 
+        if (!user.isActive) {
+            return res.status(403).json({
+                success: false,
+                message: "Tài khoản của bạn đã bị vô hiệu hóa.",
+            });
+        }
+
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({
@@ -123,8 +130,7 @@ exports.forgotPassword = async (req, res) => {
         await user.save();
 
         // Tạo link reset password
-        const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
-
+        const resetLink = `${process.env.CLIENT_URL}/auth/reset-password?token=${token}`;
         await sendResetPasswordEmail(email, resetLink);
 
         // TODO: Gửi email ở đây (chưa tích hợp)
@@ -256,6 +262,12 @@ exports.logout = async (req, res) => {
 
         user.token = null;
         await user.save();
+
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+        });
 
         logger.info(`User logged out: ${user.email}`);
         res.status(200).json({
