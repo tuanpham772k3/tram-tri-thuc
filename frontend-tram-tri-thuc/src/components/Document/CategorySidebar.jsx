@@ -16,12 +16,15 @@ export default function CategorySidebar() {
     };
 
     return (
-        <div className="p-4 border rounded">
-            <h4 className="font-semibold mb-3">📁 Danh mục</h4>
-            {loading && <p>Đang tải...</p>}
+        <div className="p-4 border rounded bg-white/80 backdrop-blur-sm shadow-sm">
+            <h4 className="font-semibold mb-3 text-gray-800">📁 Danh mục</h4>
+            {loading && <p className="text-gray-600">Đang tải danh mục...</p>}
             {error && <p className="text-red-500">{error}</p>}
             {!loading && categories.length === 0 ? (
-                <p className="text-gray-500">Không có danh mục nào.</p>
+                <div className="text-center py-4">
+                    <p className="text-gray-500">Không có danh mục nào.</p>
+                    <p className="text-sm text-gray-400 mt-1">Vui lòng quay lại sau.</p>
+                </div>
             ) : (
                 <ul className="space-y-2">
                     {categories.map((cat) => (
@@ -29,8 +32,10 @@ export default function CategorySidebar() {
                             <NavLink
                                 to={`/category/${cat.slug}`}
                                 className={({ isActive }) =>
-                                    `block px-2 py-1 rounded hover:bg-gray-100 ${
-                                        isActive ? "font-semibold text-blue-600" : ""
+                                    `block px-2 py-1.5 rounded transition-all duration-200 ${
+                                        isActive 
+                                            ? "font-semibold text-blue-600 bg-blue-50" 
+                                            : "text-gray-600 hover:bg-gray-50"
                                     }`
                                 }
                             >
@@ -46,10 +51,10 @@ export default function CategorySidebar() {
                         <button
                             key={num}
                             onClick={() => handlePageChange(num)}
-                            className={`px-3 py-1 rounded ${
+                            className={`px-3 py-1 rounded transition-colors duration-200 ${
                                 num === pagination.currentPage
                                     ? "bg-blue-600 text-white"
-                                    : "bg-gray-200 hover:bg-gray-300"
+                                    : "bg-gray-100 hover:bg-gray-200 text-gray-600"
                             }`}
                         >
                             {num}

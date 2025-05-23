@@ -1,19 +1,25 @@
 import { Outlet } from "react-router-dom";
-import Navbar from "./Header/Navbar";
-import MobileResponsiveWrapper from "./MobileResponsiveWrapper";
 import Sidebar from "./Sidebar/Sidebar";
+import Navbar from "./Header/Navbar";
 
 export default function MainLayout() {
     return (
         <div className="min-h-screen flex flex-col">
+            {/* Navbar at top */}
             <Navbar />
-            <div className="flex flex-1 overflow-hidden">
-                <MobileResponsiveWrapper>
+            
+            <div className="flex flex-1">
+                {/* Fixed Sidebar */}
+                <div className="w-64 fixed left-0 top-16 h-[calc(100vh-4rem)]">
                     <Sidebar />
-                </MobileResponsiveWrapper>
-                <main className="flex-1 overflow-y-auto p-4">
-                    <Outlet />
-                </main>
+                </div>
+
+                {/* Main Content - with margin to account for fixed sidebar */}
+                <div className="flex-1 ml-64 pt-16">
+                    <main className="min-h-[calc(100vh-4rem)] bg-gray-50">
+                        <Outlet />
+                    </main>
+                </div>
             </div>
         </div>
     );

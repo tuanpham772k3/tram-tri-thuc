@@ -1,6 +1,8 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect, useMemo } from "react";
 import { updateUserInfo } from "../../store/slices/userSlice";
+import { motion } from "framer-motion";
+import { FaUser, FaCamera, FaCheck, FaTimes } from "react-icons/fa";
 
 const EditProfileForm = () => {
     const dispatch = useDispatch();
@@ -13,11 +15,12 @@ const EditProfileForm = () => {
         }),
         [userInfo]
     );
+
     const [formData, setFormData] = useState(initialFormData);
     const [formErrors, setFormErrors] = useState({ name: "", avatar: "" });
     const [avatarPreview, setAvatarPreview] = useState(userInfo?.avatar || "");
+    const [isEditing, setIsEditing] = useState(false);
 
-    // Reset form khi user thay đổi
     useEffect(() => {
         setFormData(initialFormData);
         setAvatarPreview(userInfo?.avatar || "");
@@ -33,8 +36,8 @@ const EditProfileForm = () => {
             isValid = false;
         }
 
-        if (formData.avatar && !/^https?:\/\/.*\.(png|jpg|jpeg|gif|webp)$/.test(formData.avatar)) {
-            errors.avatar = "Avatar phải là URL hình ảnh hợp lệ (png, jpg, jpeg, gif, webp)";
+        if (formData.avatar && !/^https?:\/\/.*\.(png|jpg|jpeg|gif|webp)$/i.test(formData.avatar)) {
+            errors.avatar = "Avatar phải là URL hình ảnh hợp lệ";
             isValid = false;
         }
 
@@ -45,7 +48,12 @@ const EditProfileForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
-            await dispatch(updateUserInfo(formData));
+            try {
+                await dispatch(updateUserInfo(formData)).unwrap();
+                setIsEditing(false);
+            } catch (error) {
+                console.error("Update failed:", error);
+            }
         }
     };
 
@@ -53,6 +61,7 @@ const EditProfileForm = () => {
         setFormData(initialFormData);
         setAvatarPreview(userInfo?.avatar || "");
         setFormErrors({ name: "", avatar: "" });
+        setIsEditing(false);
     };
 
     const handleAvatarChange = (e) => {
@@ -63,125 +72,311 @@ const EditProfileForm = () => {
     };
 
     return (
-        <div className="max-w-lg mx-auto">
-            <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-2">Thông tin người dùng</h3>
-                <div className="flex items-center gap-4">
-                    <img
-                        src={userInfo?.avatar || "/src/assets/default-avatar.png"}
-                        alt="Avatar"
-                        className="w-16 h-16 rounded-full object-cover"
-                    />
+        <div className="min-h-screen relative flex items-center justify-center py-10 px-4 overflow-hidden">
+            {/* Background Base */}
+            <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50" />
+            
+            {/* Animated Circles */}
+            <div className="absolute inset-0 overflow-hidden">
+                {/* Circle 1 - Bouncy Green */}
+                <div 
+                    className="absolute w-64 h-64 bg-green-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-bounce-1"
+                    style={{
+                        left: '10%',
+                        top: '20%',
+                        animationDuration: '8s',
+                        animationDelay: '0s',
+                        zIndex: 0
+                    }}
+                />
 
-                    <div>
-                        <p className="text-gray-700">
-                            <strong>Email:</strong> {userInfo?.email || "N/A"}
-                        </p>
-                        <p className="text-gray-700">
-                            <strong>Vai trò:</strong> {userInfo?.role || "N/A"}
-                        </p>
+                {/* Circle 2 - Floating Teal */}
+                <div 
+                    className="absolute w-72 h-72 bg-teal-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-bounce-2"
+                    style={{
+                        right: '15%',
+                        top: '15%',
+                        animationDuration: '7s',
+                        animationDelay: '-2s',
+                        zIndex: 0
+                    }}
+                />
+
+                {/* Circle 3 - Dancing Emerald */}
+                <div 
+                    className="absolute w-80 h-80 bg-emerald-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-bounce-3"
+                    style={{
+                        left: '30%',
+                        bottom: '20%',
+                        animationDuration: '6s',
+                        animationDelay: '-3s',
+                        zIndex: 0
+                    }}
+                />
+
+                {/* Circle 4 - Playful Light Green */}
+                <div 
+                    className="absolute w-56 h-56 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-bounce-4"
+                    style={{
+                        right: '25%',
+                        bottom: '25%',
+                        animationDuration: '5s',
+                        animationDelay: '-1s',
+                        zIndex: 0
+                    }}
+                />
+            </div>
+            
+            {/* Main Content */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="relative z-10 w-full max-w-2xl"
+                style={{ zIndex: 20 }}
+            >
+                <div className="bg-white/90 backdrop-blur-2xl rounded-3xl shadow-xl overflow-hidden border border-white/20">
+                    <div className="p-8">
+                        <div className="text-center mb-8">
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                                className="relative inline-block"
+                            >
+                                <img
+                                    src={avatarPreview || "/src/assets/default-avatar.png"}
+                                    alt="Avatar"
+                                    className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
+                                />
+                                {isEditing && (
+                                    <button
+                                        onClick={() => document.getElementById('avatar-input').focus()}
+                                        className="absolute bottom-0 right-0 bg-green-500 text-white p-2 rounded-full shadow-lg hover:bg-green-600 transition-colors"
+                                    >
+                                        <FaCamera className="w-4 h-4" />
+                                    </button>
+                                )}
+                            </motion.div>
+                            <h2 className="text-2xl font-bold text-gray-800 mt-4">Hồ sơ của bạn</h2>
+                            <div className="mt-2 flex items-center justify-center gap-2 text-sm text-gray-600">
+                                <span className="px-3 py-1 bg-green-100 rounded-full">
+                                    {userInfo?.email}
+                                </span>
+                                <span className="px-3 py-1 bg-blue-100 rounded-full capitalize">
+                                    {userInfo?.role}
+                                </span>
+                            </div>
+                        </div>
+
+                        {userError && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl"
+                            >
+                                <p className="text-red-600 text-center">
+                                    {userError.message || userError.userError?.join(", ") || "Có lỗi xảy ra khi cập nhật"}
+                                </p>
+                            </motion.div>
+                        )}
+
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="space-y-4">
+                                <div className="relative">
+                                    <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
+                                        <FaUser className="w-4 h-4 mr-2" />
+                                        Tên hiển thị
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        disabled={!isEditing}
+                                        className={`w-full px-4 py-3 rounded-xl border ${
+                                            formErrors.name ? "border-red-500" : "border-gray-300"
+                                        } ${
+                                            isEditing 
+                                                ? "bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500" 
+                                                : "bg-gray-50"
+                                        } transition-all`}
+                                    />
+                                    {formErrors.name && (
+                                        <p className="mt-1 text-sm text-red-500">{formErrors.name}</p>
+                                    )}
+                                </div>
+
+                                <div className="relative">
+                                    <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
+                                        <FaCamera className="w-4 h-4 mr-2" />
+                                        URL Avatar
+                                    </label>
+                                    <input
+                                        id="avatar-input"
+                                        type="text"
+                                        value={formData.avatar}
+                                        onChange={handleAvatarChange}
+                                        disabled={!isEditing}
+                                        className={`w-full px-4 py-3 rounded-xl border ${
+                                            formErrors.avatar ? "border-red-500" : "border-gray-300"
+                                        } ${
+                                            isEditing 
+                                                ? "bg-white focus:ring-2 focus:ring-green-500 focus:border-green-500" 
+                                                : "bg-gray-50"
+                                        } transition-all`}
+                                    />
+                                    {formErrors.avatar && (
+                                        <p className="mt-1 text-sm text-red-500">{formErrors.avatar}</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-4">
+                                {!isEditing ? (
+                                    <motion.button
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        type="button"
+                                        onClick={() => setIsEditing(true)}
+                                        className="px-6 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors"
+                                    >
+                                        Chỉnh sửa
+                                    </motion.button>
+                                ) : (
+                                    <>
+                                        <motion.button
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            type="button"
+                                            onClick={handleReset}
+                                            className="px-6 py-2 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors flex items-center gap-2"
+                                        >
+                                            <FaTimes className="w-4 h-4" />
+                                            Hủy
+                                        </motion.button>
+                                        <motion.button
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            type="submit"
+                                            disabled={userLoading}
+                                            className={`px-6 py-2 rounded-xl text-white flex items-center gap-2 ${
+                                                userLoading
+                                                    ? "bg-green-400 cursor-not-allowed"
+                                                    : "bg-green-500 hover:bg-green-600"
+                                            } transition-colors`}
+                                        >
+                                            {userLoading ? (
+                                                <>
+                                                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                                                        <circle
+                                                            className="opacity-25"
+                                                            cx="12"
+                                                            cy="12"
+                                                            r="10"
+                                                            stroke="currentColor"
+                                                            strokeWidth="4"
+                                                        />
+                                                        <path
+                                                            className="opacity-75"
+                                                            fill="currentColor"
+                                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                        />
+                                                    </svg>
+                                                    <span>Đang lưu...</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <FaCheck className="w-4 h-4" />
+                                                    <span>Lưu thay đổi</span>
+                                                </>
+                                            )}
+                                        </motion.button>
+                                    </>
+                                )}
+                            </div>
+                        </form>
                     </div>
                 </div>
-            </div>
+            </motion.div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                        Tên
-                    </label>
-                    <input
-                        id="name"
-                        type="text"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className={`mt-1 block w-full p-2 border rounded-md ${
-                            formErrors.name ? "border-red-500" : "border-gray-300"
-                        } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
-                        aria-label="Tên người dùng"
-                    />
-                    {formErrors.name && (
-                        <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
-                    )}
-                </div>
+            {/* Updated animation styles */}
+            <style jsx>{`
+                @keyframes bounce-1 {
+                    0%, 100% {
+                        transform: translate(0, 0) scale(1);
+                    }
+                    25% {
+                        transform: translate(150px, 100px) scale(1.2);
+                    }
+                    50% {
+                        transform: translate(50px, -150px) scale(0.8);
+                    }
+                    75% {
+                        transform: translate(-100px, 50px) scale(1.1);
+                    }
+                }
 
-                <div>
-                    <label htmlFor="avatar" className="block text-sm font-medium text-gray-700">
-                        Avatar (URL)
-                    </label>
-                    <input
-                        id="avatar"
-                        type="text"
-                        value={formData.avatar}
-                        onChange={handleAvatarChange}
-                        className={`mt-1 block w-full p-2 border rounded-md ${
-                            formErrors.avatar ? "border-red-500" : "border-gray-300"
-                        } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
-                        aria-label="URL avatar"
-                    />
-                    {formErrors.avatar && (
-                        <p className="text-red-500 text-sm mt-1">{formErrors.avatar}</p>
-                    )}
-                    {avatarPreview && (
-                        <div className="mt-2">
-                            <p className="text-sm text-gray-600">Preview:</p>
-                            <img
-                                src={avatarPreview}
-                                alt="Avatar preview"
-                                className="w-24 h-24 rounded-md object-cover"
-                                onError={() => setAvatarPreview("")}
-                            />
-                        </div>
-                    )}
-                </div>
+                @keyframes bounce-2 {
+                    0%, 100% {
+                        transform: translate(0, 0) scale(0.9);
+                    }
+                    25% {
+                        transform: translate(-120px, -80px) scale(1.1);
+                    }
+                    50% {
+                        transform: translate(-60px, 120px) scale(1);
+                    }
+                    75% {
+                        transform: translate(80px, -60px) scale(0.8);
+                    }
+                }
 
-                {userError && (
-                    <p className="text-red-500 text-sm">
-                        {userError.message ||
-                            userError.userError?.join(", ") ||
-                            "Lỗi không xác định"}
-                    </p>
-                )}
+                @keyframes bounce-3 {
+                    0%, 100% {
+                        transform: translate(0, 0) scale(1);
+                    }
+                    25% {
+                        transform: translate(-80px, -120px) scale(0.9);
+                    }
+                    50% {
+                        transform: translate(100px, 80px) scale(1.2);
+                    }
+                    75% {
+                        transform: translate(60px, -100px) scale(1);
+                    }
+                }
 
-                <div className="flex gap-4">
-                    <button
-                        type="submit"
-                        disabled={userLoading}
-                        className={`px-4 py-2 rounded-md text-white ${
-                            userLoading
-                                ? "bg-blue-400 cursor-not-allowed"
-                                : "bg-blue-600 hover:bg-blue-700"
-                        } transition-colors`}
-                    >
-                        {userLoading ? (
-                            <span className="flex items-center">
-                                <svg
-                                    className="animate-spin h-5 w-5 mr-2 text-white"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <circle
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                        fill="none"
-                                    />
-                                </svg>
-                                Đang cập nhật...
-                            </span>
-                        ) : (
-                            "Cập nhật"
-                        )}
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleReset}
-                        className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 transition-colors"
-                    >
-                        Hủy
-                    </button>
-                </div>
-            </form>
+                @keyframes bounce-4 {
+                    0%, 100% {
+                        transform: translate(0, 0) scale(1.1);
+                    }
+                    25% {
+                        transform: translate(100px, -60px) scale(0.9);
+                    }
+                    50% {
+                        transform: translate(-120px, -80px) scale(1.2);
+                    }
+                    75% {
+                        transform: translate(-60px, 100px) scale(1);
+                    }
+                }
+
+                .animate-bounce-1 {
+                    animation: bounce-1 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+                }
+
+                .animate-bounce-2 {
+                    animation: bounce-2 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+                }
+
+                .animate-bounce-3 {
+                    animation: bounce-3 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+                }
+
+                .animate-bounce-4 {
+                    animation: bounce-4 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+                }
+            `}</style>
         </div>
     );
 };
