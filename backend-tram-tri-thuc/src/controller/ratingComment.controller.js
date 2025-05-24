@@ -1,8 +1,10 @@
-const Rating = require("../models/Rating.model");
-const Comment = require("../models/Comment.model");
-const Document = require("../models/Document.model");
+const Rating = require("../models/rating.model");
+const Comment = require("../models/comment.model");
+const Document = require("../models/document.model");
+const User = require("../models/user.model");
 const logger = require("../utils/logger");
 const { getPagination, getPagingData } = require("../utils/paginate");
+const { notifyDocumentOwner } = require("../utils/notification");
 
 // Tạo mới đánh giá
 exports.createRating = async (req, res) => {
@@ -27,6 +29,15 @@ exports.createRating = async (req, res) => {
 
         rating = new Rating({ userId: req.user._id, documentId, stars });
         await rating.save();
+
+        // Gửi thông báo đến chủ sở hữu
+        const user = await User.findById(req.user._id).select("name");
+        await notifyDocumentOwner({
+            documentId,
+            actionUserId: req.user._id,
+            type: "new_rating",
+            actionUserName: user.name || req.user.email,
+        });
 
         logger.info(`Rating created by ${req.user.email} for document ${documentId}`);
         res.status(201).json({
@@ -171,8 +182,17 @@ exports.createComment = async (req, res) => {
             parentCommentId: parentCommentId || null,
             isApproved: req.user.role === "admin",
         });
-
         await comment.save();
+
+        // Gửi thông báo đến chủ sở hữu
+        const user = await User.findById(req.user._id).select("name");
+        await notifyDocumentOwner({
+            documentId,
+            actionUserId: req.user._id,
+            type: "new_comment",
+            actionUserName: user.name || req.user.email,
+        });
+
         logger.info(`Comment created by ${req.user.email} for document ${documentId}`);
         res.status(201).json({
             success: true,

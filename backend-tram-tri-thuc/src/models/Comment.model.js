@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const CommentSchema = new Schema(
+const commentSchema = new Schema(
     {
         documentId: { type: Schema.Types.ObjectId, ref: "Document", required: true }, // Tham chiếu đến tài liệu
         userId: { type: Schema.Types.ObjectId, ref: "User", required: true }, // Tham chiếu đến người dùng
@@ -14,8 +14,8 @@ const CommentSchema = new Schema(
 );
 
 // Tối ưu query lấy bình luận
-CommentSchema.index({ documentId: 1, isApproved: 1, isDeleted: 1, createdAt: -1 });
+commentSchema.index({ documentId: 1, isApproved: 1, isDeleted: 1, createdAt: -1 });
 
-const Comment = mongoose.model("Comment", CommentSchema);
+const Comment = mongoose.model("Comment", commentSchema);
 
 module.exports = Comment;

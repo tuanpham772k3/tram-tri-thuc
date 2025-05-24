@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const downloadSchema = new mongoose.Schema(
+const downloadHistorySchema = new mongoose.Schema(
     {
         userId: {
             type: mongoose.Schema.Types.ObjectId,
@@ -27,9 +27,13 @@ const downloadSchema = new mongoose.Schema(
     },
     {
         timestamps: true,
-
-        indexes: [{ key: { userId: 1, documentId: 1 } }, { key: { downloadedAt: -1 } }],
+        collection: "downloadHistory",
     }
 );
 
-module.exports = mongoose.model("Download", downloadSchema);
+downloadHistorySchema.index({ userId: 1, documentId: 1 });
+downloadHistorySchema.index({ downloadedAt: -1 });
+
+const Download = mongoose.models.Download || mongoose.model("Download", downloadHistorySchema);
+
+module.exports = Download;

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const DocumentSchema = new mongoose.Schema(
+const documentSchema = new mongoose.Schema(
     {
         title: { type: String, required: true, trim: true, maxlength: 200 },
         description: { type: String, maxlength: 1000 },
@@ -41,8 +41,8 @@ const DocumentSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-DocumentSchema.index({ title: "text", description: "text", tags: "text" });
-DocumentSchema.index({
+documentSchema.index({ title: "text", description: "text", tags: "text" });
+documentSchema.index({
     slug: 1,
     categoryId: 1,
     uploaderId: 1,
@@ -51,6 +51,6 @@ DocumentSchema.index({
     isFeatured: 1,
 });
 
-const Document = mongoose.models.Document || mongoose.model("Document", DocumentSchema);
+const Document = mongoose.models.Document || mongoose.model("Document", documentSchema);
 
 module.exports = Document;

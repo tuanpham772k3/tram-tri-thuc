@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const RatingSchema = new Schema(
+const ratingSchema = new Schema(
     {
         documentId: { type: Schema.Types.ObjectId, ref: "Document", required: true }, // Tham chiếu đến tài liệu
         userId: { type: Schema.Types.ObjectId, ref: "User", required: true }, // Tham chiếu đến người dùng
@@ -13,9 +13,9 @@ const RatingSchema = new Schema(
 );
 
 // Đảm bảo mỗi user chỉ đánh giá một lần cho mỗi tài liệu
-RatingSchema.index({ userId: 1, documentId: 1 }, { unique: true });
+ratingSchema.index({ userId: 1, documentId: 1 }, { unique: true });
 
 // Tạo model Rating
-const Rating = mongoose.models.Rating || mongoose.model("Rating", RatingSchema);
+const Rating = mongoose.models.Rating || mongoose.model("Rating", ratingSchema);
 
 module.exports = Rating;

@@ -10,7 +10,6 @@ const ratingCommentRoutes = require("./ratingComment.routes");
 const statRoutes = require("./stat.routes");
 const notificationRoutes = require("./notification.routes");
 const searchRoutes = require("./search.routes");
-const userHistoryRoutes = require("./userHistory.routes");
 
 // router.use("/admin", adminRoutes);
 router.use("/auth", authRoutes);
@@ -22,7 +21,6 @@ router.use("/search", searchRoutes);
 // router.use("/share", shareRoutes);
 router.use("/stats", statRoutes);
 router.use("/users", usersRoutes);
-router.use("/", userHistoryRoutes);
 
 
 

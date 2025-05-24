@@ -1,4 +1,4 @@
-const Document = require("../models/Document.model");
+const Document = require("../models/document.model");
 
 // /api/search?keyword=python
 exports.searchDocuments = async (req, res) => {

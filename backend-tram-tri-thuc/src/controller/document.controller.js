@@ -1,12 +1,14 @@
-const Document = require("../models/Document.model");
+const Document = require("../models/document.model");
 const Category = require("../models/category.model");
-const Download = require("../models/Download.model");
+const Download = require("../models/downloadHistory.model");
+const ViewHistory = require("../models/viewHistory.model");
+const { Types } = require("mongoose");
 const logger = require("../utils/logger");
 const slugify = require("slugify");
 const fs = require("fs");
 const path = require("path");
 const { getPagination, getPagingData } = require("../utils/paginate");
-const { Types } = require("mongoose");
+const { notifyDocumentOwner } = require("../utils/notification");
 
 // GET /api/documents
 exports.getDocuments = async (req, res) => {
@@ -69,7 +71,40 @@ exports.getDocumentById = async (req, res) => {
             return res.status(404).json({ success: false, message: "Tài liệu không tồn tại." });
         }
 
+        // Tăng viewCount
         await Document.findByIdAndUpdate(req.params.id, { $inc: { viewCount: 1 } });
+
+        // Ghi hoặc cập nhật lịch sử xem nếu user đã đăng nhập
+        if (req.user && req.user._id) {
+            try {
+                const existingView = await ViewHistory.findOne({
+                    userId: req.user._id,
+                    documentId: document._id,
+                });
+
+                if (existingView) {
+                    existingView.viewedAt = new Date();
+                    await existingView.save();
+                    logger.info(
+                        `View history updated for user ${req.user.email}, document ${document._id}`
+                    );
+                } else {
+                    await ViewHistory.create({
+                        userId: req.user._id,
+                        documentId: document._id,
+                        viewedAt: new Date(),
+                    });
+                    logger.info(
+                        `View history created for user ${req.user.email}, document ${document._id}`
+                    );
+                }
+            } catch (viewError) {
+                logger.error(`Error recording ViewHistory: ${viewError.message}`);
+            }
+        } else {
+            logger.warn(`No req.user found, skipping ViewHistory for document ${req.params.id}`);
+        }
+
         res.status(200).json({ success: true, data: document });
     } catch (error) {
         logger.error("Get document by ID error:", error);
@@ -85,20 +120,47 @@ exports.getDocumentBySlug = async (req, res) => {
             .populate("uploaderId", "name email")
             .lean();
 
-        if (!document) {
+        // Kiểm tra tài liệu tồn tại và công khai
+        if (!document || document.status !== "approved" || !document.isPublic) {
             return res
                 .status(404)
                 .json({ success: false, message: "Tài liệu không tồn tại hoặc không công khai." });
         }
 
+        // Tăng viewCount
         await Document.findOneAndUpdate({ slug: req.params.slug }, { $inc: { viewCount: 1 } });
-        if (req.user) {
-            await ViewHistory.create({
-                userId: req.user._id,
-                documentId: req.params.id,
-                viewedAt: new Date(),
-            });
+
+        // Ghi hoặc cập nhật lịch sử xem nếu user đã đăng nhập
+        if (req.user && req.user._id) {
+            try {
+                const existingView = await ViewHistory.findOne({
+                    userId: req.user._id,
+                    documentId: document._id,
+                });
+
+                if (existingView) {
+                    existingView.viewedAt = new Date();
+                    await existingView.save();
+                    logger.info(
+                        `View history updated for user ${req.user.email}, document ${document._id}`
+                    );
+                } else {
+                    await ViewHistory.create({
+                        userId: req.user._id,
+                        documentId: document._id,
+                        viewedAt: new Date(),
+                    });
+                    logger.info(
+                        `View history created for user ${req.user.email}, document ${document._id}`
+                    );
+                }
+            } catch (viewError) {
+                logger.error(`Error recording ViewHistory: ${viewError.message}`);
+            }
+        } else {
+            logger.warn(`No req.user found, skipping ViewHistory for slug ${req.params.slug}`);
         }
+
         res.status(200).json({ success: true, data: document });
     } catch (error) {
         logger.error("Get document by slug error:", error);
@@ -367,6 +429,14 @@ exports.approveDocument = async (req, res) => {
         document.status = "approved";
         document.isPublic = true;
         await document.save();
+
+        // Gửi thông báo đến chủ sở hữu
+        await notifyDocumentOwner({
+            documentId: document._id,
+            actionUserId: req.user._id, // Admin thực hiện duyệt
+            type: "document_approved",
+            actionUserName: req.user.email, // Có thể thay bằng name nếu cần
+        });
 
         logger.info(`Document approved by ${req.user.email}: ${document.title}`);
         res.status(200).json({

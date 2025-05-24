@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const ShareSchema = new Schema(
+const shareSchema = new Schema(
     {
         documentId: { type: Schema.Types.ObjectId, ref: "Document", required: true }, // Tham chiếu đến tài liệu
         sharedBy: { type: Schema.Types.ObjectId, ref: "User", required: true }, // Người chia sẻ (uploader)
@@ -16,6 +16,6 @@ const ShareSchema = new Schema(
     }
 );
 
-const Share = mongoose.model("Share", ShareSchema);
+const Share = mongoose.model("Share", shareSchema);
 
 module.exports = Share;

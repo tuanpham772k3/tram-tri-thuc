@@ -20,8 +20,13 @@ const viewHistorySchema = new Schema(
     },
     {
         timestamps: true,
-        indexes: [{ key: { userId: 1, documentId: 1 } }, { key: { viewedAt: -1 } }],
+        collection: "viewHistory",
     }
 );
 
-module.exports = mongoose.model("ViewHistory", viewHistorySchema);
+viewHistorySchema.index({ userId: 1, documentId: 1 });
+viewHistorySchema.index({ viewedAt: -1 });
+
+const ViewHistory = mongoose.models.ViewHistory || mongoose.model("ViewHistory", viewHistorySchema);
+
+module.exports = ViewHistory;

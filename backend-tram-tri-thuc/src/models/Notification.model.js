@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const NotificationSchema = new Schema(
+const notificationSchema = new Schema(
     {
         userId: {
             type: Schema.Types.ObjectId,
@@ -27,9 +27,12 @@ const NotificationSchema = new Schema(
             default: false,
         }, // Trạng thái đã đọc
     },
-    { timestamps: true, indexes: [{ key: { userId: 1, createdAt: -1 } }, { key: { isRead: 1 } }] }
+    { timestamps: true }
 );
 
-const Notification = mongoose.model("Notification", NotificationSchema);
+notificationSchema.index({ userId: 1, createdAt: -1 });
+notificationSchema.index({ isRead: 1 });
+
+const Notification = mongoose.model("Notification", notificationSchema);
 
 module.exports = Notification;

@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 const User = require("../models/user.model");
-const Rating = require("../models/Rating.model");
-const Document = require("../models/Document.model");
-const ViewHistory = require("../models/ViewHistory.model");
-const Downloads = require("../models/Download.model");
+const Rating = require("../models/rating.model");
+const Document = require("../models/document.model");
+const ViewHistory = require("../models/viewHistory.model");
+const Download = require("../models/downloadHistory.model");
 const logger = require("../utils/logger");
 const { getPagination, getPagingData } = require("../utils/paginate");
 
@@ -192,14 +192,14 @@ class UserService {
         try {
             const { page, limit, skip } = getPagination(queryParams);
 
-            const downloads = await Downloads.find({ userId })
+            const downloads = await Download.find({ userId })
                 .populate("documentId", "title slug")
                 .sort({ downloadedAt: -1 })
                 .skip(skip)
                 .limit(limit)
                 .lean();
 
-            const total = await Downloads.countDocuments({ userId });
+            const total = await Download.countDocuments({ userId });
             return getPagingData(downloads, total, page, limit);
         } catch (error) {
             logger.error("Lỗi getUserDownloads:", error);

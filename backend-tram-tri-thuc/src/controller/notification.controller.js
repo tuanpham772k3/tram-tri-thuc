@@ -1,5 +1,5 @@
-const Notification = require("../models/Notification.model");
-const User = require("../models/User.model");
+const Notification = require("../models/notification.model");
+const User = require("../models/user.model");
 const logger = require("../utils/logger");
 const { getPagination, getPagingData } = require("../utils/paginate");
 

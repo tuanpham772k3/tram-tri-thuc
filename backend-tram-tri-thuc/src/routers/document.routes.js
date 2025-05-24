@@ -58,9 +58,11 @@ router.get(
 // Lấy thông tin chi tiết của tài liệu theo ID
 router.get(
     "/:id",
+    authMiddleware,
+    isUploader,
     [param("id").isMongoId().withMessage("Invalid document ID"), validate],
     async (req, res, next) => {
-        req.document = await require("../models/Document.model").findById(req.params.id);
+        req.document = await require("../models/document.model").findById(req.params.id);
         next();
     },
     checkDocumentStatus,
@@ -70,6 +72,7 @@ router.get(
 // Lấy thông tin chi tiết của tài liệu theo slug
 router.get(
     "/slug/:slug",
+    authMiddleware,
     [
         param("slug")
             .notEmpty()
@@ -78,7 +81,7 @@ router.get(
         validate,
     ],
     async (req, res, next) => {
-        req.document = await require("../models/Document.model").findOne({ slug: req.params.slug });
+        req.document = await require("../models/document.model").findOne({ slug: req.params.slug });
         next();
     },
     checkDocumentStatus,

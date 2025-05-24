@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const CategorySchema = new Schema(
+const categorySchema = new Schema(
     {
         name: { type: String, required: true, trim: true, maxlength: 100 },
         slug: { type: String, required: true, unique: true, match: /^[a-z0-9-]+$/ },
@@ -10,6 +10,8 @@ const CategorySchema = new Schema(
     { timestamps: true }
 );
 
-CategorySchema.index({ slug: 1 });
+categorySchema.index({ slug: 1 });
 
-module.exports = mongoose.model("Category", CategorySchema);
+const Category = mongoose.model("Category", categorySchema);
+
+module.exports = Category;
