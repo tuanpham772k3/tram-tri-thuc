@@ -1,7 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import SearchBar from "../components/Document/SearchBar";
-import DocumentCard from "../components/Document/DocumentCard";
-import FilterPanel from "../components/Document/FilterPanel";
 import { motion } from "framer-motion";
 import { 
     FaBook, FaGraduationCap, FaPencilAlt, FaLightbulb, FaBrain, 
@@ -206,7 +203,7 @@ const SearchPage = () => {
                         transition={{ delay: 0.3 }}
                         className="bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-md mb-4"
                     >
-                        <SearchBar onSearch={setSearchQuery} />
+                        <SearchImput onSearch={setSearchQuery} />
                         <FilterPanel onFilterChange={handleFilterChange} />
                     </motion.div>
 

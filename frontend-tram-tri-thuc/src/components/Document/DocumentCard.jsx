@@ -1,14 +1,50 @@
-// frontend/src/components/Document/DocumentCard.js
-import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { Download } from "lucide-react";
-import { downloadDocument } from "../../store/slices/documentSlice";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Download, Heart } from "lucide-react";
+import { downloadDocument, toggleFavorite } from "../../store/slices/documentSlice";
+import { useEffect } from "react";
+import { fetchFavoriteDocuments } from "../../store/slices/userSlice";
 
 export default function DocumentCard({ document }) {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const {
+        userInfo,
+        favoriteDocuments = [],
+        loading: userLoading,
+    } = useSelector((state) => state.user);
+
+    const isFavorite = favoriteDocuments.some((fav) => fav._id === document._id);
+    const favoriteCount = document.favoriteCount ?? 0;
+
+    // Fetch favoriteDocuments khi component mount và user đã đăng nhập
+    useEffect(() => {
+        if (userInfo && favoriteDocuments.length === 0) {
+            dispatch(fetchFavoriteDocuments());
+        }
+    }, [dispatch, userInfo, favoriteDocuments.length]);
+
+    useEffect(() => {
+        console.log("DocumentCard re-render:", {
+            isFavorite,
+            favoriteCount,
+        });
+    }, [isFavorite, favoriteCount]);
 
     const handleDownload = () => {
         dispatch(downloadDocument(document._id));
+    };
+
+    const handleToggleFavorite = () => {
+        if (!userInfo) {
+            navigate("/auth/login");
+            return;
+        }
+        dispatch(toggleFavorite(document._id))
+            .unwrap()
+            .catch((error) => {
+                console.error("Toggle favorite failed:", error);
+            });
     };
 
     // Xử lý tags từ chuỗi sang mảng
@@ -36,7 +72,19 @@ export default function DocumentCard({ document }) {
                 ))}
             </div>
             <div className="flex items-center justify-between mt-4 text-sm text-gray-600">
-                <span>{document.viewCount || 0} lượt xem</span>
+                <div className="flex items-center gap-4">
+                    <span>{document.viewCount || 0} lượt xem</span>
+                    <button
+                        className={`flex items-center gap-1 ${
+                            isFavorite ? "text-red-600" : "text-gray-600"
+                        } hover:text-red-800 transition-colors`}
+                        onClick={handleToggleFavorite}
+                        disabled={userLoading}
+                    >
+                        <Heart size={16} className={isFavorite ? "fill-current" : "fill-none"} />
+                        <span>{favoriteCount}</span>
+                    </button>
+                </div>
                 <button
                     className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
                     onClick={handleDownload}

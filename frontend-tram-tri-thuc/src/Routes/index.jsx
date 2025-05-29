@@ -16,17 +16,19 @@ import SearchPage from "../pages/SearchPage";
 import Login from "../pages/Auth/Login";
 import Register from "../pages/Auth/Register";
 import ForgotPassword from "../pages/Auth/ForgotPassword";
+import ResetPassword from "../pages/Auth/ResetPassword";
 
 // Pages – User
-import MyDownloadsPage from "../pages/user/MyDownloadsPage";
-import MyFavoritesPage from "../pages/user/MyFavoritesPage";
-import MyViewsPage from "../pages/user/MyViewsPage";
+import MyDownloadedHistory from "../pages/User/MyDownloadedHistory";
+import MyFavoritesDocuments from "../pages/User/MyFavoritesDocuments";
+import MyViewedHistory from "../pages/User/MyViewedHistory";
 import ProfileInfo from "../pages/User/ProfileInfo";
 import NotificationPage from "../pages/NotificationPage";
 
 // Pages – Uploader
 import UploadPage from "../pages/Uploader/UploadPage";
 import MyDocumentsPage from "../pages/Uploader/MyDocumentsPage";
+import EditDocumentForm from "../components/Uploader/EditDocumentForm";
 
 // Pages – Admin
 // import AdminDashboardPage from "@/pages/admin/AdminDashboardPage";
@@ -37,8 +39,7 @@ import MyDocumentsPage from "../pages/Uploader/MyDocumentsPage";
 import ProtectedRoute from "./ProtectedRoute";
 import UploaderRoute from "./UploaderRoute";
 import AdminRoute from "./AdminRoute";
-import EditDocumentForm from "../components/Uploader/EditDocumentForm";
-import ResetPassword from "../pages/Auth/ResetPassword";
+import RatingPage from "../pages/RatingPage";
 
 const router = createBrowserRouter([
     {
@@ -47,8 +48,10 @@ const router = createBrowserRouter([
         children: [
             { index: true, element: <HomePage /> },
             { path: "documents/:slug", element: <DocumentDetailPage /> },
+            { path: "documents/:id", element: <DocumentDetailPage /> },
             { path: "category/:slug", element: <CategoryPage /> },
             { path: "search", element: <SearchPage /> },
+            { path: "rating", element: <RatingPage /> },
         ],
     },
     {
@@ -74,9 +77,9 @@ const router = createBrowserRouter([
                 element: <UserProfilePage />,
                 children: [
                     { index: true, element: <ProfileInfo /> },
-                    { path: "downloads", element: <MyDownloadsPage /> },
-                    { path: "favorites", element: <MyFavoritesPage /> },
-                    { path: "views", element: <MyViewsPage /> },
+                    { path: "downloads", element: <MyDownloadedHistory /> },
+                    { path: "favorites", element: <MyFavoritesDocuments /> },
+                    { path: "views", element: <MyViewedHistory /> },
                 ],
             },
             { path: "notifications", element: <NotificationPage /> },

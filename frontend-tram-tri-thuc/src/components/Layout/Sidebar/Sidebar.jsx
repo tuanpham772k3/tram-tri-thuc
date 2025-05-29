@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Bell, FileText, LogOut, Upload, User } from "lucide-react";
+import { Bell, FileText, LogOut, Star, Upload, User } from "lucide-react";
 
 export default function Sidebar() {
     return (
@@ -28,9 +28,10 @@ export default function Sidebar() {
                             className={({ isActive }) => `
                                 flex items-center gap-3 px-4 py-2.5 rounded-lg
                                 transition-all duration-200 ease-out
-                                ${isActive 
-                                    ? 'bg-white/10 text-white' 
-                                    : 'text-teal-100 hover:bg-white/5'
+                                ${
+                                    isActive
+                                        ? "bg-white/10 text-white"
+                                        : "text-teal-100 hover:bg-white/5"
                                 }
                             `}
                         >
@@ -39,13 +40,30 @@ export default function Sidebar() {
                         </NavLink>
 
                         <NavLink
+                            to="/rating"
+                            className={({ isActive }) => `
+                                flex items-center gap-3 px-4 py-2.5 rounded-lg
+                                transition-all duration-200 ease-out
+                                ${
+                                    isActive
+                                        ? "bg-white/10 text-white"
+                                        : "text-teal-100 hover:bg-white/5"
+                                }
+                            `}
+                        >
+                            <Star className="w-[18px] h-[18px]" />
+                            <span className="font-normal">Hệ thống đánh giá</span>
+                        </NavLink>
+
+                        <NavLink
                             to="/uploader/my-documents"
                             className={({ isActive }) => `
                                 flex items-center gap-3 px-4 py-2.5 rounded-lg
                                 transition-all duration-200 ease-out
-                                ${isActive 
-                                    ? 'bg-white/10 text-white' 
-                                    : 'text-teal-100 hover:bg-white/5'
+                                ${
+                                    isActive
+                                        ? "bg-white/10 text-white"
+                                        : "text-teal-100 hover:bg-white/5"
                                 }
                             `}
                         >
@@ -58,9 +76,10 @@ export default function Sidebar() {
                             className={({ isActive }) => `
                                 flex items-center gap-3 px-4 py-2.5 rounded-lg
                                 transition-all duration-200 ease-out
-                                ${isActive 
-                                    ? 'bg-white/10 text-white' 
-                                    : 'text-teal-100 hover:bg-white/5'
+                                ${
+                                    isActive
+                                        ? "bg-white/10 text-white"
+                                        : "text-teal-100 hover:bg-white/5"
                                 }
                             `}
                         >
@@ -73,9 +92,10 @@ export default function Sidebar() {
                             className={({ isActive }) => `
                                 flex items-center gap-3 px-4 py-2.5 rounded-lg
                                 transition-all duration-200 ease-out
-                                ${isActive 
-                                    ? 'bg-white/10 text-white' 
-                                    : 'text-teal-100 hover:bg-white/5'
+                                ${
+                                    isActive
+                                        ? "bg-white/10 text-white"
+                                        : "text-teal-100 hover:bg-white/5"
                                 }
                             `}
                         >
@@ -91,9 +111,10 @@ export default function Sidebar() {
                             className={({ isActive }) => `
                                 flex items-center gap-3 px-4 py-2.5 rounded-lg
                                 transition-all duration-200 ease-out
-                                ${isActive 
-                                    ? 'bg-red-400/10 text-red-100' 
-                                    : 'text-red-100 hover:bg-red-400/5'
+                                ${
+                                    isActive
+                                        ? "bg-red-400/10 text-red-100"
+                                        : "text-red-100 hover:bg-red-400/5"
                                 }
                             `}
                         >

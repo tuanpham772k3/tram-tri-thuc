@@ -48,11 +48,20 @@ customAxios.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        // Kiểm tra lỗi 401 và chưa thử lại
+        // Retry for network errors (timeout, no connection)
+        if (!error.response && !originalRequest._retry) {
+            originalRequest._retry = true;
+            return new Promise((resolve) => {
+                setTimeout(() => resolve(customAxios(originalRequest)), 1000); // Retry sau 1s
+            });
+        }
+
+        // Kiểm tra lỗi 401 và không retry cho endpoint /auth/login
         if (
             error.response?.status === 401 &&
             !originalRequest._retry &&
-            error.config.url !== "/auth/refresh-token"
+            error.config.url !== "/auth/refresh-token" &&
+            error.config.url !== "/auth/login" // Thêm kiểm tra này
         ) {
             if (isRefreshing) {
                 // Nếu đang làm mới token, đưa request vào hàng đợi
@@ -101,6 +110,17 @@ customAxios.interceptors.response.use(
                 isRefreshing = false;
             }
         }
+
+        // Xử lý lỗi 401 từ /auth/login một cách riêng biệt
+        if (error.response?.status === 401 && error.config.url === "/auth/login") {
+            console.error("Login failed:", {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message,
+            });
+            return Promise.reject(error); // Trả về lỗi gốc để xử lý trong loginThunk
+        }
+
         console.error("API error:", {
             status: error.response?.status,
             data: error.response?.data,

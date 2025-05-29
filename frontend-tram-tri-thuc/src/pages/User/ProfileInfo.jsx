@@ -1,13 +1,7 @@
 import EditProfileForm from "../../components/User/EditProfileForm";
 
 const ProfileInfo = () => {
-    return (
-        
-            
-                    <EditProfileForm />
-               
-       
-    );
+    return <EditProfileForm />;
 };
 
 export default ProfileInfo;

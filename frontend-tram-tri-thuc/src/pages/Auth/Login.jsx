@@ -61,7 +61,7 @@ const Login = () => {
             const velocity = 2 + Math.random() * 4; // Tốc độ ngẫu nhiên
             const size = 3 + Math.random() * 3; // Kích thước ngẫu nhiên
             const distance = 30 + Math.random() * 60; // Khoảng cách ngẫu nhiên
-            
+
             return {
                 id: `${cardIndex}-${i}-${Date.now()}`,
                 x: centerX,
@@ -70,13 +70,13 @@ const Login = () => {
                 targetY: centerY + Math.sin(angle) * distance,
                 size,
                 velocity,
-                cardIndex
+                cardIndex,
             };
         });
 
-        setSparkles(prev => [...prev, ...newSparkles]);
+        setSparkles((prev) => [...prev, ...newSparkles]);
         setTimeout(() => {
-            setSparkles(prev => prev.filter(s => !newSparkles.includes(s)));
+            setSparkles((prev) => prev.filter((s) => !newSparkles.includes(s)));
         }, 1000);
     };
 
@@ -102,7 +102,7 @@ const Login = () => {
                     animation: sparkle 600ms ease-out forwards;
                 }
                 .sparkle::before {
-                    content: '';
+                    content: "";
                     position: absolute;
                     width: 100%;
                     height: 100%;
@@ -124,7 +124,7 @@ const Login = () => {
                                 Nơi Chia Sẻ & Khám Phá
                             </span>
                         </h1>
-                        
+
                         <div className="space-y-6 mt-12">
                             {[0, 1, 2].map((index) => (
                                 <div
@@ -133,32 +133,54 @@ const Login = () => {
                                     className="group relative flex items-center space-x-4 bg-white/10 p-4 rounded-xl backdrop-blur-sm hover:bg-white/20 transform hover:scale-105 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-white/10 overflow-hidden"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-indigo-500/10 group-hover:via-purple-500/10 group-hover:to-pink-500/10 transition-all duration-500"></div>
-                                    
-                                    {sparkles.filter(s => s.cardIndex === index).map(sparkle => (
-                                        <div
-                                            key={sparkle.id}
-                                            className="sparkle"
-                                            style={{
-                                                left: `${sparkle.x}px`,
-                                                top: `${sparkle.y}px`,
-                                                width: `${sparkle.size}px`,
-                                                height: `${sparkle.size}px`,
-                                                '--tx': `${sparkle.targetX - sparkle.x}px`,
-                                                '--ty': `${sparkle.targetY - sparkle.y}px`,
-                                            }}
-                                        />
-                                    ))}
+
+                                    {sparkles
+                                        .filter((s) => s.cardIndex === index)
+                                        .map((sparkle) => (
+                                            <div
+                                                key={sparkle.id}
+                                                className="sparkle"
+                                                style={{
+                                                    left: `${sparkle.x}px`,
+                                                    top: `${sparkle.y}px`,
+                                                    width: `${sparkle.size}px`,
+                                                    height: `${sparkle.size}px`,
+                                                    "--tx": `${sparkle.targetX - sparkle.x}px`,
+                                                    "--ty": `${sparkle.targetY - sparkle.y}px`,
+                                                }}
+                                            />
+                                        ))}
 
                                     <div className="flex-shrink-0 relative z-10">
-                                        <svg className="w-8 h-8 transform group-hover:scale-110 transition-transform duration-300 group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg
+                                            className="w-8 h-8 transform group-hover:scale-110 transition-transform duration-300 group-hover:rotate-12"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
                                             {index === 0 && (
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="2"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                />
                                             )}
                                             {index === 1 && (
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="2"
+                                                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                                                />
                                             )}
                                             {index === 2 && (
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="2"
+                                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                                                />
                                             )}
                                         </svg>
                                     </div>
@@ -198,11 +220,16 @@ const Login = () => {
                                 <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-100">
                                     <p className="text-red-600 text-sm text-center">
                                         {error.includes("304")
-                                            ? "Lỗi server: Response 304 bất thường. Vui lòng thử lại hoặc liên hệ hỗ trợ."
-                                            : error ===
-                                              "Email not verified. Please verify your email before logging in."
-                                            ? "Email chưa được xác minh. Vui lòng kiểm tra email để xác thực."
-                                            : error}
+                                            ? "Lỗi server: Vui lòng thử lại hoặc liên hệ hỗ trợ."
+                                            : error.includes("Email hoặc mật khẩu không đúng")
+                                              ? "Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại."
+                                              : error.includes(
+                                                      "Tài khoản của bạn đã bị vô hiệu hóa"
+                                                  )
+                                                ? "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ hỗ trợ."
+                                                : error.includes("Lỗi kết nối server")
+                                                  ? "Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng."
+                                                  : error}
                                     </p>
                                 </div>
                             )}
@@ -238,8 +265,8 @@ const Login = () => {
                                     >
                                         <span className="text-gray-600">Ghi nhớ đăng nhập</span>
                                     </Checkbox>
-                                    <Link 
-                                        to="/auth/forgot-password" 
+                                    <Link
+                                        to="/auth/forgot-password"
                                         className="text-purple-600 hover:text-purple-700 hover:underline font-medium"
                                     >
                                         Quên mật khẩu?
@@ -276,7 +303,9 @@ const Login = () => {
                                             alt="Google"
                                             className="w-5 h-5 mr-2"
                                         />
-                                        <span className="text-sm font-medium text-gray-600">Google</span>
+                                        <span className="text-sm font-medium text-gray-600">
+                                            Google
+                                        </span>
                                     </button>
                                     <button
                                         type="button"
@@ -287,13 +316,18 @@ const Login = () => {
                                             alt="Facebook"
                                             className="w-5 h-5 mr-2"
                                         />
-                                        <span className="text-sm font-medium text-gray-600">Facebook</span>
+                                        <span className="text-sm font-medium text-gray-600">
+                                            Facebook
+                                        </span>
                                     </button>
                                 </div>
 
                                 <p className="text-center text-gray-600 text-sm mt-8">
                                     Chưa có tài khoản?{" "}
-                                    <Link to="/auth/register" className="text-purple-600 hover:text-purple-700 hover:underline font-medium">
+                                    <Link
+                                        to="/auth/register"
+                                        className="text-purple-600 hover:text-purple-700 hover:underline font-medium"
+                                    >
                                         Đăng ký ngay
                                     </Link>
                                 </p>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Card, Checkbox } from "antd";
 import { FaEnvelope, FaLock, FaUser, FaHandPointRight } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import FormInput from "../../components/Auth/FormInput";
@@ -11,7 +11,8 @@ import { registerThunk, resetAuthState } from "../../store/slices/authSlice";
 const Register = () => {
     const [sparkles, setSparkles] = useState([]);
     const dispatch = useDispatch();
-    const { loading, error } = useSelector((state) => state.auth);
+    const navigate = useNavigate();
+    const { loading, error, success } = useSelector((state) => state.auth);
 
     const createSparkles = (e, cardIndex) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -24,7 +25,7 @@ const Register = () => {
             const velocity = 2 + Math.random() * 4; // Tốc độ ngẫu nhiên
             const size = 3 + Math.random() * 3; // Kích thước ngẫu nhiên
             const distance = 30 + Math.random() * 60; // Khoảng cách ngẫu nhiên
-            
+
             return {
                 id: `${cardIndex}-${i}-${Date.now()}`,
                 x: centerX,
@@ -33,13 +34,13 @@ const Register = () => {
                 targetY: centerY + Math.sin(angle) * distance,
                 size,
                 velocity,
-                cardIndex
+                cardIndex,
             };
         });
 
-        setSparkles(prev => [...prev, ...newSparkles]);
+        setSparkles((prev) => [...prev, ...newSparkles]);
         setTimeout(() => {
-            setSparkles(prev => prev.filter(s => !newSparkles.includes(s)));
+            setSparkles((prev) => prev.filter((s) => !newSparkles.includes(s)));
         }, 1000);
     };
 
@@ -56,9 +57,7 @@ const Register = () => {
                 .min(3, "Tên phải có ít nhất 3 ký tự")
                 .max(50, "Tên không được vượt quá 50 ký tự")
                 .required("Vui lòng nhập họ tên"),
-            email: Yup.string()
-                .email("Email không hợp lệ")
-                .required("Vui lòng nhập email"),
+            email: Yup.string().email("Email không hợp lệ").required("Vui lòng nhập email"),
             password: Yup.string()
                 .min(6, "Mật khẩu phải có ít nhất 6 ký tự")
                 .matches(/[A-Z]/, "Mật khẩu phải chứa ít nhất 1 chữ in hoa")
@@ -67,15 +66,21 @@ const Register = () => {
             confirmPassword: Yup.string()
                 .oneOf([Yup.ref("password"), null], "Mật khẩu xác nhận không khớp")
                 .required("Vui lòng xác nhận mật khẩu"),
-            agree: Yup.boolean()
-                .oneOf([true], "Bạn phải đồng ý với điều khoản sử dụng")
-                .required(),
+            agree: Yup.boolean().oneOf([true], "Bạn phải đồng ý với điều khoản sử dụng").required(),
         }),
         onSubmit: async (values) => {
             const { name, email, password } = values;
             await dispatch(registerThunk({ name, email, password }));
         },
     });
+
+    useEffect(() => {
+        if (success) {
+            formik.resetForm(); // Reset form khi đăng ký thành công
+            navigate("/auth/login"); // Chuyển hướng đến trang đăng nhập
+            dispatch(resetAuthState()); // Reset trạng thái auth
+        }
+    }, [success, navigate, dispatch, formik]);
 
     useEffect(() => {
         return () => {
@@ -105,7 +110,7 @@ const Register = () => {
                     animation: sparkle 600ms ease-out forwards;
                 }
                 .sparkle::before {
-                    content: '';
+                    content: "";
                     position: absolute;
                     width: 100%;
                     height: 100%;
@@ -127,7 +132,7 @@ const Register = () => {
                                 Khám Phá Kho Tàng Tri Thức
                             </span>
                         </h1>
-                        
+
                         <div className="space-y-6 mt-12">
                             {[0, 1, 2].map((index) => (
                                 <div
@@ -136,32 +141,54 @@ const Register = () => {
                                     className="group relative flex items-center space-x-4 bg-white/10 p-4 rounded-xl backdrop-blur-sm hover:bg-white/20 transform hover:scale-105 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-white/10 overflow-hidden"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-green-500/0 to-lime-500/0 group-hover:from-emerald-500/10 group-hover:via-green-500/10 group-hover:to-lime-500/10 transition-all duration-500"></div>
-                                    
-                                    {sparkles.filter(s => s.cardIndex === index).map(sparkle => (
-                                        <div
-                                            key={sparkle.id}
-                                            className="sparkle"
-                                            style={{
-                                                left: `${sparkle.x}px`,
-                                                top: `${sparkle.y}px`,
-                                                width: `${sparkle.size}px`,
-                                                height: `${sparkle.size}px`,
-                                                '--tx': `${sparkle.targetX - sparkle.x}px`,
-                                                '--ty': `${sparkle.targetY - sparkle.y}px`,
-                                            }}
-                                        />
-                                    ))}
+
+                                    {sparkles
+                                        .filter((s) => s.cardIndex === index)
+                                        .map((sparkle) => (
+                                            <div
+                                                key={sparkle.id}
+                                                className="sparkle"
+                                                style={{
+                                                    left: `${sparkle.x}px`,
+                                                    top: `${sparkle.y}px`,
+                                                    width: `${sparkle.size}px`,
+                                                    height: `${sparkle.size}px`,
+                                                    "--tx": `${sparkle.targetX - sparkle.x}px`,
+                                                    "--ty": `${sparkle.targetY - sparkle.y}px`,
+                                                }}
+                                            />
+                                        ))}
 
                                     <div className="flex-shrink-0 relative z-10">
-                                        <svg className="w-8 h-8 transform group-hover:scale-110 transition-transform duration-300 group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg
+                                            className="w-8 h-8 transform group-hover:scale-110 transition-transform duration-300 group-hover:rotate-12"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
                                             {index === 0 && (
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="2"
+                                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                                />
                                             )}
                                             {index === 1 && (
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="2"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                />
                                             )}
                                             {index === 2 && (
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="2"
+                                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                                                />
                                             )}
                                         </svg>
                                     </div>
@@ -252,13 +279,18 @@ const Register = () => {
                                     >
                                         <span className="text-gray-600">
                                             Tôi đồng ý với{" "}
-                                            <Link to="#" className="text-green-600 hover:text-green-700 hover:underline font-medium">
+                                            <Link
+                                                to="#"
+                                                className="text-green-600 hover:text-green-700 hover:underline font-medium"
+                                            >
                                                 điều khoản sử dụng
                                             </Link>
                                         </span>
                                     </Checkbox>
                                     {formik.touched.agree && formik.errors.agree && (
-                                        <p className="text-red-500 text-xs">{formik.errors.agree}</p>
+                                        <p className="text-red-500 text-xs">
+                                            {formik.errors.agree}
+                                        </p>
                                     )}
                                 </div>
 
@@ -292,7 +324,9 @@ const Register = () => {
                                             alt="Google"
                                             className="w-5 h-5 mr-2"
                                         />
-                                        <span className="text-sm font-medium text-gray-600">Google</span>
+                                        <span className="text-sm font-medium text-gray-600">
+                                            Google
+                                        </span>
                                     </button>
                                     <button
                                         type="button"
@@ -303,13 +337,18 @@ const Register = () => {
                                             alt="Facebook"
                                             className="w-5 h-5 mr-2"
                                         />
-                                        <span className="text-sm font-medium text-gray-600">Facebook</span>
+                                        <span className="text-sm font-medium text-gray-600">
+                                            Facebook
+                                        </span>
                                     </button>
                                 </div>
 
                                 <p className="text-center text-gray-600 text-sm mt-8">
                                     Đã có tài khoản?{" "}
-                                    <Link to="/auth/login" className="text-green-600 hover:text-green-700 hover:underline font-medium">
+                                    <Link
+                                        to="/auth/login"
+                                        className="text-green-600 hover:text-green-700 hover:underline font-medium"
+                                    >
                                         Đăng nhập
                                     </Link>
                                 </p>

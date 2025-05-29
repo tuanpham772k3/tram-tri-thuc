@@ -31,14 +31,17 @@ export const loginThunk = createAsyncThunk(
             await dispatch(fetchUserInfo()).unwrap();
             return res.data.data;
         } catch (err) {
-            const message =
-                err.code === "ERR_NETWORK"
-                    ? "Lỗi kết nối server: Vấn đề CORS hoặc server không phản hồi."
-                    : err.response?.status === 304
-                      ? "Lỗi server: Nhận response 304 bất thường."
-                      : err.response?.data?.message || "Lỗi đăng nhập.";
+            const status = err.response?.status;
+            let message = "Lỗi đăng nhập.";
+            if (status === 401) {
+                message = err.response?.data?.message || "Email hoặc mật khẩu không đúng.";
+            } else if (err.code === "ERR_NETWORK") {
+                message = "Lỗi kết nối server: Vui lòng kiểm tra kết nối mạng.";
+            } else if (status === 403) {
+                message = "Tài khoản của bạn đã bị vô hiệu hóa.";
+            }
             console.error("Login error:", {
-                status: err.response?.status,
+                status,
                 data: err.response?.data,
                 message: err.message,
                 code: err.code,
@@ -116,6 +119,7 @@ const initialState = {
     isAuthenticated: !!localStorage.getItem("accessToken"),
     loading: false,
     error: null,
+    success: false,
 };
 
 // ========== Helpers ==========
@@ -123,14 +127,16 @@ const initialState = {
 const handlePending = (state) => {
     state.loading = true;
     state.error = null;
+    state.success = false;
 };
 
 const handleRejected = (state, action, messageFallback) => {
     state.loading = false;
+    state.success = false;
     const message = action.payload?.message || messageFallback;
     state.error = message;
     if (message.includes("304")) {
-        state.error = "Lỗi server: Response 304 bất thường. Vui lòng thử lại.";
+        state.error = "Lỗi server: Vui lòng thử lại.";
     }
     showToast("error", state.error);
 };
@@ -144,10 +150,12 @@ const authSlice = createSlice({
         resetAuthState: (state) => {
             state.loading = false;
             state.error = null;
+            state.success = false;
         },
 
         clearAuthState: (state) => {
             state.error = null;
+            state.success = false;
         },
     },
     extraReducers: (builder) => {
@@ -158,6 +166,7 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.accessToken = action.payload.accessToken;
                 state.isAuthenticated = true;
+                state.success = true;
                 localStorage.setItem("accessToken", action.payload.accessToken);
                 showToast("success", "Đăng nhập thành công.");
             })
@@ -169,6 +178,7 @@ const authSlice = createSlice({
             .addCase(registerThunk.pending, handlePending)
             .addCase(registerThunk.fulfilled, (state) => {
                 state.loading = false;
+                state.success = true;
                 showToast("success", "Đăng ký thành công. Vui lòng đăng nhập.");
             })
             .addCase(registerThunk.rejected, (state, action) => {

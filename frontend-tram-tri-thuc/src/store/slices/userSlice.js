@@ -2,8 +2,9 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import showToast from "../../utils/toast";
 import customAxios from "../../utils/customAxios";
 import { loginThunk, logoutThunk } from "./authSlice";
+import { toggleFavorite } from "./documentSlice";
 
-// Lấy danh thông tin người dùng
+// Lấy thông tin người dùng
 export const fetchUserInfo = createAsyncThunk(
     "user/fetchUserInfo",
     async (_, { rejectWithValue }) => {
@@ -18,7 +19,7 @@ export const fetchUserInfo = createAsyncThunk(
     }
 );
 
-//  cập nhật thông tin user
+// Cập nhật thông tin người dùng
 export const updateUserInfo = createAsyncThunk(
     "user/updateUserInfo",
     async (data, { rejectWithValue }) => {
@@ -33,6 +34,11 @@ export const updateUserInfo = createAsyncThunk(
                 throw new Error("Không có dữ liệu hợp lệ để cập nhật");
             }
 
+            // Validate email format
+            if (filteredData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(filteredData.email)) {
+                throw new Error("Email không hợp lệ");
+            }
+
             const response = await customAxios.put("/users/me", filteredData);
             showToast("success", response.data.message);
             return response.data.data;
@@ -44,6 +50,7 @@ export const updateUserInfo = createAsyncThunk(
     }
 );
 
+// Xóa tài khoản người dùng
 export const deleteMyAccount = createAsyncThunk(
     "user/deleteMyAccount",
     async (_, { rejectWithValue }) => {
@@ -57,7 +64,8 @@ export const deleteMyAccount = createAsyncThunk(
     }
 );
 
-export const fetchUserHistory = createAsyncThunk(
+// Lấy lịch sử tài liệu đã xem
+export const fetchViewedHistory = createAsyncThunk(
     "user/fetchUserHistory",
     async (params = {}, { rejectWithValue }) => {
         try {
@@ -69,7 +77,21 @@ export const fetchUserHistory = createAsyncThunk(
     }
 );
 
-export const fetchUserFavorites = createAsyncThunk(
+// Lấy danh sách tài liệu đã tải xuống
+export const fetchDownloadedHistory = createAsyncThunk(
+    "user/fetchUserDownloads",
+    async (params = {}, { rejectWithValue }) => {
+        try {
+            const response = await customAxios.get("/users/me/downloads", { params });
+            return response.data.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || { message: "Lỗi khi lấy lịch sử tải." });
+        }
+    }
+);
+
+// Lấy danh sách tài liệu đã yêu thích
+export const fetchFavoriteDocuments = createAsyncThunk(
     "user/fetchUserFavorites",
     async (params = {}, { rejectWithValue }) => {
         try {
@@ -83,45 +105,18 @@ export const fetchUserFavorites = createAsyncThunk(
     }
 );
 
-export const toggleFavorite = createAsyncThunk(
-    "user/toggleFavorite",
-    async (docId, { rejectWithValue }) => {
-        try {
-            const response = await customAxios.patch(`/users/me/favorites/${docId}`);
-            showToast("success", response.data.message);
-            return response.data.data; // Backend trả về danh sách favorites
-        } catch (error) {
-            return rejectWithValue(
-                error.response?.data || { message: "Lỗi khi cập nhật yêu thích." }
-            );
-        }
-    }
-);
-
-export const fetchUserDownloads = createAsyncThunk(
-    "user/fetchUserDownloads",
-    async (params = {}, { rejectWithValue }) => {
-        try {
-            const response = await customAxios.get("/users/me/downloads", { params });
-            return response.data.data;
-        } catch (error) {
-            return rejectWithValue(error.response?.data || { message: "Lỗi khi lấy lịch sử tải." });
-        }
-    }
-);
-
 // Initial State
 const initialState = {
     userInfo: null,
-    history: [],
-    favorites: [],
-    downloads: [],
+    viewedHistory: [],
+    favoriteDocuments: [],
+    downloadedHistory: [],
     loading: false,
     error: null,
     pagination: {
-        history: { totalItems: 0, totalPages: 0, currentPage: 1, limit: 10 },
-        favorites: { totalItems: 0, totalPages: 0, currentPage: 1, limit: 10 },
-        downloads: { totalItems: 0, totalPages: 0, currentPage: 1, limit: 10 },
+        viewedHistory: { totalItems: 0, totalPages: 0, currentPage: 1, limit: 10 },
+        favoriteDocuments: { totalItems: 0, totalPages: 0, currentPage: 1, limit: 10 },
+        downloadedHistory: { totalItems: 0, totalPages: 0, currentPage: 1, limit: 10 },
     },
 };
 
@@ -134,13 +129,11 @@ const handlePending = (state) => {
 
 const handleRejected = (state, action) => {
     state.loading = false;
-    let errorMessage = "Đã xảy ra lỗi không xác định.";
+    let errorMessage = action.payload?.message || "Đã xảy ra lỗi không xác định.";
     if (action.payload?.status === 401) {
         errorMessage = "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.";
     } else if (action.payload?.status === 404) {
-        errorMessage = "Không tìm thấy tài nguyên.";
-    } else {
-        errorMessage = action.payload?.message || action.error?.message || errorMessage;
+        errorMessage = action.payload?.message || "Không tìm thấy tài nguyên.";
     }
     state.error = errorMessage;
     console.error("API Error:", action.payload || action.error);
@@ -158,7 +151,17 @@ const userSlice = createSlice({
             state.error = null;
         },
         resetUserState: (state) => {
-            return initialState;
+            state.userInfo = null;
+            state.viewedHistory = [];
+            state.favoriteDocuments = [];
+            state.downloadedHistory = [];
+            state.loading = false;
+            state.error = null;
+            state.pagination = {
+                viewedHistory: { totalItems: 0, totalPages: 0, currentPage: 1, limit: 100 },
+                favoriteDocuments: { totalItems: 0, totalPages: 0, currentPage: 1, limit: 100 },
+                downloadedHistory: { totalItems: 0, totalPages: 0, currentPage: 1, limit: 10 },
+            };
         },
     },
     extraReducers: (builder) => {
@@ -166,6 +169,7 @@ const userSlice = createSlice({
         builder
             .addCase(loginThunk.fulfilled, (state, action) => {
                 state.userInfo = action.payload.user; // Đồng bộ userInfo ngay sau login
+                state.favoriteDocuments = [];
             })
             .addCase(logoutThunk.fulfilled, (state) => {
                 return initialState; // Reset userSlice khi logout
@@ -186,6 +190,8 @@ const userSlice = createSlice({
             .addCase(updateUserInfo.fulfilled, (state, action) => {
                 state.loading = false;
                 state.userInfo = action.payload;
+                // Tự động fetch favoriteDocuments khi lấy userInfo thành công
+                state.favoriteDocuments = []; // Reset trước khi fetch lại
             })
             .addCase(updateUserInfo.rejected, handleRejected);
 
@@ -193,64 +199,72 @@ const userSlice = createSlice({
         builder
             .addCase(deleteMyAccount.pending, handlePending)
             .addCase(deleteMyAccount.fulfilled, (state) => {
-                state.loading = false;
-                state.userInfo = null;
+                return initialState;
             })
             .addCase(deleteMyAccount.rejected, handleRejected);
 
         // fetchUserHistory
         builder
-            .addCase(fetchUserHistory.pending, handlePending)
-            .addCase(fetchUserHistory.fulfilled, (state, action) => {
+            .addCase(fetchViewedHistory.pending, handlePending)
+            .addCase(fetchViewedHistory.fulfilled, (state, action) => {
                 state.loading = false;
-                state.history = action.payload.items;
-                state.pagination.history = {
+                state.viewedHistory = action.payload.items;
+                state.pagination.viewedHistory = {
                     totalItems: action.payload.totalItems,
                     totalPages: action.payload.totalPages,
                     currentPage: action.payload.currentPage,
-                    limit: action.payload.limit,
+                    limit: action.payload.limit || state.pagination.viewedHistory.limit,
                 };
             })
-            .addCase(fetchUserHistory.rejected, handleRejected);
+            .addCase(fetchViewedHistory.rejected, handleRejected);
+
+        // fetchUserDownloads
+        builder
+            .addCase(fetchDownloadedHistory.pending, handlePending)
+            .addCase(fetchDownloadedHistory.fulfilled, (state, action) => {
+                state.loading = false;
+                state.downloadedHistory = action.payload.items;
+                state.pagination.downloadedHistory = {
+                    totalItems: action.payload.totalItems,
+                    totalPages: action.payload.totalPages,
+                    currentPage: action.payload.currentPage,
+                    limit: action.payload.limit || state.pagination.downloadedHistory.limit,
+                };
+            })
+            .addCase(fetchDownloadedHistory.rejected, handleRejected);
 
         // fetchUserFavorites
         builder
-            .addCase(fetchUserFavorites.pending, handlePending)
-            .addCase(fetchUserFavorites.fulfilled, (state, action) => {
+            .addCase(fetchFavoriteDocuments.pending, handlePending)
+            .addCase(fetchFavoriteDocuments.fulfilled, (state, action) => {
                 state.loading = false;
-                state.favorites = action.payload.items;
-                state.pagination.favorites = {
+                state.favoriteDocuments = action.payload.items;
+                state.pagination.favoriteDocuments = {
                     totalItems: action.payload.totalItems,
                     totalPages: action.payload.totalPages,
                     currentPage: action.payload.currentPage,
-                    limit: action.payload.limit,
+                    limit: action.payload.limit || state.pagination.favoriteDocuments.limit,
                 };
             })
-            .addCase(fetchUserFavorites.rejected, handleRejected);
+            .addCase(fetchFavoriteDocuments.rejected, handleRejected);
 
-        // toggleFavorite
+        // toggleFavorite từ documentSlice
         builder
             .addCase(toggleFavorite.pending, handlePending)
             .addCase(toggleFavorite.fulfilled, (state, action) => {
                 state.loading = false;
-                state.favorites = action.payload; // Backend trả về danh sách favorites đầy đủ
+                // Cập nhật danh sách favoriteDocuments từ payload của toggleFavorite
+                state.favoriteDocuments = action.payload.favoriteDocuments.map((doc) => ({
+                    ...doc,
+                    favoriteCount: doc.favoriteCount ?? 0,
+                }));
+                showToast("success", action.payload.message);
             })
-            .addCase(toggleFavorite.rejected, handleRejected);
-
-        // fetchUserDownloads
-        builder
-            .addCase(fetchUserDownloads.pending, handlePending)
-            .addCase(fetchUserDownloads.fulfilled, (state, action) => {
+            .addCase(toggleFavorite.rejected, (state, action) => {
                 state.loading = false;
-                state.downloads = action.payload.items;
-                state.pagination.downloads = {
-                    totalItems: action.payload.totalItems,
-                    totalPages: action.payload.totalPages,
-                    currentPage: action.payload.currentPage,
-                    limit: action.payload.limit,
-                };
-            })
-            .addCase(fetchUserDownloads.rejected, handleRejected);
+                state.error = action.payload;
+                showToast("error", action.payload);
+            });
     },
 });
 

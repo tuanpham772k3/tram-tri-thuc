@@ -1,86 +1,144 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import showToast from "../../utils/toast";
+import customAxios from "../../utils/customAxios";
+import debounce from "lodash/debounce";
 
-// Giả lập gọi API lấy danh sách người dùng
-export const fetchAllUsers = createAsyncThunk("admin/fetchAllUsers", async () => {
-    // Giả lập dữ liệu
-    return [
-        { _id: "1", name: "Admin One", email: "admin1@example.com", role: "admin", isActive: true },
-        {
-            _id: "2",
-            name: "Uploader A",
-            email: "up1@example.com",
-            role: "uploader",
-            isActive: true,
-        },
-        { _id: "3", name: "Member B", email: "mem2@example.com", role: "member", isActive: false },
-    ];
-});
+// ========== Thunks ==========
 
-// Giả lập gọi API lấy danh sách tài liệu chờ duyệt
-export const fetchPendingDocuments = createAsyncThunk("admin/fetchPendingDocuments", async () => {
-    return [
-        { _id: "doc1", title: "Tài liệu A", uploaderName: "Uploader A", isApproved: false },
-        { _id: "doc2", title: "Tài liệu B", uploaderName: "Uploader B", isApproved: false },
-    ];
-});
+// Làm mới danh sách bình luận admin với debounce
+const debouncedFetchAdminComments = debounce(
+    async (params, dispatch) => {
+        try {
+            dispatch(fetchAdminComments(params));
+        } catch (err) {
+            // Lỗi đã được xử lý trong rejected của fetchAdminComments
+        }
+    },
+    500,
+    { leading: false, trailing: true }
+);
 
-// Giả lập gọi API lấy thống kê tổng quan
-export const fetchAdminStats = createAsyncThunk("admin/fetchAdminStats", async () => {
-    return {
-        totalUsers: 120,
-        totalDocuments: 350,
-        pendingDocuments: 12,
-        reportedComments: 5,
-    };
-});
+// Lấy danh sách bình luận (lọc theo báo cáo)
+export const fetchAdminComments = createAsyncThunk(
+    "admin/fetchComments",
+    async (params, { rejectWithValue }) => {
+        try {
+            const res = await customAxios.get("/admin/comments", { params });
+            return {
+                ...res.data.data,
+                items: res.data.data.items.map((comment) => ({
+                    ...comment,
+                    user: {
+                        name: comment.user?.name || comment.user?.email || "Ẩn danh",
+                        email: comment.user?.email || "",
+                    },
+                    document: {
+                        title: comment.documentId?.title || "Không xác định",
+                    },
+                })),
+            };
+        } catch (err) {
+            const message = err.response?.data?.message || "Không thể lấy danh sách bình luận.";
+            showToast("error", message);
+            return rejectWithValue({ message, status: err.response?.status });
+        }
+    }
+);
+
+// Xóa cứng bình luận
+export const forceDeleteComment = createAsyncThunk(
+    "admin/forceDeleteComment",
+    async (commentId, { dispatch, getState, rejectWithValue }) => {
+        try {
+            const res = await customAxios.delete(`/admin/comments/${commentId}/force`);
+            showToast("success", res.data.message);
+            // Hủy debounce trước
+            debouncedFetchAdminComments.cancel();
+            // Làm mới danh sách bình luận
+            debouncedFetchAdminComments({ page: getState().admin.currentPage }, dispatch);
+            return { commentId };
+        } catch (err) {
+            const message = err.response?.data?.message || "Không thể xóa bình luận.";
+            showToast("error", message);
+            return rejectWithValue({ message, status: err.response?.status });
+        }
+    }
+);
+
+// Thử lại khi gặp lỗi
+export const retryAdminAction = createAsyncThunk(
+    "admin/retry",
+    async ({ action, payload }, { dispatch }) => {
+        return dispatch(action(payload));
+    }
+);
+
+// ========== Initial State ==========
+
+const initialState = {
+    comments: [], // Danh sách bình luận admin
+    totalItems: 0,
+    totalPages: 0,
+    currentPage: 1,
+    loading: false,
+    error: null, // Lưu cả message và status
+};
+
+// ========== Helpers ==========
+
+const handlePending = (state) => {
+    state.loading = true;
+    state.error = null;
+};
+
+const handleRejected = (state, action, messageFallback) => {
+    state.loading = false;
+    state.error = action.payload || { message: messageFallback };
+};
+
+// ========== Slice ==========
 
 const adminSlice = createSlice({
     name: "admin",
-    initialState: {
-        users: [],
-        pendingDocuments: [],
-        stats: null,
-        loading: false,
-        error: null,
-    },
+    initialState,
     reducers: {
-        toggleUserStatus(state, action) {
-            const userId = action.payload;
-            const user = state.users.find((u) => u._id === userId);
-            if (user) user.isActive = !user.isActive;
+        resetAdminState: (state) => {
+            state.comments = [];
+            state.totalItems = 0;
+            state.totalPages = 0;
+            state.currentPage = 1;
+            state.loading = false;
+            state.error = null;
         },
-        approveDocument(state, action) {
-            const docId = action.payload;
-            const docIndex = state.pendingDocuments.findIndex((d) => d._id === docId);
-            if (docIndex !== -1) {
-                state.pendingDocuments.splice(docIndex, 1); // Remove khỏi danh sách chờ duyệt
-            }
+        clearAdminError: (state) => {
+            state.error = null;
         },
     },
     extraReducers: (builder) => {
+        // Fetch Admin Comments
         builder
-            .addCase(fetchAllUsers.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(fetchAllUsers.fulfilled, (state, action) => {
+            .addCase(fetchAdminComments.pending, handlePending)
+            .addCase(fetchAdminComments.fulfilled, (state, action) => {
                 state.loading = false;
-                state.users = action.payload;
+                state.comments = action.payload.items;
+                state.totalItems = action.payload.totalItems;
+                state.totalPages = action.payload.totalPages;
+                state.currentPage = action.payload.currentPage;
             })
-            .addCase(fetchAllUsers.rejected, (state, action) => {
+            .addCase(fetchAdminComments.rejected, (state, action) => {
+                handleRejected(state, action, "Lấy danh sách bình luận thất bại.");
+            })
+            // Force Delete Comment
+            .addCase(forceDeleteComment.pending, handlePending)
+            .addCase(forceDeleteComment.fulfilled, (state, action) => {
                 state.loading = false;
-                state.error = action.error.message;
+                // Dữ liệu được làm mới qua debouncedFetchAdminComments
             })
-
-            .addCase(fetchPendingDocuments.fulfilled, (state, action) => {
-                state.pendingDocuments = action.payload;
-            })
-
-            .addCase(fetchAdminStats.fulfilled, (state, action) => {
-                state.stats = action.payload;
+            .addCase(forceDeleteComment.rejected, (state, action) => {
+                handleRejected(state, action, "Xóa bình luận thất bại.");
             });
     },
 });
 
-export const { toggleUserStatus, approveDocument } = adminSlice.actions;
-
+export const { resetAdminState, clearAdminError } = adminSlice.actions;
 export default adminSlice.reducer;
