@@ -7,6 +7,7 @@ import showToast from "../../../utils/toast";
 import LoadingSpinner from "../../Common/LoadingSpinner";
 import { logoutThunk } from "../../../store/slices/authSlice";
 import { fetchUserInfo, resetUserState } from "../../../store/slices/userSlice";
+import NotificationBell from "../../User/NotificationBell";
 
 export default function Navbar() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -72,14 +73,12 @@ export default function Navbar() {
     ];
 
     return (
-        <motion.nav 
-            className="bg-white/90 backdrop-blur-md shadow-lg sticky top-0 z-40"
-        >
+        <motion.nav className="bg-white/90 backdrop-blur-md shadow-lg sticky top-0 z-40">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
-                    <Link 
-                        to="/" 
+                    <Link
+                        to="/"
                         className="flex items-center space-x-2 text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
                     >
                         <span className="text-3xl">📚</span>
@@ -103,13 +102,10 @@ export default function Navbar() {
                     {/* Right Section */}
                     <div className="flex items-center space-x-4">
                         {/* Notifications */}
-                        <Link
-                            to="/user/notifications"
-                            className="relative text-gray-600 hover:text-blue-600 transition-colors p-2"
-                        >
-                            <Bell className="w-5 h-5" />
-                            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-                        </Link>
+                        <NotificationBell
+                            onClick={() => navigate("/user/notifications")}
+                            className="text-gray-600 hover:text-blue-600 transition-colors p-2"
+                        />
 
                         {/* User Menu */}
                         {isAuthenticated ? (
@@ -122,8 +118,13 @@ export default function Navbar() {
                                         className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
                                     >
                                         <img
-                                            src={userInfo?.avatar || "/src/assets/default-avatar.png"}
-                                            onError={(e) => (e.currentTarget.src = "/src/assets/default-avatar.png")}
+                                            src={
+                                                userInfo?.avatar || "/src/assets/default-avatar.png"
+                                            }
+                                            onError={(e) =>
+                                                (e.currentTarget.src =
+                                                    "/src/assets/default-avatar.png")
+                                            }
                                             alt="User Avatar"
                                             className="w-8 h-8 rounded-full ring-2 ring-blue-100 hover:ring-blue-300 transition-all"
                                         />
@@ -142,8 +143,14 @@ export default function Navbar() {
                                             <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50">
                                                 <div className="flex items-center space-x-4">
                                                     <img
-                                                        src={userInfo?.avatar || "/src/assets/default-avatar.png"}
-                                                        onError={(e) => (e.currentTarget.src = "/src/assets/default-avatar.png")}
+                                                        src={
+                                                            userInfo?.avatar ||
+                                                            "/src/assets/default-avatar.png"
+                                                        }
+                                                        onError={(e) =>
+                                                            (e.currentTarget.src =
+                                                                "/src/assets/default-avatar.png")
+                                                        }
                                                         alt="User Avatar"
                                                         className="w-12 h-12 rounded-full ring-4 ring-white shadow-md"
                                                     />
@@ -166,7 +173,9 @@ export default function Navbar() {
                                                     className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors group"
                                                 >
                                                     <User className="w-5 h-5 group-hover:stroke-blue-600" />
-                                                    <span className="text-sm font-medium">Hồ sơ cá nhân</span>
+                                                    <span className="text-sm font-medium">
+                                                        Hồ sơ cá nhân
+                                                    </span>
                                                 </Link>
 
                                                 <Link
@@ -175,7 +184,9 @@ export default function Navbar() {
                                                     className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors group"
                                                 >
                                                     <Settings className="w-5 h-5 group-hover:stroke-blue-600" />
-                                                    <span className="text-sm font-medium">Cài đặt tài khoản</span>
+                                                    <span className="text-sm font-medium">
+                                                        Cài đặt tài khoản
+                                                    </span>
                                                 </Link>
 
                                                 <div className="h-[1px] bg-gray-100 my-2 mx-4"></div>
@@ -186,7 +197,9 @@ export default function Navbar() {
                                                     disabled={authLoading || userLoading}
                                                 >
                                                     <LogOut className="w-5 h-5 group-hover:stroke-red-700" />
-                                                    <span className="text-sm font-medium">Đăng xuất</span>
+                                                    <span className="text-sm font-medium">
+                                                        Đăng xuất
+                                                    </span>
                                                 </button>
                                             </div>
                                         </motion.div>
@@ -247,7 +260,7 @@ export default function Navbar() {
                 }
 
                 .nav-link::after {
-                    content: '';
+                    content: "";
                     position: absolute;
                     bottom: -2px;
                     left: 50%;

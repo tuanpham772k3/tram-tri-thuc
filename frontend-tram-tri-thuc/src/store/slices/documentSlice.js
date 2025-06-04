@@ -10,9 +10,8 @@ export const fetchDocuments = createAsyncThunk(
             const response = await customAxios.get("/documents", { params });
             return response.data.data; // { totalItems, totalPages, currentPage, items }
         } catch (error) {
-            return rejectWithValue(
-                error.response?.data?.message || "Không thể lấy danh sách tài liệu"
-            );
+            const message = error.response?.data?.message || "Không thể lấy danh sách tài liệu";
+            return rejectWithValue(message);
         }
     }
 );
@@ -54,41 +53,77 @@ export const downloadDocument = createAsyncThunk(
         try {
             // Lấy thông tin tài liệu để có fileName
             const state = getState();
-            const document =
+            const documentData =
                 state.documents.currentDocument ||
                 state.documents.documents.find((doc) => doc._id === id) ||
                 state.documents.myDocuments.find((doc) => doc._id === id);
 
-            const response = await customAxios.get(`/documents/download/${id}`, {
+            const response = await customAxios.get(`/documents/${id}/download`, {
                 responseType: "blob",
+                timeout: 30000, // 30 second timeout
             });
 
-            const fileName = document?.fileName || `document-${id}`;
-            const url = window.URL.createObjectURL(new Blob([response.data]));
+            // Check if response is actually a blob
+            if (!(response.data instanceof Blob)) {
+                throw new Error("Invalid response format");
+            }
+
+            // Extract filename from response headers if available
+            const contentDisposition = response.headers["content-disposition"];
+            let fileName = documentData?.fileName || `document-${id}`;
+
+            if (contentDisposition) {
+                const fileNameMatch = contentDisposition.match(
+                    /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
+                );
+                if (fileNameMatch && fileNameMatch[1]) {
+                    fileName = decodeURIComponent(fileNameMatch[1].replace(/['"]/g, ""));
+                }
+            }
+
+            // Create download link
+            const url = window.URL.createObjectURL(response.data);
             const link = document.createElement("a");
             link.href = url;
             link.setAttribute("download", fileName);
+            link.style.display = "none";
+
+            // Append to body, click, then remove
             document.body.appendChild(link);
             link.click();
-            link.remove();
+            document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
+
             showToast("success", "Tải tài liệu thành công.");
-            return id;
+            return { id, fileName };
         } catch (error) {
+            console.error("Download error:", error);
+
             let message;
-            switch (error.response?.status) {
-                case 404:
-                    message = "Tài liệu không tồn tại.";
-                    break;
-                case 403:
-                    message = "Bạn không có quyền tải tài liệu này.";
-                    break;
-                case 401:
-                    message = "Vui lòng đăng nhập để tải tài liệu.";
-                    break;
-                default:
-                    message = error.response?.data?.message || "Không thể tải tài liệu.";
+            if (error.code === "ECONNABORTED") {
+                message = "Timeout: Quá trình tải xuống mất quá nhiều thời gian.";
+            } else {
+                switch (error.response?.status) {
+                    case 404:
+                        message = "Tài liệu không tồn tại.";
+                        break;
+                    case 403:
+                        message = "Bạn không có quyền tải tài liệu này.";
+                        break;
+                    case 401:
+                        message = "Vui lòng đăng nhập để tải tài liệu.";
+                        break;
+                    case 500:
+                        message = "Lỗi server. Vui lòng thử lại sau.";
+                        break;
+                    default:
+                        message =
+                            error.response?.data?.message ||
+                            error.message ||
+                            "Không thể tải tài liệu.";
+                }
             }
+
             showToast("error", message);
             return rejectWithValue({ message, status: error.response?.status });
         }
@@ -129,14 +164,20 @@ export const uploadDocument = createAsyncThunk(
 // Lấy danh sách tài liệu của người dùng
 export const fetchMyDocuments = createAsyncThunk(
     "documents/fetchMyDocuments",
-    async (_, { rejectWithValue }) => {
+    async (params, { rejectWithValue }) => {
         try {
-            const response = await customAxios.get("/documents/me");
-            return response.data.data; // documents array
+            const response = await customAxios.get("/documents/me", { params });
+            return response.data.data; // { totalItems, totalPages, currentPage, items }
         } catch (error) {
-            return rejectWithValue(
-                error.response?.data?.message || "Không thể lấy danh sách tài liệu cá nhân"
-            );
+            const status = error.response?.status;
+            let message =
+                error.response?.data?.message || "Không thể lấy danh sách tài liệu cá nhân";
+            if (status === 401) {
+                message = "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.";
+            } else if (status === 403) {
+                message = "Bạn không có quyền truy cập danh sách tài liệu.";
+            }
+            return rejectWithValue({ message, status });
         }
     }
 );
@@ -278,9 +319,9 @@ export const fetchFeaturedDocuments = createAsyncThunk(
             const response = await customAxios.get("/documents/featured", { params });
             return response.data.data; // { totalItems, totalPages, currentPage, items }
         } catch (error) {
-            return rejectWithValue(
-                error.response?.data?.message || "Không thể lấy danh sách tài liệu nổi bật"
-            );
+            const message =
+                error.response?.data?.message || "Không thể lấy danh sách tài liệu nổi bật";
+            return rejectWithValue(message);
         }
     }
 );
@@ -338,11 +379,19 @@ const documentSlice = createSlice({
             totalItems: 0,
             totalPages: 0,
             currentPage: 1,
+            limit: 10,
         },
         featuredPagination: {
             totalItems: 0,
             totalPages: 0,
             currentPage: 1,
+            limit: 10,
+        },
+        myDocumentsPagination: {
+            totalItems: 0,
+            totalPages: 0,
+            currentPage: 1,
+            limit: 10,
         },
     },
     reducers: {
@@ -363,7 +412,13 @@ const documentSlice = createSlice({
 
         const normalizeDocument = (doc) => ({
             ...doc,
+            _id: doc._id?.toString(),
             favoriteCount: doc.favoriteCount ?? 0,
+            viewCount: doc.viewCount ?? 0,
+            downloadCount: doc.downloadCount ?? 0,
+            category: doc.category || { _id: null, name: "", slug: "" },
+            uploader: doc.uploader || { _id: null, name: "" },
+            createdAt: doc.createdAt ? new Date(doc.createdAt).toISOString() : null,
         });
 
         builder
@@ -371,23 +426,26 @@ const documentSlice = createSlice({
             .addCase(fetchDocuments.pending, handlePending)
             .addCase(fetchDocuments.fulfilled, (state, action) => {
                 state.loading = false;
-                state.documents = action.payload.items.map(normalizeDocument);
+                state.documents = action.payload.items?.map(normalizeDocument) || [];
                 state.pagination = {
-                    totalItems: action.payload.totalItems,
-                    totalPages: action.payload.totalPages,
-                    currentPage: action.payload.currentPage,
+                    totalItems: action.payload.totalItems || 0,
+                    totalPages: action.payload.totalPages || 0,
+                    currentPage: action.payload.currentPage || 1,
+                    limit: action.payload.limit || state.pagination.limit,
                 };
             })
             .addCase(fetchDocuments.rejected, handleRejected)
+
             // fetchFeaturedDocuments
             .addCase(fetchFeaturedDocuments.pending, handlePending)
             .addCase(fetchFeaturedDocuments.fulfilled, (state, action) => {
                 state.loading = false;
-                state.featuredDocuments = action.payload.items.map(normalizeDocument);
+                state.featuredDocuments = action.payload.items?.map(normalizeDocument) || [];
                 state.featuredPagination = {
-                    totalItems: action.payload.totalItems,
-                    totalPages: action.payload.totalPages,
-                    currentPage: action.payload.currentPage,
+                    totalItems: action.payload.totalItems || 0,
+                    totalPages: action.payload.totalPages || 0,
+                    currentPage: action.payload.currentPage || 1,
+                    limit: action.payload.limit || state.featuredPagination.limit,
                 };
             })
             .addCase(fetchFeaturedDocuments.rejected, handleRejected)
@@ -420,6 +478,7 @@ const documentSlice = createSlice({
             .addCase(uploadDocument.fulfilled, (state, action) => {
                 state.loading = false;
                 state.myDocuments.push(normalizeDocument(action.payload));
+                state.myDocumentsPagination.totalItems += 1;
             })
             .addCase(uploadDocument.rejected, handleRejected)
 
@@ -427,7 +486,13 @@ const documentSlice = createSlice({
             .addCase(fetchMyDocuments.pending, handlePending)
             .addCase(fetchMyDocuments.fulfilled, (state, action) => {
                 state.loading = false;
-                state.myDocuments = action.payload.map(normalizeDocument);
+                state.myDocuments = action.payload.items?.map(normalizeDocument) || [];
+                state.myDocumentsPagination = {
+                    totalItems: action.payload.totalItems || 0,
+                    totalPages: action.payload.totalPages || 0,
+                    currentPage: action.payload.currentPage || 1,
+                    limit: action.payload.limit || state.myDocumentsPagination.limit,
+                };
             })
             .addCase(fetchMyDocuments.rejected, handleRejected)
 
@@ -515,16 +580,17 @@ const documentSlice = createSlice({
             .addCase(toggleFavorite.fulfilled, (state, action) => {
                 state.loading = false;
                 const { document } = action.payload;
-                const docId = document._id;
                 const updatedDoc = normalizeDocument(document);
-
                 state.documents = state.documents.map((doc) =>
-                    doc._id === docId ? updatedDoc : doc
+                    doc._id === updatedDoc._id ? updatedDoc : doc
+                );
+                state.myDocuments = state.myDocuments.map((doc) =>
+                    doc._id === updatedDoc._id ? updatedDoc : doc
                 );
                 state.featuredDocuments = state.featuredDocuments.map((doc) =>
-                    doc._id === docId ? updatedDoc : doc
+                    doc._id === updatedDoc._id ? updatedDoc : doc
                 );
-                if (state.currentDocument?._id === docId) {
+                if (state.currentDocument?._id === updatedDoc._id) {
                     state.currentDocument = updatedDoc;
                 }
             })

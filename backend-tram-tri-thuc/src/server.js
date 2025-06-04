@@ -3,6 +3,8 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db.config.js");
+const http = require("http");
+const socketIo = require("socket.io");
 
 dotenv.config();
 
@@ -15,6 +17,34 @@ const corsOptions = {
 };
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+    cors: {
+        origin: process.env.CLIENT_URL || "http://localhost:5173",
+        methods: ["GET", "POST"],
+    },
+});
+
+// Middleware để lưu socket.io instance vào req
+app.use((req, res, next) => {
+    req.io = io;
+    next();
+});
+
+// Kết nối WebSocket
+io.on("connection", (socket) => {
+    logger.info(`Client connected: ${socket.id}`);
+
+    // Client gửi userId để tham gia room
+    socket.on("join", (userId) => {
+        socket.join(userId);
+        logger.info(`User ${userId} joined room`);
+    });
+
+    socket.on("disconnect", () => {
+        logger.info(`Client disconnected: ${socket.id}`);
+    });
+});
 
 // Log request để debug
 app.use((req, res, next) => {

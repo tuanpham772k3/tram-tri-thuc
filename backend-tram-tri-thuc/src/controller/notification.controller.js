@@ -23,7 +23,11 @@ exports.createNotification = async (req, res) => {
         });
 
         await notification.save();
+
+        // Gửi thông báo qua WebSocket tới userId
+        req.io.to(userId).emit("newNotification", notification);
         logger.info(`Notification created for user ${userId}, type: ${type}`);
+
         res.status(201).json({
             success: true,
             message: "Gửi thông báo thành công.",
@@ -96,7 +100,7 @@ exports.markNotificationAsRead = async (req, res) => {
         logger.info(`Notification ${id} marked as read by user ${userId}`);
         res.status(200).json({
             success: true,
-            message: "Đánh dấu thông báo đã đọc thành công.",
+            message: "Đánh dấu thông báo đã đọc.",
             data: notification,
         });
     } catch (error) {
@@ -104,6 +108,39 @@ exports.markNotificationAsRead = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Không thể đánh dấu thông báo đã đọc.",
+        });
+    }
+};
+
+exports.markAsUnread = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user._id;
+
+        const notification = await Notification.findOneAndUpdate(
+            { _id: id, userId },
+            { isRead: false, updatedAt: new Date() },
+            { new: true }
+        );
+
+        if (!notification) {
+            return res.status(404).json({
+                success: false,
+                message: "Thông báo không tồn tại hoặc bạn không có quyền.",
+            });
+        }
+
+        logger.info(`Notification ${id} marked as unread by user ${userId}`);
+        return res.status(200).json({
+            success: true,
+            message: "Đánh dấu thông báo chưa đọc.",
+            data: notification,
+        });
+    } catch (error) {
+        logger.error("Error marking notification as unread:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Lỗi server khi đánh dấu thông báo chưa đọc.",
         });
     }
 };
@@ -117,7 +154,7 @@ exports.markAllNotificationsAsRead = async (req, res) => {
         logger.info(`All notifications marked as read for user ${userId}`);
         res.status(200).json({
             success: true,
-            message: "Đánh dấu tất cả thông báo đã đọc thành công.",
+            message: "Đánh dấu tất cả thông báo đã đọc.",
         });
     } catch (error) {
         logger.error(`Mark all notifications read error: ${error.message}`);
@@ -178,39 +215,6 @@ exports.deleteAllNotifications = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Không thể xóa tất cả thông báo.",
-        });
-    }
-};
-
-exports.broadcastNotification = async (req, res) => {
-    try {
-        const { target, message, type } = req.body;
-
-        let query = {};
-        if (target !== "all") {
-            query.role = target;
-        }
-
-        const users = await User.find(query).select("_id");
-        const notifications = users.map((user) => ({
-            userId: user._id,
-            type,
-            message,
-            link: "/system-updates",
-        }));
-
-        await Notification.insertMany(notifications);
-        logger.info(`Broadcast notification sent to ${target} by admin ${req.user.email}`);
-        res.status(201).json({
-            success: true,
-            message: "Gửi thông báo broadcast thành công.",
-            data: { count: notifications.length },
-        });
-    } catch (error) {
-        logger.error(`Broadcast notification error: ${error.message}`);
-        res.status(500).json({
-            success: false,
-            message: "Không thể gửi thông báo broadcast.",
         });
     }
 };

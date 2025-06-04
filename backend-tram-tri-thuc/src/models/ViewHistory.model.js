@@ -24,7 +24,7 @@ const viewHistorySchema = new Schema(
     }
 );
 
-viewHistorySchema.index({ userId: 1, documentId: 1 });
+viewHistorySchema.index({ userId: 1, documentId: 1 }, { unique: true });
 viewHistorySchema.index({ viewedAt: -1 });
 
 const ViewHistory = mongoose.models.ViewHistory || mongoose.model("ViewHistory", viewHistorySchema);

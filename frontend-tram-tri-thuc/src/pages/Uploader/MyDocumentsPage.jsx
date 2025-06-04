@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { clearError, deleteDocument, fetchMyDocuments } from "../../store/slices/documentSlice";
@@ -12,8 +12,6 @@ import {
     FaLightbulb,
     FaBrain,
     FaChalkboardTeacher,
-    FaBookReader,
-    FaAtom,
     FaUniversity,
     FaUserGraduate,
     FaSchool,
@@ -23,49 +21,169 @@ import {
     FaFlask,
     FaCalculator,
 } from "react-icons/fa";
+import useDebounce from "../../utils/useDebounce";
+import { fetchCategories } from "../../store/slices/categorySlice";
+import SearchBar from "../../components/Document/SearchBar";
+import FilterPanel from "../../components/Document/FilterPanel";
+import Pagination from "../../components/Common/Pagination";
 
 export default function MyDocumentsPage() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { myDocuments, loading, error } = useSelector((state) => state.documents);
+    const {
+        myDocuments,
+        loading: documentsLoading,
+        error: documentsError,
+        myDocumentsPagination,
+    } = useSelector((state) => state.documents);
+    const {
+        categories,
+        loading: categoriesLoading,
+        error: categoriesError,
+    } = useSelector((state) => state.categories);
     const { userInfo } = useSelector((state) => state.user);
 
+    const [filters, setFilters] = useState({
+        search: "",
+        category: "",
+        status: "",
+        startDate: "",
+        endDate: "",
+        dateField: "createdAt",
+        sort: "createdAt:desc",
+        page: 1,
+    });
+    const debouncedSearch = useDebounce(filters.search, 500);
+
+    // Fetch categories
     useEffect(() => {
+        dispatch(fetchCategories());
+    }, [dispatch]);
+
+    // Fetch documents
+    const fetchDocuments = useCallback(() => {
         const token = localStorage.getItem("accessToken");
         if (!token) {
             showToast("error", "Vui lòng đăng nhập để xem tài liệu.");
             navigate("/auth/login");
-        } else {
-            dispatch(fetchMyDocuments());
+            return;
         }
-        return () => dispatch(clearError());
-    }, [dispatch, navigate, userInfo]);
 
+        const params = {
+            ...filters,
+            search: debouncedSearch,
+            page: filters.page,
+        };
+        // Clean params: remove empty values
+        const cleanParams = Object.fromEntries(
+            Object.entries(params).filter(([_, v]) => v != null && v !== "")
+        );
+        console.log("API Params:", cleanParams);
+        dispatch(fetchMyDocuments(cleanParams))
+            .unwrap()
+            .then((data) => console.log("API Response:", data))
+            .catch((err) => {
+                console.error("API Error:", err);
+                showToast("error", err.message || "Lỗi khi tải tài liệu.");
+            });
+    }, [
+        dispatch,
+        navigate,
+        debouncedSearch,
+        filters.page,
+        filters.category,
+        filters.status,
+        filters.startDate,
+        filters.endDate,
+        filters.dateField,
+        filters.sort,
+    ]);
+
+    // Trigger fetch when debouncedSearch or other filters change
     useEffect(() => {
-        if (error) {
-            showToast(
-                "error",
-                error === "Không thể lấy danh sách tài liệu cá nhân"
-                    ? "Lỗi khi tải tài liệu. Vui lòng kiểm tra quyền truy cập hoặc đăng nhập lại."
-                    : error
-            );
-        }
-    }, [error]);
+        fetchDocuments();
+    }, [fetchDocuments, debouncedSearch]);
 
-    const handleDelete = (id) => {
-        if (window.confirm("Bạn có chắc muốn xóa tài liệu này?")) {
+    // Handle errors
+    useEffect(() => {
+        if (documentsError) {
+            showToast("error", documentsError);
+            dispatch(clearError());
+        }
+        if (categoriesError) {
+            showToast("error", categoriesError);
+            dispatch(clearError());
+        }
+    }, [documentsError, categoriesError, dispatch]);
+
+    const handleDelete = useCallback(
+        (id) => {
+            if (!window.confirm("Bạn có chắc muốn xóa tài liệu này?")) return;
+
             dispatch(deleteDocument(id))
                 .unwrap()
-                .then(() => showToast("success", "Xóa tài liệu thành công!"))
-                .catch((err) => showToast("error", err || "Lỗi khi xóa tài liệu."));
-        }
-    };
+                .then(() => {
+                    showToast("success", "Xóa tài liệu thành công!");
+                    fetchDocuments(); // Refresh danh sách
+                })
+                .catch((err) => showToast("error", err?.message || "Lỗi khi xóa tài liệu."));
+        },
+        [dispatch, fetchDocuments]
+    );
+
+    const handleFilterChange = useCallback((newFilters) => {
+        setFilters({ ...newFilters, page: 1 }); // Reset page when filters change
+    }, []);
+
+    const handlePageChange = useCallback((newPage) => {
+        setFilters((prev) => ({ ...prev, page: newPage }));
+    }, []);
+
+    const filtersConfig = useMemo(
+        () => [
+            {
+                key: "category",
+                label: "Danh mục",
+                type: "select",
+                placeholder: "Chọn danh mục",
+                options: categories.map((cat) => ({
+                    value: cat.slug,
+                    label: cat.name,
+                })),
+            },
+            {
+                key: "status",
+                label: "Trạng thái",
+                type: "select",
+                placeholder: "Chọn trạng thái",
+                options: [
+                    { value: "approved", label: "Đã duyệt" },
+                    { value: "pending", label: "Chờ duyệt" },
+                    { value: "rejected", label: "Bị từ chối" },
+                ],
+            },
+            {
+                key: "startDate",
+                label: "Ngày bắt đầu",
+                type: "date",
+                placeholder: "Chọn ngày bắt đầu",
+            },
+        ],
+        [categories]
+    );
+
+    const sortOptions = useMemo(
+        () => [
+            { value: "createdAt:desc", label: "Mới nhất" },
+            { value: "createdAt:asc", label: "Cũ nhất" },
+        ],
+        []
+    );
 
     return (
         <div className="min-h-screen relative -mt-16">
-            {/* Background Base with enhanced gradient */}
+            {/* Background Base */}
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
-                {/* Subtle Pattern Overlay */}
                 <div
                     className="absolute inset-0 opacity-5"
                     style={{
@@ -77,9 +195,7 @@ export default function MyDocumentsPage() {
 
             {/* Animated Background Elements */}
             <div className="absolute inset-0 overflow-hidden">
-                {/* Floating Circles */}
                 <div className="absolute w-full h-full">
-                    {/* Large Circle with Icon */}
                     <div
                         className="absolute w-96 h-96 bg-gradient-to-r from-emerald-200 to-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-70"
                         style={{
@@ -98,8 +214,6 @@ export default function MyDocumentsPage() {
                     >
                         <FaGraduationCap className="w-20 h-20" />
                     </div>
-
-                    {/* Medium Circle with Icon */}
                     <div
                         className="absolute w-72 h-72 bg-gradient-to-r from-teal-200 to-cyan-200 rounded-full mix-blend-multiply filter blur-xl opacity-70"
                         style={{
@@ -120,8 +234,6 @@ export default function MyDocumentsPage() {
                     >
                         <FaBook className="w-16 h-16" />
                     </div>
-
-                    {/* Small Circle with Icon */}
                     <div
                         className="absolute w-48 h-48 bg-gradient-to-r from-cyan-200 to-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70"
                         style={{
@@ -143,131 +255,101 @@ export default function MyDocumentsPage() {
                         <FaLightbulb className="w-12 h-12" />
                     </div>
                 </div>
-
-                {/* Floating Educational Icons */}
                 <div className="absolute inset-0">
-                    <div
-                        className="absolute text-emerald-500 opacity-30"
-                        style={{
+                    {[
+                        {
+                            icon: FaBrain,
+                            color: "emerald-500",
                             top: "35%",
                             right: "35%",
-                            animation: "float 18s ease-in-out infinite",
-                            animationDelay: "-2s",
-                        }}
-                    >
-                        <FaBrain className="w-10 h-10" />
-                    </div>
-                    <div
-                        className="absolute text-teal-500 opacity-30"
-                        style={{
+                            delay: "-2s",
+                        },
+                        {
+                            icon: FaPencilAlt,
+                            color: "teal-500",
                             top: "65%",
                             right: "25%",
-                            animation: "float 20s ease-in-out infinite",
-                            animationDelay: "-7s",
-                        }}
-                    >
-                        <FaPencilAlt className="w-8 h-8" />
-                    </div>
-                    <div
-                        className="absolute text-cyan-500 opacity-30"
-                        style={{
+                            delay: "-7s",
+                        },
+                        {
+                            icon: FaChalkboardTeacher,
+                            color: "cyan-500",
                             bottom: "40%",
                             left: "40%",
-                            animation: "float 22s ease-in-out infinite",
-                            animationDelay: "-4s",
-                        }}
-                    >
-                        <FaChalkboardTeacher className="w-14 h-14" />
-                    </div>
-                    {/* New Icons */}
-                    <div
-                        className="absolute text-blue-500 opacity-30"
-                        style={{
+                            delay: "-4s",
+                        },
+                        {
+                            icon: FaUniversity,
+                            color: "blue-500",
                             top: "20%",
                             right: "45%",
-                            animation: "float 19s ease-in-out infinite",
-                            animationDelay: "-1s",
-                        }}
-                    >
-                        <FaUniversity className="w-12 h-12" />
-                    </div>
-                    <div
-                        className="absolute text-purple-500 opacity-30"
-                        style={{
+                            delay: "-1s",
+                        },
+                        {
+                            icon: FaUserGraduate,
+                            color: "purple-500",
                             bottom: "30%",
                             right: "15%",
-                            animation: "float 21s ease-in-out infinite",
-                            animationDelay: "-8s",
-                        }}
-                    >
-                        <FaUserGraduate className="w-10 h-10" />
-                    </div>
-                    <div
-                        className="absolute text-indigo-500 opacity-30"
-                        style={{
+                            delay: "-8s",
+                        },
+                        {
+                            icon: FaSchool,
+                            color: "indigo-500",
                             top: "50%",
                             left: "20%",
-                            animation: "float 17s ease-in-out infinite",
-                            animationDelay: "-3s",
-                        }}
-                    >
-                        <FaSchool className="w-16 h-16" />
-                    </div>
-                    <div
-                        className="absolute text-pink-500 opacity-30"
-                        style={{
+                            delay: "-3s",
+                        },
+                        {
+                            icon: FaBookOpen,
+                            color: "pink-500",
                             top: "25%",
                             left: "35%",
-                            animation: "float 23s ease-in-out infinite",
-                            animationDelay: "-6s",
-                        }}
-                    >
-                        <FaBookOpen className="w-12 h-12" />
-                    </div>
-                    <div
-                        className="absolute text-red-500 opacity-30"
-                        style={{
+                            delay: "-6s",
+                        },
+                        {
+                            icon: FaDesktop,
+                            color: "red-500",
                             bottom: "25%",
                             left: "15%",
-                            animation: "float 16s ease-in-out infinite",
-                            animationDelay: "-5s",
-                        }}
-                    >
-                        <FaDesktop className="w-10 h-10" />
-                    </div>
-                    <div
-                        className="absolute text-yellow-500 opacity-30"
-                        style={{
+                            delay: "-5s",
+                        },
+                        {
+                            icon: FaMicroscope,
+                            color: "yellow-500",
                             top: "15%",
                             left: "45%",
-                            animation: "float 24s ease-in-out infinite",
-                            animationDelay: "-9s",
-                        }}
-                    >
-                        <FaMicroscope className="w-14 h-14" />
-                    </div>
-                    <div
-                        className="absolute text-green-500 opacity-30"
-                        style={{
+                            delay: "-9s",
+                        },
+                        {
+                            icon: FaFlask,
+                            color: "green-500",
                             bottom: "15%",
                             right: "40%",
-                            animation: "float 20s ease-in-out infinite",
-                            animationDelay: "-4s",
-                        }}
-                    >
-                        <FaFlask className="w-12 h-12" />
-                    </div>
-                    <div
-                        className="absolute text-blue-400 opacity-30"
-                        style={{
+                            delay: "-4s",
+                        },
+                        {
+                            icon: FaCalculator,
+                            color: "blue-400",
                             top: "40%",
                             right: "10%",
-                            animation: "float 18s ease-in-out infinite",
-                            animationDelay: "-7s",
-                        }}
-                    >
-                        <FaCalculator className="w-10 h-10" />
-                    </div>
+                            delay: "-7s",
+                        },
+                    ].map(({ icon: Icon, color, top, right, bottom, left, delay }, index) => (
+                        <div
+                            key={index}
+                            className={`absolute text-${color} opacity-30`}
+                            style={{
+                                top,
+                                right,
+                                bottom,
+                                left,
+                                animation: `float 18s ease-in-out infinite`,
+                                animationDelay: delay,
+                            }}
+                        >
+                            <Icon className="w-10 h-10" />
+                        </div>
+                    ))}
                 </div>
             </div>
 
@@ -279,7 +361,7 @@ export default function MyDocumentsPage() {
                     transition={{ duration: 0.8 }}
                     className="max-w-4xl mx-auto px-4"
                 >
-                    {/* Header Section */}
+                    {/* Header */}
                     <div className="mb-8">
                         <div className="flex justify-between items-center">
                             <h1 className="text-3xl font-bold text-gray-900">Tài liệu của tôi</h1>
@@ -296,15 +378,44 @@ export default function MyDocumentsPage() {
                         </p>
                     </div>
 
+                    {/* Filter and Search */}
+                    <div className="mb-6">
+                        <SearchBar
+                            onSearch={(value) =>
+                                setFilters((prev) => ({ ...prev, search: value, page: 1 }))
+                            }
+                            placeholder="Tìm kiếm tiêu đề, mô tả, thẻ..."
+                        />
+                        {categoriesLoading ? (
+                            <div className="flex justify-center items-center h-10">
+                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-600" />
+                            </div>
+                        ) : (
+                            <FilterPanel
+                                filtersConfig={filtersConfig}
+                                sortOptions={sortOptions}
+                                onFilterChange={handleFilterChange}
+                                defaultFilters={{
+                                    category: "",
+                                    status: "",
+                                    startDate: "",
+                                    endDate: "",
+                                    dateField: "createdAt",
+                                    sort: "createdAt:desc",
+                                }}
+                            />
+                        )}
+                    </div>
+
                     {/* Loading State */}
-                    {loading && (
+                    {documentsLoading && (
                         <div className="flex justify-center items-center h-64">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600" />
                         </div>
                     )}
 
                     {/* Error State */}
-                    {error && (
+                    {documentsError && (
                         <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
                             <div className="flex">
                                 <div className="flex-shrink-0">
@@ -321,79 +432,103 @@ export default function MyDocumentsPage() {
                                     </svg>
                                 </div>
                                 <div className="ml-3">
-                                    <p className="text-sm text-red-700">{error}</p>
+                                    <p className="text-sm text-red-700">{documentsError}</p>
                                 </div>
                             </div>
                         </div>
                     )}
 
                     {/* Documents List */}
-                    {!loading && !error && (
+                    {!documentsLoading && !documentsError && (
                         <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
                             {myDocuments.length > 0 ? (
-                                <ul className="divide-y divide-gray-200">
-                                    {myDocuments.map((doc) => (
-                                        <motion.li
-                                            key={doc._id}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.5 }}
-                                            className="hover:bg-gray-50/50 transition-colors"
-                                        >
-                                            <div className="px-6 py-4">
-                                                <div className="flex items-center justify-between">
-                                                    <div className="flex-1 min-w-0">
-                                                        <h3 className="text-lg font-semibold text-gray-900 truncate">
-                                                            {doc.title}
-                                                        </h3>
-                                                        <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500">
-                                                            <span>
-                                                                Đăng ngày:{" "}
-                                                                {new Date(
-                                                                    doc.createdAt
-                                                                ).toLocaleDateString("vi-VN")}
-                                                            </span>
-                                                            <span className="flex items-center">
-                                                                <span
-                                                                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                                                        doc.status === "approved"
-                                                                            ? "bg-green-100 text-green-800"
-                                                                            : "bg-yellow-100 text-yellow-800"
-                                                                    }`}
-                                                                >
-                                                                    {doc.status === "approved" ? (
-                                                                        <FiCheck className="w-4 h-4 mr-1" />
-                                                                    ) : (
-                                                                        <FiClock className="w-4 h-4 mr-1" />
-                                                                    )}
-                                                                    {doc.status === "approved"
-                                                                        ? "Đã duyệt"
-                                                                        : "Chờ duyệt"}
+                                <>
+                                    <ul className="divide-y divide-gray-200">
+                                        {myDocuments.map((doc) => (
+                                            <motion.li
+                                                key={doc._id}
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ duration: 0.5 }}
+                                                className="hover:bg-gray-50/50 transition-colors"
+                                            >
+                                                <div className="px-6 py-4">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex-1 min-w-0">
+                                                            <h3 className="text-lg font-semibold text-gray-900 truncate">
+                                                                {doc.title}
+                                                            </h3>
+                                                            <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500">
+                                                                <span>
+                                                                    Đăng ngày:{" "}
+                                                                    {new Date(
+                                                                        doc.createdAt
+                                                                    ).toLocaleDateString("vi-VN")}
                                                                 </span>
-                                                            </span>
+                                                                <span className="flex items-center">
+                                                                    <span
+                                                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                                            doc.status ===
+                                                                            "approved"
+                                                                                ? "bg-green-100 text-green-800"
+                                                                                : doc.status ===
+                                                                                    "pending"
+                                                                                  ? "bg-yellow-100 text-yellow-800"
+                                                                                  : "bg-red-100 text-red-800"
+                                                                        }`}
+                                                                    >
+                                                                        {doc.status ===
+                                                                        "approved" ? (
+                                                                            <FiCheck className="w-4 h-4 mr-1" />
+                                                                        ) : (
+                                                                            <FiClock className="w-4 h-4 mr-1" />
+                                                                        )}
+                                                                        {doc.status === "approved"
+                                                                            ? "Đã duyệt"
+                                                                            : doc.status ===
+                                                                                "pending"
+                                                                              ? "Chờ duyệt"
+                                                                              : "Bị từ chối"}
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center space-x-3">
+                                                            <Link
+                                                                to={`/uploader/edit-document/${doc._id}`}
+                                                                className="inline-flex items-center p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-full transition-colors"
+                                                                title="Chỉnh sửa"
+                                                            >
+                                                                <FiEdit2 className="w-5 h-5" />
+                                                            </Link>
+                                                            <button
+                                                                onClick={() =>
+                                                                    handleDelete(doc._id)
+                                                                }
+                                                                className="inline-flex items-center p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-full transition-colors"
+                                                                title="Xóa"
+                                                            >
+                                                                <FiTrash2 className="w-5 h-5" />
+                                                            </button>
                                                         </div>
                                                     </div>
-                                                    <div className="flex items-center space-x-3">
-                                                        <Link
-                                                            to={`/edit-document/${doc._id}`}
-                                                            className="inline-flex items-center p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-full transition-colors"
-                                                            title="Chỉnh sửa"
-                                                        >
-                                                            <FiEdit2 className="w-5 h-5" />
-                                                        </Link>
-                                                        <button
-                                                            onClick={() => handleDelete(doc._id)}
-                                                            className="inline-flex items-center p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-full transition-colors"
-                                                            title="Xóa"
-                                                        >
-                                                            <FiTrash2 className="w-5 h-5" />
-                                                        </button>
-                                                    </div>
                                                 </div>
-                                            </div>
-                                        </motion.li>
-                                    ))}
-                                </ul>
+                                            </motion.li>
+                                        ))}
+                                    </ul>
+                                    <Pagination
+                                        page={myDocumentsPagination.currentPage}
+                                        totalPages={myDocumentsPagination.totalPages}
+                                        onNext={() =>
+                                            handlePageChange(myDocumentsPagination.currentPage + 1)
+                                        }
+                                        onPrev={() =>
+                                            handlePageChange(myDocumentsPagination.currentPage - 1)
+                                        }
+                                        onPageChange={handlePageChange}
+                                        isLoading={documentsLoading}
+                                    />
+                                </>
                             ) : (
                                 <div className="text-center py-8">
                                     <p className="text-gray-500">Chưa có tài liệu nào.</p>
@@ -402,24 +537,18 @@ export default function MyDocumentsPage() {
                         </div>
                     )}
                 </motion.div>
-            </div>
 
-            <style>{`
-                @keyframes float {
-                    0%, 100% {
-                        transform: translate(0, 0) rotate(0deg);
-                    }
-                    25% {
-                        transform: translate(20px, -20px) rotate(5deg);
-                    }
-                    50% {
-                        transform: translate(-10px, 20px) rotate(-5deg);
-                    }
-                    75% {
-                        transform: translate(-20px, -10px) rotate(3deg);
-                    }
-                }
-            `}</style>
+                <style>
+                    {`
+            @keyframes float {
+              0%, 100% { transform: translate(0, 0) rotate(0deg); }
+              25% { transform: translate(20px, -20px) rotate(5deg); }
+              50% { transform: translate(-20px, 20px) rotate(-5deg); }
+              75% { transform: translate(-20px, -10px) rotate(3deg); }
+            }
+          `}
+                </style>
+            </div>
         </div>
     );
 }

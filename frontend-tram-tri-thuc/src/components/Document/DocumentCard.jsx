@@ -2,10 +2,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Download, Heart } from "lucide-react";
 import { downloadDocument, toggleFavorite } from "../../store/slices/documentSlice";
-import { useEffect } from "react";
 import { fetchFavoriteDocuments } from "../../store/slices/userSlice";
 
-export default function DocumentCard({ document }) {
+export default function DocumentCard({ document, type }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const {
@@ -16,20 +15,6 @@ export default function DocumentCard({ document }) {
 
     const isFavorite = favoriteDocuments.some((fav) => fav._id === document._id);
     const favoriteCount = document.favoriteCount ?? 0;
-
-    // Fetch favoriteDocuments khi component mount và user đã đăng nhập
-    useEffect(() => {
-        if (userInfo && favoriteDocuments.length === 0) {
-            dispatch(fetchFavoriteDocuments());
-        }
-    }, [dispatch, userInfo, favoriteDocuments.length]);
-
-    useEffect(() => {
-        console.log("DocumentCard re-render:", {
-            isFavorite,
-            favoriteCount,
-        });
-    }, [isFavorite, favoriteCount]);
 
     const handleDownload = () => {
         dispatch(downloadDocument(document._id));
@@ -42,12 +27,15 @@ export default function DocumentCard({ document }) {
         }
         dispatch(toggleFavorite(document._id))
             .unwrap()
+            .then(() => {
+                // Gọi lại fetchFavoriteDocuments để đồng bộ
+                dispatch(fetchFavoriteDocuments({ page: 1, limit: 12 }));
+            })
             .catch((error) => {
                 console.error("Toggle favorite failed:", error);
             });
     };
 
-    // Xử lý tags từ chuỗi sang mảng
     const tags = document.tag ? document.tag.split(",").map((tag) => tag.trim()) : [];
 
     return (
@@ -56,10 +44,37 @@ export default function DocumentCard({ document }) {
                 <h3 className="font-semibold text-lg text-blue-600 hover:underline">
                     {document.title}
                 </h3>
-                <p className="text-sm text-gray-500">{document.uploaderId?.name || "Unknown"}</p>
+                <p className="text-sm text-gray-500">{document.uploader?.name || "Unknown"}</p>
                 <p className="text-sm text-gray-700 mt-2">
                     {document.description || "Không có mô tả"}
                 </p>
+                {type === "download" && document.downloadedAt && (
+                    <p className="text-xs text-gray-500 mt-1">
+                        Tải xuống:{" "}
+                        {new Date(document.downloadedAt).toLocaleString("vi-VN", {
+                            dateStyle: "short",
+                            timeStyle: "short",
+                        })}
+                    </p>
+                )}
+                {type === "favorite" && document.favoritedAt && (
+                    <p className="text-xs text-gray-500 mt-1">
+                        Yêu thích:{" "}
+                        {new Date(document.favoritedAt).toLocaleString("vi-VN", {
+                            dateStyle: "short",
+                            timeStyle: "short",
+                        })}
+                    </p>
+                )}
+                {type === "view" && document.viewedAt && (
+                    <p className="text-xs text-gray-500 mt-1">
+                        Xem:{" "}
+                        {new Date(document.viewedAt).toLocaleString("vi-VN", {
+                            dateStyle: "short",
+                            timeStyle: "short",
+                        })}
+                    </p>
+                )}
             </Link>
             <div className="flex flex-wrap gap-2 mt-2">
                 {tags.map((tag, index) => (

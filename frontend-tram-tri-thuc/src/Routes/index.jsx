@@ -28,7 +28,7 @@ import NotificationPage from "../pages/NotificationPage";
 // Pages – Uploader
 import UploadPage from "../pages/Uploader/UploadPage";
 import MyDocumentsPage from "../pages/Uploader/MyDocumentsPage";
-import EditDocumentForm from "../components/Uploader/EditDocumentForm";
+import EditDocumentPage from "../pages/Uploader/EditDocumentPage";
 
 // Pages – Admin
 // import AdminDashboardPage from "@/pages/admin/AdminDashboardPage";
@@ -95,7 +95,7 @@ const router = createBrowserRouter([
         children: [
             { path: "upload", element: <UploadPage /> },
             { path: "my-documents", element: <MyDocumentsPage /> },
-            { path: "edit-document/:documentId", element: <EditDocumentForm /> },
+            { path: "edit-document/:documentId", element: <EditDocumentPage /> },
         ],
     },
     // {

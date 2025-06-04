@@ -37,11 +37,12 @@ const documentSchema = new mongoose.Schema(
         isFeatured: { type: Boolean, default: false },
         viewCount: { type: Number, default: 0 },
         downloadCount: { type: Number, default: 0 },
+        favoriteCount: { type: Number, default: 0, min: 0 },
     },
     { timestamps: true }
 );
 
-documentSchema.index({ title: "text", description: "text", tags: "text" });
+documentSchema.index({ title: "text", slug: "text", description: "text", tags: "text" });
 documentSchema.index({
     slug: 1,
     categoryId: 1,

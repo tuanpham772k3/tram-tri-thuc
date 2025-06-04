@@ -7,11 +7,10 @@ export default function UploaderRoute({ children }) {
     const { userInfo } = useSelector((state) => state.user);
 
     if (!isAuthenticated) {
-        showToast("error", "Vui lòng đăng nhập để tiếp tục.");
         return <Navigate to="/auth/login" />;
     }
     if (!userInfo || !["uploader", "admin"].includes(userInfo.role)) {
-        showToast("error", "Bạn cần quyền uploader để truy cập.");
+        showToast("error", "Bạn không có quyền truy cập vào trang này.");
         return <Navigate to="/" />;
     }
 

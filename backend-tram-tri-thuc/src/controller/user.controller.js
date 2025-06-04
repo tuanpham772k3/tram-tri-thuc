@@ -1,3 +1,4 @@
+const { Types } = require("mongoose");
 const UserService = require("../services/user.service");
 const logger = require("../utils/logger");
 
@@ -115,26 +116,6 @@ async function getUserFavorites(req, res) {
     }
 }
 
-async function toggleFavorite(req, res) {
-    try {
-        const { id: docId } = req.params;
-        const result = await UserService.toggleFavorite(req.user._id, docId);
-        return res.status(200).json({
-            success: true,
-            status: 200,
-            message: result.message,
-            data: result.favorites,
-        });
-    } catch (error) {
-        logger.error("Lỗi toggleFavorite:", error);
-        return res.status(error.message.includes("Không tìm thấy") ? 404 : 400).json({
-            success: false,
-            status: error.message.includes("Không tìm thấy") ? 404 : 400,
-            message: error.message || "Lỗi khi cập nhật yêu thích",
-        });
-    }
-}
-
 async function getUserDownloads(req, res) {
     try {
         const downloads = await UserService.getUserDownloads(req.user._id, req.query);
@@ -161,6 +142,5 @@ module.exports = {
     deleteMyAccount,
     getUserHistory,
     getUserFavorites,
-    toggleFavorite,
     getUserDownloads,
 };

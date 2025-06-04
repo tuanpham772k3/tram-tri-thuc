@@ -169,7 +169,7 @@ const DetailedRating = ({
                                                     size="small"
                                                     className="mt-2"
                                                     onClick={() =>
-                                                        onDeleteRating(rating.documentId)
+                                                        onDeleteRating(documentId)
                                                     }
                                                 >
                                                     Xóa

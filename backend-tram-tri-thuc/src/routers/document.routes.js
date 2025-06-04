@@ -19,8 +19,10 @@ const {
     approveDocument,
     featureDocument,
     getFeaturedDocuments,
+    toggleFavorite,
 } = require("../controller/document.controller");
 const { documentListLimiter } = require("../middlewares/rateLimit");
+const optionalAuth = require("../middlewares/optionalAuth");
 
 // Lấy danh sách tài liệu của người dùng hiện tại
 router.get("/me", authMiddleware, isUploader, getMyDocuments);
@@ -39,16 +41,11 @@ router.get(
             .trim()
             .isLength({ max: 100 })
             .withMessage("Search query too long"),
-        query("category")
-            .optional()
-            .trim()
-            .matches(/^[a-z0-9-]+$/)
-            .withMessage("Invalid category slug"),
         query("uploader").optional().trim().isMongoId().withMessage("Invalid uploader ID"),
         query("sort")
             .optional()
-            .matches(/^(views|downloads|createdAt):(asc|desc)$/)
-            .withMessage("Invalid sort format (e.g., views:desc)"),
+            .matches(/^(viewCount|downloadCount|createdAt|averageRating):(asc|desc)$/)
+            .withMessage("Invalid sort format (e.g., averageRating:desc)"),
         validate,
     ],
     documentListLimiter,
@@ -59,7 +56,7 @@ router.get(
 router.get(
     "/:id",
     authMiddleware,
-    isUploader,
+    // isUploader,
     [param("id").isMongoId().withMessage("Invalid document ID"), validate],
     async (req, res, next) => {
         req.document = await require("../models/document.model").findById(req.params.id);
@@ -72,7 +69,7 @@ router.get(
 // Lấy thông tin chi tiết của tài liệu theo slug
 router.get(
     "/slug/:slug",
-    authMiddleware,
+    authMiddleware, // Xác thực tùy chọn, có thể là người dùng đã đăng nhập hoặc không
     [
         param("slug")
             .notEmpty()
@@ -90,8 +87,9 @@ router.get(
 
 // Tải xuống tài liệu theo ID
 router.get(
-    "/download/:id",
-    [param("id").isMongoId().withMessage("Invalid document ID"), validate, authMiddleware],
+    "/:id/download",
+    authMiddleware,
+    [param("id").isMongoId().withMessage("Invalid document ID"), validate],
     downloadDocument
 );
 
@@ -137,7 +135,7 @@ router.delete(
 
 // Duyệt tài liệu (chỉ dành cho admin)
 router.patch(
-    "/approve/:id",
+    "/:id/approve",
     authMiddleware, // Yêu cầu xác thực người dùng
     isAdmin, // Chỉ admin mới có quyền
     [param("id").isMongoId().withMessage("Invalid document ID"), validate],
@@ -146,11 +144,19 @@ router.patch(
 
 // Đánh dấu tài liệu là nổi bật (chỉ dành cho admin)
 router.patch(
-    "/feature/:id",
+    "/:id/feature",
     authMiddleware, // Yêu cầu xác thực người dùng
     isAdmin, // Chỉ admin mới có quyền
     [param("id").isMongoId().withMessage("Invalid document ID"), validate],
     featureDocument
+);
+
+// Thêm/xoá tài liệu yêu thích
+router.post(
+    "/:id/favorite",
+    authMiddleware,
+    [param("id").isMongoId().withMessage("ID tài liệu không hợp lệ"), validate],
+    toggleFavorite
 );
 
 module.exports = router;

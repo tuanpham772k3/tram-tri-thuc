@@ -2,6 +2,8 @@ const Document = require("../models/document.model");
 const Category = require("../models/category.model");
 const Download = require("../models/downloadHistory.model");
 const ViewHistory = require("../models/viewHistory.model");
+const Favorite = require("../models/favorite.model");
+const User = require("../models/user.model");
 const { Types } = require("mongoose");
 const logger = require("../utils/logger");
 const slugify = require("slugify");
@@ -13,15 +15,15 @@ const { notifyDocumentOwner } = require("../utils/notification");
 // GET /api/documents
 exports.getDocuments = async (req, res) => {
     try {
-        const { search, category, uploader, sort } = req.query;
+        const { search, category, uploader, sort, format, startDate, endDate, dateField } =
+            req.query;
         const { page, limit, skip } = getPagination(req.query);
 
         const query = { status: "approved", isPublic: true };
-        if (search) {
-            query.$text = { $search: search };
-        }
+
+        // Lọc theo danh mục
         if (category) {
-            const categoryDoc = await Category.findOne({ slug: category });
+            const categoryDoc = await Category.findOne({ slug: category }).lean();
             if (!categoryDoc) {
                 return res.status(200).json({
                     success: true,
@@ -30,24 +32,126 @@ exports.getDocuments = async (req, res) => {
             }
             query.categoryId = categoryDoc._id;
         }
-        if (uploader) query.uploaderId = uploader;
 
+        // Lọc theo uploader
+        if (uploader) {
+            if (!Types.ObjectId.isValid(uploader)) {
+                return res.status(400).json({ success: false, message: "Invalid uploader ID" });
+            }
+            query.uploaderId = new Types.ObjectId(uploader);
+        }
+
+        // Lọc theo format
+        if (format) {
+            const validFormats = ["pdf", "docx", "pptx", "zip"];
+            if (!validFormats.includes(format.toLowerCase())) {
+                return res.status(400).json({ success: false, message: "Invalid format" });
+            }
+            query.format = format.toLowerCase();
+        }
+
+        // Lọc theo khoảng ngày
+        if (startDate && endDate) {
+            const validDateFields = ["createdAt", "updatedAt"];
+            const selectedDateField = validDateFields.includes(dateField) ? dateField : "createdAt";
+
+            // Kiểm tra định dạng ngày
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                return res.status(400).json({ success: false, message: "Invalid date format" });
+            }
+            if (start > end) {
+                return res
+                    .status(400)
+                    .json({ success: false, message: "startDate must be before endDate" });
+            }
+
+            query[selectedDateField] = {
+                $gte: start,
+                $lte: end,
+            };
+        }
+
+        // Sắp xếp
+        const validSortFields = ["viewCount", "downloadCount", "averageRating", "createdAt"];
         const sortOptions = {};
         if (sort) {
             const [field, order] = sort.split(":");
+            if (!validSortFields.includes(field)) {
+                return res.status(400).json({ success: false, message: "Invalid sort field" });
+            }
             sortOptions[field] = order === "desc" ? -1 : 1;
         } else {
-            sortOptions.createdAt = -1;
+            sortOptions.createdAt = -1; // Mặc định sắp xếp mới nhất
         }
 
-        const documents = await Document.find(query)
-            .select("title slug categoryId uploaderId viewCount downloadCount createdAt")
-            .populate("categoryId", "name slug")
-            .populate("uploaderId", "name email")
-            .sort(sortOptions)
-            .skip(skip)
-            .limit(limit)
-            .lean();
+        const documents = await Document.aggregate([
+            { $match: query },
+            {
+                $lookup: {
+                    from: "ratings",
+                    localField: "_id",
+                    foreignField: "documentId",
+                    as: "ratings",
+                },
+            },
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "categoryId",
+                    foreignField: "_id",
+                    as: "category",
+                },
+            },
+            { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "uploaderId",
+                    foreignField: "_id",
+                    as: "uploader",
+                },
+            },
+            {
+                $match: search
+                    ? {
+                          $or: [
+                              { title: { $regex: search, $options: "i" } },
+                              { description: { $regex: search, $options: "i" } },
+                              { tags: { $regex: search, $options: "i" } },
+                              { "uploader.name": { $regex: search, $options: "i" } },
+                          ],
+                      }
+                    : {},
+            },
+            { $unwind: { path: "$uploader", preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    _id: 1,
+                    title: 1,
+                    slug: 1,
+                    description: 1,
+                    thumbnailUrl: 1,
+                    format: 1,
+                    viewCount: 1,
+                    downloadCount: 1,
+                    favoriteCount: 1,
+                    createdAt: 1,
+                    category: {
+                        _id: "$category._id",
+                        name: "$category.name",
+                        slug: "$category.slug",
+                    },
+                    uploader: { _id: "$uploader._id", name: "$uploader.name" },
+                    averageRating: { $avg: "$ratings.score" },
+                    totalRatings: { $size: "$ratings" },
+                },
+            },
+            { $sort: sortOptions },
+            { $skip: skip },
+            { $limit: limit },
+        ]);
 
         const totalDocs = await Document.countDocuments(query);
         const pagingData = getPagingData(documents, totalDocs, page, limit);
@@ -120,45 +224,58 @@ exports.getDocumentBySlug = async (req, res) => {
             .populate("uploaderId", "name email")
             .lean();
 
-        // Kiểm tra tài liệu tồn tại và công khai
-        if (!document || document.status !== "approved" || !document.isPublic) {
-            return res
-                .status(404)
-                .json({ success: false, message: "Tài liệu không tồn tại hoặc không công khai." });
+        if (!document) {
+            return res.status(404).json({ success: false, message: "Tài liệu không tồn tại." });
         }
 
         // Tăng viewCount
         await Document.findOneAndUpdate({ slug: req.params.slug }, { $inc: { viewCount: 1 } });
 
         // Ghi hoặc cập nhật lịch sử xem nếu user đã đăng nhập
-        if (req.user && req.user._id) {
+        if (req.user?._id) {
+            if (!Types.ObjectId.isValid(req.user._id)) {
+                logger.error(`Invalid user ID: ${req.user._id}`);
+                return res
+                    .status(400)
+                    .json({ success: false, message: "ID người dùng không hợp lệ." });
+            }
             try {
-                const existingView = await ViewHistory.findOne({
-                    userId: req.user._id,
-                    documentId: document._id,
-                });
+                console.log(
+                    `Attempting to record ViewHistory for user ${req.user._id}, document ${document._id}`
+                ); // Debug log
+                const updateResult = await ViewHistory.updateOne(
+                    {
+                        userId: new Types.ObjectId(req.user._id),
+                        documentId: document._id,
+                    },
+                    {
+                        $set: { viewedAt: new Date() },
+                        $setOnInsert: {
+                            userId: new Types.ObjectId(req.user._id),
+                            documentId: document._id,
+                        },
+                    },
+                    { upsert: true }
+                );
 
-                if (existingView) {
-                    existingView.viewedAt = new Date();
-                    await existingView.save();
+                if (updateResult.matchedCount > 0) {
                     logger.info(
                         `View history updated for user ${req.user.email}, document ${document._id}`
                     );
                 } else {
-                    await ViewHistory.create({
-                        userId: req.user._id,
-                        documentId: document._id,
-                        viewedAt: new Date(),
-                    });
                     logger.info(
                         `View history created for user ${req.user.email}, document ${document._id}`
                     );
                 }
             } catch (viewError) {
-                logger.error(`Error recording ViewHistory: ${viewError.message}`);
+                logger.error(`Error recording ViewHistory: ${viewError.message}`, {
+                    stack: viewError.stack,
+                });
             }
         } else {
-            logger.warn(`No req.user found, skipping ViewHistory for slug ${req.params.slug}`);
+            logger.warn(
+                `No authenticated user, skipping ViewHistory for document ${req.params.slug}`
+            );
         }
 
         res.status(200).json({ success: true, data: document });
@@ -178,37 +295,64 @@ exports.downloadDocument = async (req, res) => {
         }
         logger.info(`Document found: ${req.params.id}`);
 
-        // Kiểm tra quyền truy cập
-        if (
-            document.status !== "approved" &&
-            document.uploaderId.toString() !== req.user._id.toString() &&
-            req.user.role !== "admin"
-        ) {
-            logger.warn(`Access denied to document: ${req.params.id}`, { user: req.user });
-            return res.status(403).json({
-                success: false,
-                message: "Tài liệu chưa được duyệt hoặc bạn không có quyền.",
-            });
-        }
+        // Construct file path more safely
+        const filePath = path.resolve(__dirname, "../../uploads", document.fileName);
 
-        await Document.findByIdAndUpdate(document.id, { $inc: { downloadCount: 1 } });
-        await Download.create({
-            userId: req.user._id,
-            documentId: document.id,
-            downloadedAt: new Date(),
-            ipAddress: req.ip,
-            deviceInfo: req.headers["user-agent"],
-        });
-
-        const filePath = path.join(__dirname, "../../uploads", document.fileName);
+        // Check if file exists before proceeding
         if (!fs.existsSync(filePath)) {
             logger.warn(`File not found: ${filePath}`);
             return res.status(404).json({ success: false, message: "File không tồn tại." });
         }
-        res.download(filePath, document.fileName);
+
+        // Kiểm tra và cập nhật hoặc tạo mới bản ghi tải xuống
+        const existingDownload = await Download.findOne({
+            userId: req.user._id,
+            documentId: document._id,
+        });
+
+        if (existingDownload) {
+            existingDownload.downloadedAt = new Date();
+            existingDownload.ipAddress = req.ip;
+            existingDownload.deviceInfo = req.headers["user-agent"];
+            await existingDownload.save();
+            logger.info(
+                `Download history updated for user ${req.user._id}, document ${document._id}`
+            );
+        } else {
+            await Download.create({
+                userId: req.user._id,
+                documentId: document._id,
+                downloadedAt: new Date(),
+                ipAddress: req.ip,
+                deviceInfo: req.headers["user-agent"],
+            });
+            logger.info(
+                `Download history created for user ${req.user._id}, document ${document._id}`
+            );
+        }
+
+        // Tăng downloadCount
+        await Document.findByIdAndUpdate(document._id, { $inc: { downloadCount: 1 } });
+
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="${encodeURIComponent(document.fileName)}"`
+        );
+        res.setHeader("Content-Type", "application/octet-stream");
+
+        res.download(filePath, document.fileName, (err) => {
+            if (err) {
+                logger.error(`Download error: ${err.message}`);
+                if (!res.headersSent) {
+                    res.status(500).json({ success: false, message: "Không thể tải tài liệu." });
+                }
+            }
+        });
     } catch (error) {
         logger.error(`Download document error: ${error.message}`, { stack: error.stack });
-        res.status(500).json({ success: false, message: "Không thể tải tài liệu." });
+        if (!res.headersSent) {
+            res.status(500).json({ success: false, message: "Không thể tải tài liệu." });
+        }
     }
 };
 
@@ -234,9 +378,9 @@ exports.uploadDocument = async (req, res) => {
             if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
             if (
                 thumbnail &&
-                fs.existsSync(path.join(__dirname, "../../Uploads", thumbnail.filename))
+                fs.existsSync(path.join(__dirname, "../../uploads", thumbnail.filename))
             ) {
-                fs.unlinkSync(path.join(__dirname, "../../Uploads", thumbnail.filename));
+                fs.unlinkSync(path.join(__dirname, "../../uploads", thumbnail.filename));
             }
             return res.status(400).json({ success: false, message: "Danh mục không tồn tại." });
         }
@@ -275,13 +419,13 @@ exports.uploadDocument = async (req, res) => {
         });
     } catch (error) {
         if (req.files?.file?.[0]) {
-            const filePath = path.join(__dirname, "../../Uploads", req.files.file[0].filename);
+            const filePath = path.join(__dirname, "../../uploads", req.files.file[0].filename);
             if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
         }
         if (req.files?.thumbnail?.[0]) {
             const thumbnailPath = path.join(
                 __dirname,
-                "../../Uploads",
+                "../../uploads",
                 req.files.thumbnail[0].filename
             );
             if (fs.existsSync(thumbnailPath)) fs.unlinkSync(thumbnailPath);
@@ -294,31 +438,161 @@ exports.uploadDocument = async (req, res) => {
 // GET /api/documents/me
 exports.getMyDocuments = async (req, res) => {
     try {
-        if (!req.user?._id) {
+        const { search, category, status, sort, startDate, endDate, dateField } = req.query;
+        const { page, limit, skip } = getPagination(req.query);
+
+        // Validate userId
+        const userId = req.user?._id;
+        if (!userId) {
             logger.error("Không tìm thấy ID người dùng trong req.user", { user: req.user });
-            return res.status(400).json({
-                success: false,
-                message: "Không tìm thấy ID người dùng.",
-            });
+            return res
+                .status(400)
+                .json({ success: false, message: "Không tìm thấy ID người dùng." });
         }
-        if (!Types.ObjectId.isValid(req.user._id)) {
-            logger.error("Định dạng ID người dùng không hợp lệ", { userId: req.user._id });
-            return res.status(400).json({
-                success: false,
-                message: "Định dạng ID người dùng không hợp lệ.",
-            });
-        }
-        logger.info("Đang lấy tài liệu cho người dùng", { userId: req.user._id });
-        const documents = await Document.find({ uploaderId: req.user._id })
-            .populate("categoryId", "name slug")
-            .sort({ createdAt: -1 })
-            .lean();
-
-        if (documents.length === 0) {
-            logger.info(`Không tìm thấy tài liệu nào cho người dùng: ${req.user._id}`);
+        if (!Types.ObjectId.isValid(userId)) {
+            logger.error("Định dạng ID người dùng không hợp lệ", { userId });
+            return res
+                .status(400)
+                .json({ success: false, message: "Định dạng ID người dùng không hợp lệ." });
         }
 
-        res.status(200).json({ success: true, data: documents });
+        // Build initial query
+        const query = { uploaderId: new Types.ObjectId(userId) };
+
+        // Filter by category
+        if (category) {
+            const categoryDoc = await Category.findOne({ slug: category }).lean();
+            if (!categoryDoc) {
+                return res.status(200).json({
+                    success: true,
+                    data: { totalItems: 0, totalPages: 0, currentPage: page, items: [] },
+                });
+            }
+            query.categoryId = categoryDoc._id;
+        }
+
+        // Filter by status
+        if (status) {
+            const validStatuses = ["approved", "pending", "rejected"];
+            if (!validStatuses.includes(status)) {
+                return res.status(400).json({ success: false, message: "Invalid status." });
+            }
+            query.status = status;
+        }
+
+        // Filter by date range
+        if (startDate && endDate) {
+            const validDateFields = ["createdAt", "updatedAt"];
+            const field = validDateFields.includes(dateField) ? dateField : "createdAt";
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+
+            if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                return res.status(400).json({ success: false, message: "Invalid date format." });
+            }
+            if (start > end) {
+                return res
+                    .status(400)
+                    .json({ success: false, message: "startDate must be before endDate." });
+            }
+
+            query[field] = { $gte: start, $lte: end };
+        }
+
+        // Build sort
+        const sortOptions = (() => {
+            const validSortFields = ["viewCount", "downloadCount", "favoriteCount", "createdAt"];
+            if (sort) {
+                const [field, order] = sort.split(":");
+                if (!validSortFields.includes(field)) {
+                    return null;
+                }
+                return { [field]: order === "desc" ? -1 : 1 };
+            }
+            return { createdAt: -1 };
+        })();
+
+        if (!sortOptions) {
+            return res.status(400).json({ success: false, message: "Invalid sort field." });
+        }
+
+        // Aggregation pipeline
+        const pipeline = [
+            { $match: query },
+            ...(search
+                ? [
+                      {
+                          $match: {
+                              $or: [
+                                  { title: { $regex: search, $options: "i" } },
+                                  { description: { $regex: search, $options: "i" } },
+                                  { tags: { $regex: search, $options: "i" } },
+                              ],
+                          },
+                      },
+                  ]
+                : []),
+            // Lookup category
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "categoryId",
+                    foreignField: "_id",
+                    as: "category",
+                },
+            },
+            { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
+            // Lookup uploader
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "uploaderId",
+                    foreignField: "_id",
+                    as: "uploader",
+                },
+            },
+            { $unwind: { path: "$uploader", preserveNullAndEmptyArrays: true } },
+            // Project fields
+            {
+                $project: {
+                    _id: 1,
+                    title: 1,
+                    slug: 1,
+                    description: 1,
+                    thumbnailUrl: 1,
+                    format: 1,
+                    viewCount: 1,
+                    downloadCount: 1,
+                    favoriteCount: 1,
+                    status: 1,
+                    createdAt: 1,
+                    category: {
+                        _id: "$category._id",
+                        name: "$category.name",
+                        slug: "$category.slug",
+                    },
+                    uploader: {
+                        _id: "$uploader._id",
+                        name: "$uploader.name",
+                    },
+                },
+            },
+            { $sort: sortOptions },
+            {
+                $facet: {
+                    items: [{ $skip: skip }, { $limit: limit }],
+                    totalCount: [{ $count: "count" }],
+                },
+            },
+        ];
+
+        const result = await Document.aggregate(pipeline);
+
+        const items = result[0]?.items || [];
+        const totalItems = result[0]?.totalCount[0]?.count || 0;
+        const pagingData = getPagingData(items, totalItems, page, limit);
+
+        return res.status(200).json({ success: true, data: pagingData });
     } catch (error) {
         logger.error(`Get my documents error: ${error.message}`, { stack: error.stack });
         res.status(500).json({ success: false, message: "Không thể lấy danh sách tài liệu." });
@@ -484,18 +758,116 @@ exports.featureDocument = async (req, res) => {
 //lấy tài liệu nổi bật
 exports.getFeaturedDocuments = async (req, res) => {
     try {
+        const { search, category, sort, startDate, endDate, dateField } = req.query;
         const { page, limit, skip } = getPagination(req.query);
+
         const query = { isFeatured: true, status: "approved", isPublic: true };
-        const documents = await Document.find(query)
-            .select("title slug categoryId uploaderId viewCount downloadCount createdAt")
-            .populate("categoryId", "name slug")
-            .populate("uploaderId", "name email")
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(limit)
-            .lean();
-        const total = await Document.countDocuments(query);
-        const pagingData = getPagingData(documents, total, page, limit);
+
+        // Lọc theo danh mục
+        if (category) {
+            const categoryDoc = await Category.findOne({ slug: category }).lean();
+            if (!categoryDoc) {
+                return res.status(200).json({
+                    success: true,
+                    data: { totalItems: 0, totalPages: 0, currentPage: page, items: [] },
+                });
+            }
+            query.categoryId = categoryDoc._id;
+        }
+
+        // Lọc theo khoảng ngày
+        if (startDate && endDate) {
+            const validDateFields = ["createdAt", "updatedAt"];
+            const selectedDateField = validDateFields.includes(dateField) ? dateField : "createdAt";
+
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                return res.status(400).json({ success: false, message: "Invalid date format" });
+            }
+            if (start > end) {
+                return res
+                    .status(400)
+                    .json({ success: false, message: "startDate must be before endDate" });
+            }
+
+            query[selectedDateField] = {
+                $gte: start,
+                $lte: end,
+            };
+        }
+
+        // Sắp xếp
+        const validSortFields = ["viewCount", "downloadCount", "favoriteCount", "createdAt"];
+        const sortOptions = {};
+        if (sort) {
+            const [field, order] = sort.split(":");
+            if (!validSortFields.includes(field)) {
+                return res.status(400).json({ success: false, message: "Invalid sort field" });
+            }
+            sortOptions[field] = order === "desc" ? -1 : 1;
+        } else {
+            sortOptions.createdAt = -1; // Mặc định sắp xếp mới nhất
+        }
+
+        const documents = await Document.aggregate([
+            { $match: query },
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "categoryId",
+                    foreignField: "_id",
+                    as: "category",
+                },
+            },
+            { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "uploaderId",
+                    foreignField: "_id",
+                    as: "uploader",
+                },
+            },
+            { $unwind: { path: "$uploader", preserveNullAndEmptyArrays: true } },
+            {
+                $match: search
+                    ? {
+                          $or: [
+                              { title: { $regex: search, $options: "i" } },
+                              { description: { $regex: search, $options: "i" } },
+                              { tags: { $regex: search, $options: "i" } },
+                          ],
+                      }
+                    : {},
+            },
+            {
+                $project: {
+                    _id: 1,
+                    title: 1,
+                    slug: 1,
+                    description: 1,
+                    thumbnailUrl: 1,
+                    format: 1,
+                    viewCount: 1,
+                    downloadCount: 1,
+                    favoriteCount: 1,
+                    createdAt: 1,
+                    category: {
+                        _id: "$category._id",
+                        name: "$category.name",
+                        slug: "$category.slug",
+                    },
+                    uploader: { _id: "$uploader._id", name: "$uploader.name" },
+                },
+            },
+            { $sort: sortOptions },
+            { $skip: skip },
+            { $limit: limit },
+        ]);
+
+        const totalDocs = await Document.countDocuments(query);
+        const pagingData = getPagingData(documents, totalDocs, page, limit);
 
         res.status(200).json({ success: true, data: pagingData });
     } catch (error) {
@@ -504,5 +876,80 @@ exports.getFeaturedDocuments = async (req, res) => {
             success: false,
             message: "Không thể lấy danh sách tài liệu nổi bật.",
         });
+    }
+};
+
+// PATCH /api/documents/:id/favorite
+exports.toggleFavorite = async (req, res) => {
+    try {
+        const { id: docId } = req.params;
+        const userId = req.user._id;
+
+        if (!Types.ObjectId.isValid(docId) || !Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ success: false, message: "ID không hợp lệ" });
+        }
+
+        const document = await Document.findById(docId);
+        if (!document || document.status !== "approved") {
+            return res.status(404).json({
+                success: false,
+                message: "Tài liệu không tồn tại hoặc chưa được duyệt",
+            });
+        }
+
+        const existingFavorite = await Favorite.findOne({ userId, documentId: docId });
+
+        let isFavorite;
+        if (existingFavorite) {
+            // Xóa khỏi yêu thích
+            await Favorite.deleteOne({ userId, documentId: docId });
+            await Document.updateOne({ _id: docId }, { $inc: { favoriteCount: -1 } });
+            isFavorite = false;
+        } else {
+            // Thêm vào yêu thích
+            const favoriteCount = await Favorite.countDocuments({ userId });
+            if (favoriteCount >= 100) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Danh sách yêu thích đã đạt giới hạn",
+                });
+            }
+            await Favorite.create({ userId, documentId: docId, favoritedAt: new Date() });
+            await Document.updateOne({ _id: docId }, { $inc: { favoriteCount: 1 } });
+            isFavorite = true;
+        }
+
+        const updatedDocument = await Document.findById(docId)
+            .select(
+                "title description slug categoryId uploaderId viewCount downloadCount favoriteCount createdAt"
+            )
+            .populate("categoryId", "name slug")
+            .populate("uploaderId", "name email")
+            .lean();
+
+        const favoriteDocuments = await Favorite.find({ userId })
+            .populate({
+                path: "documentId",
+                select: "title description slug categoryId uploaderId viewCount downloadCount favoriteCount createdAt",
+                populate: [
+                    { path: "categoryId", select: "name slug" },
+                    { path: "uploaderId", select: "name email" },
+                ],
+            })
+            .lean()
+            .then((favorites) => favorites.map((fav) => fav.documentId));
+
+        res.status(200).json({
+            success: true,
+            data: {
+                document: updatedDocument,
+                favoriteDocuments: favoriteDocuments || [],
+                isFavorite,
+                message: isFavorite ? "Đã thêm vào yêu thích" : "Đã xóa khỏi yêu thích",
+            },
+        });
+    } catch (error) {
+        logger.error("Toggle favorite error:", error);
+        res.status(500).json({ success: false, message: "Lỗi khi cập nhật yêu thích" });
     }
 };

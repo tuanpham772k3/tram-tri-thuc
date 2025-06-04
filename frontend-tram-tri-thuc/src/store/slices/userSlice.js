@@ -22,7 +22,7 @@ export const fetchUserInfo = createAsyncThunk(
 // Cập nhật thông tin người dùng
 export const updateUserInfo = createAsyncThunk(
     "user/updateUserInfo",
-    async (data, { rejectWithValue }) => {
+    async (data, { rejectWithValue, dispatch }) => {
         try {
             const allowedFields = ["name", "avatar", "email"];
             const filteredData = {};
@@ -41,6 +41,9 @@ export const updateUserInfo = createAsyncThunk(
 
             const response = await customAxios.put("/users/me", filteredData);
             showToast("success", response.data.message);
+
+            // Gọi fetchFavoriteDocuments để đồng bộ danh sách yêu thích
+            dispatch(fetchFavoriteDocuments());
             return response.data.data;
         } catch (error) {
             return rejectWithValue(
@@ -53,10 +56,12 @@ export const updateUserInfo = createAsyncThunk(
 // Xóa tài khoản người dùng
 export const deleteMyAccount = createAsyncThunk(
     "user/deleteMyAccount",
-    async (_, { rejectWithValue }) => {
+    async (_, { rejectWithValue, dispatch }) => {
         try {
             const response = await customAxios.delete("/users/me");
             showToast("success", response.data.message);
+            // Gọi logoutThunk để clear session
+            dispatch(logoutThunk());
             return null;
         } catch (error) {
             return rejectWithValue(error.response?.data || { message: "Lỗi khi xóa tài khoản." });
@@ -169,7 +174,6 @@ const userSlice = createSlice({
         builder
             .addCase(loginThunk.fulfilled, (state, action) => {
                 state.userInfo = action.payload.user; // Đồng bộ userInfo ngay sau login
-                state.favoriteDocuments = [];
             })
             .addCase(logoutThunk.fulfilled, (state) => {
                 return initialState; // Reset userSlice khi logout
@@ -190,8 +194,7 @@ const userSlice = createSlice({
             .addCase(updateUserInfo.fulfilled, (state, action) => {
                 state.loading = false;
                 state.userInfo = action.payload;
-                // Tự động fetch favoriteDocuments khi lấy userInfo thành công
-                state.favoriteDocuments = []; // Reset trước khi fetch lại
+                // favoriteDocuments đã được đồng bộ qua dispatch(fetchFavoriteDocuments)
             })
             .addCase(updateUserInfo.rejected, handleRejected);
 
@@ -210,9 +213,9 @@ const userSlice = createSlice({
                 state.loading = false;
                 state.viewedHistory = action.payload.items;
                 state.pagination.viewedHistory = {
-                    totalItems: action.payload.totalItems,
-                    totalPages: action.payload.totalPages,
-                    currentPage: action.payload.currentPage,
+                    totalItems: action.payload.totalItems || 0,
+                    totalPages: action.payload.totalPages || 1,
+                    currentPage: action.payload.currentPage || 1,
                     limit: action.payload.limit || state.pagination.viewedHistory.limit,
                 };
             })
@@ -225,9 +228,9 @@ const userSlice = createSlice({
                 state.loading = false;
                 state.downloadedHistory = action.payload.items;
                 state.pagination.downloadedHistory = {
-                    totalItems: action.payload.totalItems,
-                    totalPages: action.payload.totalPages,
-                    currentPage: action.payload.currentPage,
+                    totalItems: action.payload.totalItems || 0,
+                    totalPages: action.payload.totalPages || 1,
+                    currentPage: action.payload.currentPage || 1,
                     limit: action.payload.limit || state.pagination.downloadedHistory.limit,
                 };
             })
@@ -240,9 +243,9 @@ const userSlice = createSlice({
                 state.loading = false;
                 state.favoriteDocuments = action.payload.items;
                 state.pagination.favoriteDocuments = {
-                    totalItems: action.payload.totalItems,
-                    totalPages: action.payload.totalPages,
-                    currentPage: action.payload.currentPage,
+                    totalItems: action.payload.totalItems || 0,
+                    totalPages: action.payload.totalPages || 1,
+                    currentPage: action.payload.currentPage || 1,
                     limit: action.payload.limit || state.pagination.favoriteDocuments.limit,
                 };
             })
@@ -253,16 +256,12 @@ const userSlice = createSlice({
             .addCase(toggleFavorite.pending, handlePending)
             .addCase(toggleFavorite.fulfilled, (state, action) => {
                 state.loading = false;
-                // Cập nhật danh sách favoriteDocuments từ payload của toggleFavorite
-                state.favoriteDocuments = action.payload.favoriteDocuments.map((doc) => ({
-                    ...doc,
-                    favoriteCount: doc.favoriteCount ?? 0,
-                }));
+                // Không cập nhật favoriteDocuments trực tiếp, đã gọi fetchFavoriteDocuments trong toggleFavorite
                 showToast("success", action.payload.message);
             })
             .addCase(toggleFavorite.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload;
+                state.error = action.payload.message;
                 showToast("error", action.payload);
             });
     },

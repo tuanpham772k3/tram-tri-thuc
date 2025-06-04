@@ -19,7 +19,7 @@ module.exports = {
     loginLimiter: createRateLimiter(
         15 * 60 * 1000, // 15 phút
         5,
-        "Quá nhiều lần thử đăng nhập, vui lòng thử lại sau 15 phút."
+        "Quá nhiều lần đăng nhập sai, vui lòng thử lại sau 15 phút."
     ),
     forgotPasswordLimiter: createRateLimiter(
         60 * 60 * 1000, // 1 giờ
@@ -54,7 +54,7 @@ module.exports = {
     commentLimiter: createRateLimiter(
         60 * 1000, // 1 phút
         5,
-        "Bạn đã gửi quá nhiều bình luận hoặc đánh giá, vui lòng thử lại sau 1 phút."
+        "Bạn đã gửi quá nhiều yêu cầu, vui lòng thử lại sau 1 phút."
     ),
 
 };

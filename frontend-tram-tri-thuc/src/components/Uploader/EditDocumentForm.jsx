@@ -2,32 +2,51 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { clearError, updateDocument } from "../../store/slices/documentSlice";
 import showToast from "../../utils/toast";
+import { FaSave, FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
-const EditDocumentForm = ({ document }) => {
+const EditDocumentForm = ({ document, onSuccess }) => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { loading, error } = useSelector((state) => state.documents);
     const [formData, setFormData] = useState({
         title: "",
         description: "",
-        tags: "",
+        tags: [], // Mảng chuỗi
     });
 
+    // Khởi tạo formData từ document
     useEffect(() => {
         if (document) {
             setFormData({
                 title: document.title || "",
                 description: document.description || "",
-                tag: document.tag || "",
+                tags: Array.isArray(document.tags) ? document.tags : [],
             });
         }
         return () => dispatch(clearError());
     }, [document, dispatch]);
 
+    // Xử lý thay đổi input
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        if (name === "tags") {
+            // Chuyển chuỗi tags thành mảng, tách bằng dấu phẩy
+            setFormData((prev) => ({
+                ...prev,
+                tags: value
+                    ? value
+                          .split(",")
+                          .map((tag) => tag.trim())
+                          .filter(Boolean)
+                    : [],
+            }));
+        } else {
+            setFormData((prev) => ({ ...prev, [name]: value }));
+        }
     };
 
+    // Xử lý submit form
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -37,48 +56,77 @@ const EditDocumentForm = ({ document }) => {
                     data: {
                         title: formData.title,
                         description: formData.description,
-                        tag: formData.tag,
+                        tags: formData.tags,
                     },
                 })
             ).unwrap();
             showToast("success", "Cập nhật tài liệu thành công!");
+            if (onSuccess) onSuccess(); // Chuyển hướng về MyDocumentsPage
         } catch (err) {
-            showToast("error", "Không thể cập nhật tài liệu");
+            showToast("error", err.message || "Không thể cập nhật tài liệu.");
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4 max-w-xl">
-            {error && <p className="text-red-500">{error}</p>}
-            <input
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                placeholder="Tiêu đề"
-                className="w-full p-2 border rounded"
-                required
-            />
-            <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Mô tả"
-                className="w-full p-2 border rounded"
-            />
-            <input
-                name="tag"
-                value={formData.tag}
-                onChange={handleChange}
-                placeholder="Tags (cách nhau bằng dấu phẩy)"
-                className="w-full p-2 border rounded"
-            />
-            <button
-                type="submit"
-                disabled={loading}
-                className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
-            >
-                {loading ? "Đang lưu..." : "Lưu thay đổi"}
-            </button>
+        <form
+            onSubmit={handleSubmit}
+            className="space-y-6 max-w-xl mx-auto bg-white/80 p-6 rounded-lg shadow-lg"
+        >
+            {error && (
+                <div className="bg-red-50 border-l-4 border-red-500 p-4">
+                    <p className="text-sm text-red-700">{error}</p>
+                </div>
+            )}
+            <div>
+                <label className="block text-sm font-medium text-gray-700">Tiêu đề</label>
+                <input
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    placeholder="Nhập tiêu đề"
+                    className="mt-1 w-full p-3 border rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+                    required
+                />
+            </div>
+            <div>
+                <label className="block text-sm font-medium text-gray-700">Mô tả</label>
+                <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    placeholder="Nhập mô tả"
+                    rows={4}
+                    className="mt-1 w-full p-3 border rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+                />
+            </div>
+            <div>
+                <label className="block text-sm font-medium text-gray-700">Tags</label>
+                <input
+                    name="tags"
+                    value={formData.tags.join(", ")}
+                    onChange={handleChange}
+                    placeholder="Nhập tags, cách nhau bằng dấu phẩy"
+                    className="mt-1 w-full p-3 border rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+                />
+            </div>
+            <div className="flex space-x-4">
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-400 transition-colors"
+                >
+                    <FaSave className="mr-2" />
+                    {loading ? "Đang lưu..." : "Lưu thay đổi"}
+                </button>
+                <button
+                    type="button"
+                    onClick={() => navigate("/uploader/my-documents")}
+                    className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                    <FaTimes className="mr-2" />
+                    Hủy
+                </button>
+            </div>
         </form>
     );
 };

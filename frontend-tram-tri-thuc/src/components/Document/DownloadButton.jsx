@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Download } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { downloadDocument } from "../../store/slices/documentSlice";
-import showToast from "../../utils/toast";
 
 export default function DownloadButton({ documentId }) {
     const dispatch = useDispatch();
@@ -11,24 +10,32 @@ export default function DownloadButton({ documentId }) {
     const [isDownloading, setIsDownloading] = useState(false);
 
     const handleDownload = async () => {
+        if (isDownloading) return; // Prevent double clicks
+
         setIsDownloading(true);
         try {
             await dispatch(downloadDocument(documentId)).unwrap();
-            showToast("success", "Tải tài liệu thành công!");
         } catch (err) {
-            showToast("error", "Không thể tải tài liệu");
+            console.error("Download failed:", err);
+            // Error message already shown in thunk
+        } finally {
+            setIsDownloading(false);
         }
-        setIsDownloading(false);
     };
 
     return (
         <button
             onClick={handleDownload}
             disabled={loading || isDownloading}
-            className="mt-3 flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
+            className={`mt-3 flex items-center gap-2 px-4 py-2 rounded transition-colors ${
+                loading || isDownloading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700 text-white"
+            }`}
+            aria-label="Tải xuống tài liệu"
         >
             <Download size={18} />
-            {loading || isDownloading ? "Đang tải..." : "Tải tài liệu"}
+            {isDownloading ? "Đang tải..." : "Tải tài liệu"}
         </button>
     );
 }

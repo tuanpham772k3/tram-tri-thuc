@@ -19,10 +19,17 @@ export const fetchCategories = createAsyncThunk(
 // Lấy chi tiết danh mục theo slug
 export const fetchCategoryBySlug = createAsyncThunk(
     "categories/fetchCategoryBySlug",
-    async (slug, { rejectWithValue }) => {
+    async ({ slug, params = {} }, { rejectWithValue }) => {
         try {
-            const response = await customAxios.get(`/categories/${slug}`);
-            return response.data.data; // category
+            const defaultParams = {
+                page: 1,
+                limit: 10,
+                ...params,
+            };
+            const response = await customAxios.get(`/categories/${slug}`, {
+                params: defaultParams,
+            });
+            return response.data.data; // { category, documents, pagination }
         } catch (error) {
             return rejectWithValue(
                 error.response?.data?.message || "Không thể lấy chi tiết danh mục"
@@ -77,9 +84,16 @@ const categorySlice = createSlice({
     initialState: {
         categories: [], // Danh sách danh mục
         currentCategory: null, // Chi tiết danh mục hiện tại
+        currentCategoryDocuments: [], // Danh sách tài liệu của danh mục hiện tại
         loading: false,
         error: null,
         pagination: {
+            totalItems: 0,
+            totalPages: 0,
+            currentPage: 1,
+        },
+        categoryDocumentsPagination: {
+            // Phân trang cho tài liệu của danh mục
             totalItems: 0,
             totalPages: 0,
             currentPage: 1,
@@ -101,6 +115,17 @@ const categorySlice = createSlice({
             state.error = action.payload || "Đã xảy ra lỗi không xác định";
         };
 
+        const normalizeDocument = (doc) => ({
+            ...doc,
+            _id: doc._id?.toString(),
+            favoriteCount: doc.favoriteCount ?? 0,
+            viewCount: doc.viewCount ?? 0,
+            downloadCount: doc.downloadCount ?? 0,
+            category: doc.category || { _id: null, name: "", slug: "" },
+            uploader: doc.uploader || { _id: null, name: "" },
+            createdAt: doc.createdAt ? new Date(doc.createdAt).toISOString() : null,
+        });
+
         builder
             // fetchCategories
             .addCase(fetchCategories.pending, handlePending)
@@ -114,13 +139,28 @@ const categorySlice = createSlice({
                 };
             })
             .addCase(fetchCategories.rejected, handleRejected)
+
             // fetchCategoryBySlug
             .addCase(fetchCategoryBySlug.pending, handlePending)
             .addCase(fetchCategoryBySlug.fulfilled, (state, action) => {
                 state.loading = false;
-                state.currentCategory = action.payload;
+                state.currentCategory = {
+                    _id: action.payload._id,
+                    name: action.payload.name,
+                    slug: action.payload.slug,
+                    description: action.payload.description,
+                    createdAt: action.payload.createdAt,
+                };
+                state.currentCategoryDocuments =
+                    action.payload.documents?.map(normalizeDocument) || [];
+                state.categoryDocumentsPagination = action.payload.pagination || {
+                    totalItems: 0,
+                    totalPages: 0,
+                    currentPage: 1,
+                };
             })
             .addCase(fetchCategoryBySlug.rejected, handleRejected)
+
             // createCategory
             .addCase(createCategory.pending, handlePending)
             .addCase(createCategory.fulfilled, (state, action) => {
@@ -129,6 +169,7 @@ const categorySlice = createSlice({
                 state.pagination.totalItems += 1;
             })
             .addCase(createCategory.rejected, handleRejected)
+
             // updateCategory
             .addCase(updateCategory.pending, handlePending)
             .addCase(updateCategory.fulfilled, (state, action) => {
@@ -141,6 +182,7 @@ const categorySlice = createSlice({
                 }
             })
             .addCase(updateCategory.rejected, handleRejected)
+
             // deleteCategory
             .addCase(deleteCategory.pending, handlePending)
             .addCase(deleteCategory.fulfilled, (state, action) => {
@@ -148,6 +190,12 @@ const categorySlice = createSlice({
                 state.categories = state.categories.filter((cat) => cat._id !== action.payload);
                 if (state.currentCategory?._id === action.payload) {
                     state.currentCategory = null;
+                    state.currentCategoryDocuments = [];
+                    state.categoryDocumentsPagination = {
+                        totalItems: 0,
+                        totalPages: 0,
+                        currentPage: 1,
+                    };
                 }
                 state.pagination.totalItems -= 1;
             })

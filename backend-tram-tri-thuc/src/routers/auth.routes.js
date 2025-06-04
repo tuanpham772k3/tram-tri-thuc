@@ -33,7 +33,7 @@ router.post(
         body("password").notEmpty().withMessage("Mật khẩu không được để trống"),
         validate,
     ],
-    loginLimiter,
+    // loginLimiter,
     login
 );
 

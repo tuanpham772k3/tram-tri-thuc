@@ -16,7 +16,7 @@ export const store = configureStore({
         documents: documentReducer,
         categories: categoryReducer,
         comments: commentReducer,
-        notification: notificationReducer,
+        notifications: notificationReducer,
         download: downloadReducer,
         ratings: ratingReducer,
         admin: adminReducer,

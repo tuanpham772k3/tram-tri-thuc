@@ -30,7 +30,6 @@ const userSchema = new mongoose.Schema(
         resetTokenExpires: { type: Date, default: null },
         role: { type: String, enum: ["admin", "uploader", "member"], default: "member" },
         isActive: { type: Boolean, default: true }, // Trạng thái hoạt động
-        favoriteDocuments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Document" }], // Danh sách tài liệu yêu thích
     },
     { timestamps: true }
 );

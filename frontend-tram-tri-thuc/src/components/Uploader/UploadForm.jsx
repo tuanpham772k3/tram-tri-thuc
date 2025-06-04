@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "../../store/slices/categorySlice";
 import { clearError, uploadDocument } from "../../store/slices/documentSlice";
@@ -6,6 +6,7 @@ import showToast from "../../utils/toast";
 import { FaCloudUploadAlt, FaImage, FaTags, FaFolder, FaHeading } from "react-icons/fa";
 import { MdDescription } from "react-icons/md";
 import { motion } from "framer-motion";
+import { useDropzone } from "react-dropzone";
 
 export default function UploadForm() {
     const dispatch = useDispatch();
@@ -21,7 +22,6 @@ export default function UploadForm() {
         thumbnail: null,
     });
 
-    const [dragActive, setDragActive] = useState(false);
     const [previewUrl, setPreviewUrl] = useState(null);
 
     useEffect(() => {
@@ -29,51 +29,58 @@ export default function UploadForm() {
         return () => dispatch(clearError());
     }, [dispatch]);
 
-    const handleDrag = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.type === "dragenter" || e.type === "dragover") {
-            setDragActive(true);
-        } else if (e.type === "dragleave") {
-            setDragActive(false);
+    // Xử lý file tài liệu (PDF)
+    const onDropDocument = useCallback((acceptedFiles, fileRejections) => {
+        if (fileRejections.length > 0) {
+            showToast("error", "Chỉ chấp nhận file PDF, tối đa 50MB");
+            return;
         }
-    };
+        const file = acceptedFiles[0];
+        setFormData((prev) => ({ ...prev, file }));
+    }, []);
 
-    const handleDrop = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setDragActive(false);
-        
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            const file = e.dataTransfer.files[0];
-            if (file.type === "application/pdf") {
-                setFormData(prev => ({ ...prev, file }));
-            } else {
-                showToast("error", "Chỉ chấp nhận file PDF");
-            }
+    // Xử lý thumbnail (hình ảnh)
+    const onDropThumbnail = useCallback((acceptedFiles, fileRejections) => {
+        if (fileRejections.length > 0) {
+            showToast("error", "Chỉ chấp nhận file ảnh (PNG, JPG), tối đa 10MB");
+            return;
         }
-    };
+        const file = acceptedFiles[0];
+        setFormData((prev) => ({ ...prev, thumbnail: file }));
+        setPreviewUrl(URL.createObjectURL(file));
+    }, []);
 
-    const handleFileChange = (e, type) => {
-        const file = e.target.files[0];
-        if (type === 'document') {
-            if (file && file.type === "application/pdf") {
-                setFormData(prev => ({ ...prev, file }));
-            } else {
-                showToast("error", "Chỉ chấp nhận file PDF");
-            }
-        } else if (type === 'thumbnail') {
-            if (file && file.type.startsWith("image/")) {
-                setFormData(prev => ({ ...prev, thumbnail: file }));
-                setPreviewUrl(URL.createObjectURL(file));
-            } else {
-                showToast("error", "Chỉ chấp nhận file ảnh");
-            }
-        }
-    };
+    // Cấu hình dropzone cho tài liệu
+    const {
+        getRootProps: getDocumentRootProps,
+        getInputProps: getDocumentInputProps,
+        isDragActive: isDocumentDragActive,
+    } = useDropzone({
+        onDrop: onDropDocument,
+        accept: { "application/pdf": [".pdf"] },
+        maxSize: 50 * 1024 * 1024, // 50MB
+        multiple: false,
+    });
+
+    // Cấu hình dropzone cho thumbnail
+    const {
+        getRootProps: getThumbnailRootProps,
+        getInputProps: getThumbnailInputProps,
+        isDragActive: isThumbnailDragActive,
+    } = useDropzone({
+        onDrop: onDropThumbnail,
+        accept: { "image/*": [".png", ".jpg", ".jpeg"] },
+        maxSize: 10 * 1024 * 1024, // 10MB
+        multiple: false,
+    });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!formData.file) {
+            showToast("error", "Vui lòng chọn file PDF");
+            return;
+        }
+
         const data = new FormData();
         data.append("title", formData.title);
         data.append("description", formData.description);
@@ -95,12 +102,12 @@ export default function UploadForm() {
             });
             setPreviewUrl(null);
         } catch {
-            showToast("error", "Không thể tải tài liệu");
+            // Toast đã được xử lý trong uploadDocument asyncThunk
         }
     };
 
     return (
-        <motion.div 
+        <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -141,7 +148,9 @@ export default function UploadForm() {
                                     <input
                                         type="text"
                                         value={formData.title}
-                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, title: e.target.value })
+                                        }
                                         className="w-full border border-gray-300 rounded-xl px-5 py-3 text-lg placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all"
                                         placeholder="Nhập tiêu đề tài liệu"
                                         required
@@ -155,7 +164,9 @@ export default function UploadForm() {
                                     </label>
                                     <select
                                         value={formData.categoryId}
-                                        onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, categoryId: e.target.value })
+                                        }
                                         className="w-full border border-gray-300 rounded-xl px-5 py-3 text-lg focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all"
                                         required
                                     >
@@ -177,7 +188,9 @@ export default function UploadForm() {
                                         type="text"
                                         placeholder="ví dụ: sách, toán, tài liệu học"
                                         value={formData.tag}
-                                        onChange={(e) => setFormData({ ...formData, tag: e.target.value })}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, tag: e.target.value })
+                                        }
                                         className="w-full border border-gray-300 rounded-xl px-5 py-3 text-lg placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all"
                                     />
                                 </div>
@@ -196,7 +209,12 @@ export default function UploadForm() {
                                     <textarea
                                         rows={4}
                                         value={formData.description}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                description: e.target.value,
+                                            })
+                                        }
                                         className="w-full border border-gray-300 rounded-xl px-5 py-3 text-lg placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all resize-none"
                                         placeholder="Mô tả ngắn gọn về tài liệu (không bắt buộc)"
                                     />
@@ -207,7 +225,15 @@ export default function UploadForm() {
                                         <FaImage className="w-5 h-5 mr-2" />
                                         Ảnh đại diện (không bắt buộc)
                                     </label>
-                                    <div className="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-green-500 transition-colors">
+                                    <div
+                                        {...getThumbnailRootProps()}
+                                        className={`mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-xl transition-colors ${
+                                            isThumbnailDragActive
+                                                ? "border-green-500 bg-green-50"
+                                                : "border-gray-300"
+                                        }`}
+                                    >
+                                        <input {...getThumbnailInputProps()} />
                                         <div className="space-y-1 text-center">
                                             {previewUrl ? (
                                                 <div className="relative group">
@@ -218,7 +244,10 @@ export default function UploadForm() {
                                                     />
                                                     <div
                                                         onClick={() => {
-                                                            setFormData(prev => ({ ...prev, thumbnail: null }));
+                                                            setFormData((prev) => ({
+                                                                ...prev,
+                                                                thumbnail: null,
+                                                            }));
                                                             setPreviewUrl(null);
                                                         }}
                                                         className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg cursor-pointer"
@@ -230,18 +259,14 @@ export default function UploadForm() {
                                                 <>
                                                     <FaImage className="mx-auto h-12 w-12 text-gray-400" />
                                                     <div className="flex text-sm text-gray-600">
-                                                        <label className="relative cursor-pointer rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500">
-                                                            <span>Tải ảnh lên</span>
-                                                            <input
-                                                                type="file"
-                                                                accept="image/*"
-                                                                onChange={(e) => handleFileChange(e, 'thumbnail')}
-                                                                className="sr-only"
-                                                            />
-                                                        </label>
+                                                        <span className="relative cursor-pointer rounded-md font-medium text-green-600 hover:text-green-500">
+                                                            Tải ảnh lên
+                                                        </span>
                                                         <p className="pl-1">hoặc kéo thả vào đây</p>
                                                     </div>
-                                                    <p className="text-xs text-gray-500">PNG, JPG tối đa 10MB</p>
+                                                    <p className="text-xs text-gray-500">
+                                                        PNG, JPG tối đa 10MB
+                                                    </p>
                                                 </>
                                             )}
                                         </div>
@@ -251,27 +276,23 @@ export default function UploadForm() {
                         </div>
 
                         <div
-                            className={`mt-6 p-6 border-2 ${
-                                dragActive ? 'border-green-500 bg-green-50' : 'border-gray-300'
-                            } border-dashed rounded-xl transition-colors relative`}
-                            onDragEnter={handleDrag}
-                            onDragLeave={handleDrag}
-                            onDragOver={handleDrag}
-                            onDrop={handleDrop}
+                            {...getDocumentRootProps()}
+                            className={`mt-6 p-6 border-2 border-dashed rounded-xl transition-colors ${
+                                isDocumentDragActive
+                                    ? "border-green-500 bg-green-50"
+                                    : "border-gray-300"
+                            }`}
                         >
+                            <input {...getDocumentInputProps()} />
                             <div className="text-center">
                                 <FaCloudUploadAlt className="mx-auto h-12 w-12 text-gray-400" />
                                 <div className="mt-4">
-                                    <label className="relative cursor-pointer rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500">
-                                        <span>Tải file PDF lên</span>
-                                        <input
-                                            type="file"
-                                            accept=".pdf"
-                                            onChange={(e) => handleFileChange(e, 'document')}
-                                            className="sr-only"
-                                        />
-                                    </label>
-                                    <p className="text-sm text-gray-500 mt-1">hoặc kéo thả file vào đây</p>
+                                    <span className="relative cursor-pointer rounded-md font-medium text-green-600 hover:text-green-500">
+                                        Tải file PDF lên
+                                    </span>
+                                    <p className="text-sm text-gray-500 mt-1">
+                                        hoặc kéo thả file vào đây
+                                    </p>
                                 </div>
                                 {formData.file && (
                                     <div className="mt-4 flex items-center justify-center">
@@ -280,7 +301,9 @@ export default function UploadForm() {
                                         </span>
                                         <button
                                             type="button"
-                                            onClick={() => setFormData(prev => ({ ...prev, file: null }))}
+                                            onClick={() =>
+                                                setFormData((prev) => ({ ...prev, file: null }))
+                                            }
                                             className="ml-2 text-red-500 hover:text-red-700"
                                         >
                                             ×
@@ -303,7 +326,10 @@ export default function UploadForm() {
                         >
                             {loading ? (
                                 <div className="flex items-center justify-center">
-                                    <svg className="animate-spin h-5 w-5 mr-3 text-white" viewBox="0 0 24 24">
+                                    <svg
+                                        className="animate-spin h-5 w-5 mr-3 text-white"
+                                        viewBox="0 0 24 24"
+                                    >
                                         <circle
                                             className="opacity-25"
                                             cx="12"

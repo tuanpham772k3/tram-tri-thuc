@@ -3,6 +3,8 @@ const User = require("../models/user.model");
 const Rating = require("../models/rating.model");
 const Document = require("../models/document.model");
 const ViewHistory = require("../models/viewHistory.model");
+const Category = require("../models/category.model");
+const Favorite = require("../models/favorite.model");
 const Download = require("../models/downloadHistory.model");
 const logger = require("../utils/logger");
 const { getPagination, getPagingData } = require("../utils/paginate");
@@ -10,16 +12,25 @@ const { getPagination, getPagingData } = require("../utils/paginate");
 class UserService {
     static async getUsers(queryParams = {}) {
         try {
+            const { search } = queryParams;
             const filter = { role: { $ne: "admin" } };
+            if (search) {
+                // Sanitize search input
+                const sanitizedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                filter.$or = [
+                    { email: { $regex: sanitizedSearch, $options: "i" } },
+                    { name: { $regex: sanitizedSearch, $options: "i" } },
+                ];
+            }
 
             const { page, limit, skip } = getPagination(queryParams);
             const total = await User.countDocuments(filter);
-
             const users = await User.find(filter)
                 .select("-password -resetToken -token")
                 .sort({ createdAt: -1 })
                 .skip(skip)
-                .limit(limit);
+                .limit(limit)
+                .lean();
             return getPagingData(users, total, page, limit);
         } catch (error) {
             logger.error("Lỗi getUsers:", error);
@@ -29,13 +40,27 @@ class UserService {
 
     static async getUserInfo(userId) {
         try {
-            const user = await User.findById(userId)
-                .select("-password -resetToken -token")
-                .populate("favoriteDocuments", "title description createdAt"); // Tùy chọn
+            const user = await User.findById(userId).select("-password -resetToken -token").lean();
             if (!user) {
                 throw new Error("Không tìm thấy người dùng");
             }
-            return user;
+
+            // Lấy danh sách tài liệu yêu thích từ Favorite model
+            const favoriteDocuments = await Favorite.find({ userId })
+                .populate({
+                    path: "documentId",
+                    select: "title description slug categoryId uploaderId viewCount downloadCount favoriteCount createdAt",
+                    populate: [
+                        { path: "categoryId", select: "name slug" },
+                        { path: "uploaderId", select: "name email" },
+                    ],
+                })
+                .lean()
+                .then((favorites) =>
+                    favorites.map((fav) => ({ ...fav.documentId, favoritedAt: fav.favoritedAt }))
+                );
+
+            return { ...user, favoriteDocuments };
         } catch (error) {
             logger.error("Lỗi getUserInfo:", error);
             throw error;
@@ -82,17 +107,17 @@ class UserService {
                 throw new Error("Không tìm thấy người dùng");
             }
 
-            // Soft delete tài liệu
-            await Document.updateMany(
-                { uploaderId: userId },
-                { isPublic: false, status: "rejected" }
-            );
+            // Xóa tài liệu
+            await Document.deleteMany({ uploaderId: userId });
 
-            // Soft delete bình luận
-            await Comment.updateMany({ userId }, { isDeleted: true });
+            // Xóa bình luận
+            await Comment.deleteMany({ userId });
 
             // Xóa đánh giá
             await Rating.deleteMany({ userId });
+
+            // Xóa favorites
+            await Favorite.deleteMany({ userId });
 
             // Xóa user
             await User.deleteOne({ _id: userId });
@@ -107,17 +132,171 @@ class UserService {
 
     static async getUserHistory(userId, queryParams) {
         try {
+            if (!mongoose.isValidObjectId(userId)) {
+                throw new Error("ID người dùng không hợp lệ");
+            }
+
+            const { search, category, sort, startDate, endDate } = queryParams;
             const { page, limit, skip } = getPagination(queryParams);
 
-            const history = await ViewHistory.find({ userId })
-                .populate("documentId", "title slug")
-                .sort({ viewedAt: -1 })
-                .skip(skip)
-                .limit(limit)
-                .lean();
+            const user = await User.findById(userId).lean();
+            if (!user) throw new Error("Không tìm thấy người dùng");
 
-            const total = await ViewHistory.countDocuments({ userId });
-            return getPagingData(history, total, page, limit);
+            const query = { userId: new mongoose.Types.ObjectId(userId) };
+
+            // Lọc theo danh mục
+            let categoryId = null;
+            if (category) {
+                const categoryDoc = await Category.findOne({ slug: category }).lean();
+                if (!categoryDoc) {
+                    return getPagingData([], 0, page, limit);
+                }
+                categoryId = categoryDoc._id;
+            }
+
+            // Lọc theo ngày xem
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                    throw new Error("Định dạng ngày không hợp lệ");
+                }
+                if (start > end) {
+                    throw new Error("startDate phải trước endDate");
+                }
+                query.viewedAt = { $gte: start, $lte: end };
+            }
+
+            // Sắp xếp
+            const sortOptions = {};
+            if (sort) {
+                const [field, order] = sort.split(":");
+                if (field !== "viewedAt") {
+                    throw new Error("Trường sắp xếp không hợp lệ");
+                }
+                sortOptions[field] = order === "desc" ? -1 : 1;
+            } else {
+                sortOptions.viewedAt = -1; // Mặc định sắp xếp theo thời gian xem mới nhất
+            }
+
+            const history = await ViewHistory.aggregate([
+                { $match: query },
+                {
+                    $lookup: {
+                        from: "documents",
+                        localField: "documentId",
+                        foreignField: "_id",
+                        as: "document",
+                        pipeline: [
+                            { $match: { status: "approved" } },
+                            ...(categoryId
+                                ? [
+                                      {
+                                          $match: {
+                                              categoryId: new mongoose.Types.ObjectId(categoryId),
+                                          },
+                                      },
+                                  ]
+                                : []),
+                            ...(search
+                                ? [
+                                      {
+                                          $match: {
+                                              $or: [
+                                                  { title: { $regex: search, $options: "i" } },
+                                                  {
+                                                      description: {
+                                                          $regex: search,
+                                                          $options: "i",
+                                                      },
+                                                  },
+                                                  { tags: { $regex: search, $options: "i" } },
+                                              ],
+                                          },
+                                      },
+                                  ]
+                                : []),
+                        ],
+                    },
+                },
+                { $unwind: { path: "$document", preserveNullAndEmptyArrays: false } }, // Chỉ giữ bản ghi có document
+                {
+                    $lookup: {
+                        from: "categories",
+                        localField: "document.categoryId",
+                        foreignField: "_id",
+                        as: "document.category",
+                    },
+                },
+                { $unwind: { path: "$document.category", preserveNullAndEmptyArrays: true } },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "document.uploaderId",
+                        foreignField: "_id",
+                        as: "document.uploader",
+                    },
+                },
+                { $unwind: { path: "$document.uploader", preserveNullAndEmptyArrays: true } },
+                {
+                    $project: {
+                        documentId: {
+                            _id: "$document._id",
+                            title: "$document.title",
+                            slug: "$document.slug",
+                            description: "$document.description",
+                            thumbnailUrl: "$document.thumbnailUrl",
+                            format: "$document.format",
+                            tags: "$document.tags",
+                            viewCount: "$document.viewCount",
+                            downloadCount: "$document.downloadCount",
+                            favoriteCount: "$document.favoriteCount",
+                            createdAt: "$document.createdAt",
+                            category: {
+                                _id: { $ifNull: ["$document.category._id", null] },
+                                name: { $ifNull: ["$document.category.name", "Unknown"] },
+                                slug: { $ifNull: ["$document.category.slug", null] },
+                            },
+                            uploader: {
+                                _id: { $ifNull: ["$document.uploader._id", null] },
+                                name: { $ifNull: ["$document.uploader.name", "Unknown"] },
+                            },
+                        },
+                        viewedAt: 1,
+                    },
+                },
+                { $sort: sortOptions },
+                { $skip: skip },
+                { $limit: limit },
+            ]);
+
+            const totalDocs = await ViewHistory.aggregate([
+                { $match: query },
+                {
+                    $lookup: {
+                        from: "documents",
+                        localField: "documentId",
+                        foreignField: "_id",
+                        as: "document",
+                        pipeline: [
+                            { $match: { status: "approved" } },
+                            ...(categoryId
+                                ? [
+                                      {
+                                          $match: {
+                                              categoryId: new mongoose.Types.ObjectId(categoryId),
+                                          },
+                                      },
+                                  ]
+                                : []),
+                        ],
+                    },
+                },
+                { $unwind: { path: "$document", preserveNullAndEmptyArrays: false } },
+                { $count: "total" },
+            ]).then((result) => result[0]?.total || 0);
+
+            return getPagingData(history, totalDocs, page, limit);
         } catch (error) {
             logger.error("Lỗi getUserHistory:", error);
             throw error;
@@ -130,81 +309,318 @@ class UserService {
                 throw new Error("ID người dùng không hợp lệ");
             }
 
+            const { search, category, sort, startDate, endDate, dateField } = queryParams;
             const { page, limit, skip } = getPagination(queryParams);
 
-            const user = await User.findById(userId).populate({
-                path: "favoriteDocuments",
-                select: "title description createdAt", // Chỉ lấy các trường cần thiết
-                options: {
-                    sort: { createdAt: -1 },
-                    skip,
-                    limit,
+            const user = await User.findById(userId).lean();
+            if (!user) throw new Error("Không tìm thấy người dùng");
+
+            const query = { userId: new mongoose.Types.ObjectId(userId) };
+
+            // Lọc theo ngày yêu thích
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                    throw new Error("Định dạng ngày không hợp lệ");
+                }
+                if (start > end) {
+                    throw new Error("startDate phải trước endDate");
+                }
+                query.favoritedAt = { $gte: start, $lte: end };
+            }
+
+            // Lọc theo danh mục
+            let categoryId = null;
+            if (category) {
+                const categoryDoc = await Category.findOne({ slug: category }).lean();
+                if (!categoryDoc) {
+                    return getPagingData([], 0, page, limit);
+                }
+                categoryId = categoryDoc._id;
+            }
+
+            // Sắp xếp
+            const validSortFields = ["viewCount", "downloadCount", "favoriteCount", "favoritedAt"];
+            const sortOptions = {};
+            if (sort) {
+                const [field, order] = sort.split(":");
+                if (!validSortFields.includes(field)) {
+                    throw new Error("Trường sắp xếp không hợp lệ");
+                }
+                sortOptions[field] = order === "desc" ? -1 : 1;
+            } else {
+                sortOptions.favoritedAt = -1; // Mặc định sắp xếp theo ngày yêu thích mới nhất
+            }
+
+            const favorites = await Favorite.aggregate([
+                { $match: query },
+                {
+                    $lookup: {
+                        from: "documents",
+                        localField: "documentId",
+                        foreignField: "_id",
+                        as: "document",
+                        pipeline: [
+                            { $match: { status: "approved" } },
+                            ...(categoryId
+                                ? [
+                                      {
+                                          $match: {
+                                              categoryId: new mongoose.Types.ObjectId(categoryId),
+                                          },
+                                      },
+                                  ]
+                                : []),
+                            ...(search
+                                ? [
+                                      {
+                                          $match: {
+                                              $or: [
+                                                  { title: { $regex: search, $options: "i" } },
+                                                  {
+                                                      description: {
+                                                          $regex: search,
+                                                          $options: "i",
+                                                      },
+                                                  },
+                                                  { tags: { $regex: search, $options: "i" } },
+                                              ],
+                                          },
+                                      },
+                                  ]
+                                : []),
+                        ],
+                    },
+                },
+                { $unwind: { path: "$document", preserveNullAndEmptyArrays: false } },
+                {
+                    $lookup: {
+                        from: "categories",
+                        localField: "document.categoryId",
+                        foreignField: "_id",
+                        as: "document.category",
+                    },
+                },
+                { $unwind: { path: "$document.category", preserveNullAndEmptyArrays: true } },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "document.uploaderId",
+                        foreignField: "_id",
+                        as: "document.uploader",
+                    },
+                },
+                { $unwind: { path: "$document.uploader", preserveNullAndEmptyArrays: true } },
+                {
+                    $project: {
+                        _id: "$document._id",
+                        title: "$document.title",
+                        slug: "$document.slug",
+                        description: "$document.description",
+                        thumbnailUrl: "$document.thumbnailUrl",
+                        format: "$document.format",
+                        viewCount: "$document.viewCount",
+                        downloadCount: "$document.downloadCount",
+                        favoriteCount: "$document.favoriteCount",
+                        createdAt: "$document.createdAt",
+                        favoritedAt: 1,
+                        category: {
+                            _id: "$document.category._id",
+                            name: "$document.category.name",
+                            slug: "$document.category.slug",
+                        },
+                        uploader: {
+                            _id: "$document.uploader._id",
+                            name: "$document.uploader.name",
+                        },
+                    },
+                },
+                { $sort: sortOptions },
+                { $skip: skip },
+                { $limit: limit },
+            ]);
+
+            const totalDocs = await Favorite.countDocuments({
+                ...query,
+                documentId: {
+                    $in: (await Document.find({ status: "approved" }).select("_id")).map(
+                        (doc) => doc._id
+                    ),
                 },
             });
 
-            if (!user) throw new Error("Không tìm thấy người dùng");
-
-            const total = user.favoriteDocuments.length;
-
-            return getPagingData(user.favoriteDocuments, total, page, limit);
+            return getPagingData(favorites, totalDocs, page, limit);
         } catch (error) {
             logger.error("Lỗi getUserFavorites:", error);
             throw error;
         }
     }
 
-    static async toggleFavorite(userId, docId) {
-        try {
-            if (!mongoose.isValidObjectId(docId)) {
-                throw new Error("ID tài liệu không hợp lệ");
-            }
-
-            const document = await Document.findById(docId);
-            if (!document || document.status !== "approved") {
-                throw new Error("Tài liệu không tồn tại hoặc chưa được duyệt.");
-            }
-
-            const user = await User.findById(userId);
-            if (!user) throw new Error("Không tìm thấy người dùng");
-
-            const isFavorite = user.favoriteDocuments.includes(docId);
-            if (isFavorite) {
-                await User.updateOne({ _id: userId }, { $pull: { favoriteDocuments: docId } });
-            } else {
-                if (user.favoriteDocuments.length >= 100) {
-                    throw new Error("Danh sách yêu thích đã đạt giới hạn");
-                }
-                await User.updateOne({ _id: userId }, { $addToSet: { favoriteDocuments: docId } });
-            }
-
-            const updatedUser = await User.findById(userId).populate("favoriteDocuments");
-            return {
-                favorites: updatedUser.favoriteDocuments,
-                message: isFavorite ? "Đã xóa khỏi yêu thích" : "Đã thêm vào yêu thích",
-            };
-        } catch (error) {
-            logger.error("Lỗi toggleFavorite:", error);
-            throw error;
-        }
-    }
-
     static async getUserDownloads(userId, queryParams) {
         try {
+            if (!mongoose.isValidObjectId(userId)) {
+                throw new Error("ID người dùng không hợp lệ");
+            }
+
+            const { search, category, sort, startDate, endDate, dateField } = queryParams;
             const { page, limit, skip } = getPagination(queryParams);
 
-            const downloads = await Download.find({ userId })
-                .populate("documentId", "title slug")
-                .sort({ downloadedAt: -1 })
-                .skip(skip)
-                .limit(limit)
-                .lean();
+            const user = await User.findById(userId).lean();
+            if (!user) throw new Error("Không tìm thấy người dùng");
 
-            const total = await Download.countDocuments({ userId });
-            return getPagingData(downloads, total, page, limit);
+            const query = { userId: new mongoose.Types.ObjectId(userId) };
+
+            // Lọc theo danh mục
+            let categoryId = null;
+            if (category) {
+                const categoryDoc = await Category.findOne({ slug: category }).lean();
+                if (!categoryDoc) {
+                    return getPagingData([], 0, page, limit);
+                }
+                categoryId = categoryDoc._id;
+            }
+
+            // Lọc theo ngày tải xuống
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                    throw new Error("Định dạng ngày không hợp lệ");
+                }
+                if (start > end) {
+                    throw new Error("startDate phải trước endDate");
+                }
+                query.downloadedAt = { $gte: start, $lte: end };
+            }
+
+            // Sắp xếp
+            const validSortFields = ["viewCount", "downloadCount", "favoriteCount", "downloadedAt"];
+            const sortOptions = {};
+            if (sort) {
+                const [field, order] = sort.split(":");
+                if (!validSortFields.includes(field)) {
+                    throw new Error("Trường sắp xếp không hợp lệ");
+                }
+                sortOptions[field] = order === "desc" ? -1 : 1;
+            } else {
+                sortOptions.downloadedAt = -1; // Mặc định sắp xếp theo thời gian tải gần nhất
+            }
+
+            // Group để lấy bản ghi tải xuống mới nhất cho mỗi tài liệu
+            const downloads = await Download.aggregate([
+                { $match: query },
+                {
+                    $sort: { downloadedAt: -1 }, // Đảm bảo bản ghi mới nhất được giữ
+                },
+                {
+                    $group: {
+                        _id: "$documentId",
+                        userId: { $first: "$userId" },
+                        downloadedAt: { $first: "$downloadedAt" },
+                        ipAddress: { $first: "$ipAddress" },
+                        deviceInfo: { $first: "$deviceInfo" },
+                    },
+                },
+                {
+                    $lookup: {
+                        from: "documents",
+                        localField: "_id",
+                        foreignField: "_id",
+                        as: "document",
+                        pipeline: [
+                            { $match: { status: "approved" } },
+                            ...(categoryId
+                                ? [
+                                      {
+                                          $match: {
+                                              categoryId: new mongoose.Types.ObjectId(categoryId),
+                                          },
+                                      },
+                                  ]
+                                : []),
+                            ...(search
+                                ? [
+                                      {
+                                          $match: {
+                                              $or: [
+                                                  { title: { $regex: search, $options: "i" } },
+                                                  {
+                                                      description: {
+                                                          $regex: search,
+                                                          $options: "i",
+                                                      },
+                                                  },
+                                                  { tags: { $regex: search, $options: "i" } },
+                                              ],
+                                          },
+                                      },
+                                  ]
+                                : []),
+                        ],
+                    },
+                },
+                { $unwind: { path: "$document", preserveNullAndEmptyArrays: false } },
+                {
+                    $lookup: {
+                        from: "categories",
+                        localField: "document.categoryId",
+                        foreignField: "_id",
+                        as: "document.category",
+                    },
+                },
+                { $unwind: { path: "$document.category", preserveNullAndEmptyArrays: true } },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "document.uploaderId",
+                        foreignField: "_id",
+                        as: "document.uploader",
+                    },
+                },
+                { $unwind: { path: "$document.uploader", preserveNullAndEmptyArrays: true } },
+                {
+                    $project: {
+                        _id: "$document._id",
+                        title: "$document.title",
+                        slug: "$document.slug",
+                        description: "$document.description",
+                        thumbnailUrl: "$document.thumbnailUrl",
+                        format: "$document.format",
+                        viewCount: "$document.viewCount",
+                        downloadCount: "$document.downloadCount",
+                        favoriteCount: "$document.favoriteCount",
+                        createdAt: "$document.createdAt",
+                        downloadedAt: 1,
+                        category: {
+                            _id: "$document.category._id",
+                            name: "$document.category.name",
+                            slug: "$document.category.slug",
+                        },
+                        uploader: {
+                            _id: "$document.uploader._id",
+                            name: "$document.uploader.name",
+                        },
+                    },
+                },
+                { $sort: sortOptions },
+                { $skip: skip },
+                { $limit: limit },
+            ]);
+
+            // Đếm tổng số tài liệu duy nhất
+            const totalDocs = await Download.aggregate([
+                { $match: query },
+                { $group: { _id: "$documentId" } },
+                { $count: "total" },
+            ]).then((result) => result[0]?.total || 0);
+
+            return getPagingData(downloads, totalDocs, page, limit);
         } catch (error) {
             logger.error("Lỗi getUserDownloads:", error);
             throw error;
         }
     }
 }
+
 module.exports = UserService;

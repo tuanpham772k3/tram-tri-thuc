@@ -67,7 +67,9 @@ export default function DocumentDetailPage() {
                     animate={{ opacity: 1 }}
                     className="p-6 text-red-500 text-center text-lg font-medium bg-red-50 rounded-lg"
                 >
-                    {error}
+                    {typeof error === "string"
+                        ? error
+                        : error.message || "Đã xảy ra lỗi không xác định"}
                 </motion.p>
             );
         }

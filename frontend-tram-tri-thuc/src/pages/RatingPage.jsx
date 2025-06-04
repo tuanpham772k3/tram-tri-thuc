@@ -88,9 +88,15 @@ const RatingPage = () => {
     // Đồng bộ selectedDocument với currentDocument
     useEffect(() => {
         if (currentDocument) {
-            setSelectedDocument(currentDocument);
+            const updatedDocument = {
+                ...currentDocument,
+                averageRating: averageRating.avgScore || 0,
+                totalRatings: averageRating.totalRatings || 0,
+            };
+            setSelectedDocument(updatedDocument);
+            console.log("SelectedDocument:", updatedDocument);
         }
-    }, [currentDocument]);
+    }, [currentDocument, averageRating]);
 
     // Xử lý lỗi
     useEffect(() => {
@@ -105,15 +111,6 @@ const RatingPage = () => {
         dispatch(fetchRatingsByDocument({ documentId: docId, params: { page: 1, limit: 10 } }));
         dispatch(fetchAverageRating(docId));
         dispatch(fetchRatingDistribution(docId));
-    };
-
-    // Xử lý yêu thích
-    const handleToggleFavorite = (docId) => {
-        dispatch(toggleFavorite(docId)).then((result) => {
-            if (result.meta.requestStatus === "rejected") {
-                toast.error(result.payload.message);
-            }
-        });
     };
 
     // Xử lý gửi đánh giá
@@ -176,18 +173,6 @@ const RatingPage = () => {
                                     <Award className="w-3 h-3" />
                                     <span>{doc.downloadCount.toLocaleString()}</span>
                                 </div>
-                                <Button
-                                    type="text"
-                                    size="small"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleToggleFavorite(doc._id);
-                                    }}
-                                >
-                                    <Heart
-                                        className={`w-4 h-4 ${doc.isFavorite ? "fill-red-500 text-red-500" : ""}`}
-                                    />
-                                </Button>
                             </div>
                         </div>
                     </div>

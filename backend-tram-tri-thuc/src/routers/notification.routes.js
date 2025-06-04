@@ -11,6 +11,7 @@ const {
     deleteNotification,
     deleteAllNotifications,
     broadcastNotification,
+    markAsUnread,
 } = require("../controller/notification.controller");
 const { body, param, query } = require("express-validator");
 
@@ -62,6 +63,9 @@ router.patch(
     markNotificationAsRead
 );
 
+router.patch("/notifications/:id/unread", authMiddleware, markAsUnread);
+
+
 // Đánh dấu tất cả thông báo là đã đọc
 router.patch("/notifications/read-all", authMiddleware, markAllNotificationsAsRead);
 
@@ -76,19 +80,5 @@ router.delete(
 // Xoá tất cả thông báo của người dùng
 router.delete("/notifications", authMiddleware, deleteAllNotifications);
 
-// Gửi thông quan trọng báo đến tất cả người dùng (lỗi server, bảo trì, v.v.)
-router.post(
-    "/notifications/broadcast",
-    authMiddleware,
-    isAdmin,
-    // notificationLimiter,
-    [
-        body("target").isIn(["all", "uploader", "admin"]).withMessage("Target không hợp lệ"),
-        body("message").notEmpty().trim().withMessage("Nội dung không được rỗng"),
-        body("type").equals("system").withMessage("Loại thông báo phải là system"),
-        validate,
-    ],
-    broadcastNotification
-);
 
 module.exports = router;

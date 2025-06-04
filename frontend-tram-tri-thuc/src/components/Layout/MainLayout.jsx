@@ -7,7 +7,7 @@ export default function MainLayout() {
         <div className="min-h-screen flex flex-col">
             {/* Navbar at top */}
             <Navbar />
-            
+
             <div className="flex flex-1">
                 {/* Fixed Sidebar */}
                 <div className="w-64 fixed left-0 top-16 h-[calc(100vh-4rem)]">
