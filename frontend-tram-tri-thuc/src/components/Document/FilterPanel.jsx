@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Sliders, RefreshCw, Filter } from "lucide-react";
 import showToast from "../../utils/toast";
 
 export default function FilterPanel({
@@ -64,18 +65,25 @@ export default function FilterPanel({
     };
 
     return (
-        <div className="p-4 bg-white/80 backdrop-blur-sm rounded-lg shadow-md">
-            <h4 className="font-medium text-sm text-gray-700 mb-2">🎛 Bộ lọc</h4>
-            <div className="flex flex-col gap-3">
+        <div className="p-2 bg-white/80 backdrop-blur-xl rounded-xl shadow border border-gray-100">
+            <div className="flex items-center gap-2 mb-1">
+                <Filter className="w-4 h-4 text-blue-500" />
+                <h4 className="font-semibold text-sm text-gray-700 tracking-wide uppercase">Bộ lọc</h4>
+            </div>
+            <div className="flex flex-wrap gap-1.5 md:gap-2 items-end">
                 {/* Dynamic Filters */}
                 {filtersConfig.map((filter) => (
-                    <div key={filter.key} className="flex flex-col gap-1">
-                        <label className="text-sm text-gray-600">{filter.label}</label>
+                    <div key={filter.key} className="flex flex-col gap-0.5 min-w-[90px] flex-grow">
+                        <label className="text-xs font-medium text-gray-500 flex items-center gap-1 mb-0.5">
+                            {filter.type === "select" && <Sliders className="w-3 h-3 text-blue-400" />}
+                            {filter.type === "date" && <Sliders className="w-3 h-3 text-emerald-400" />}
+                            {filter.label}
+                        </label>
                         {filter.type === "select" && (
                             <select
                                 value={localFilters[filter.key] || ""}
                                 onChange={(e) => handleChange(filter.key, e.target.value)}
-                                className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                className="w-full border border-gray-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white/70 shadow-sm transition"
                             >
                                 <option value="">{filter.placeholder || "Tất cả"}</option>
                                 {filter.options?.map((option) => (
@@ -99,7 +107,7 @@ export default function FilterPanel({
                                             )
                                         )
                                     }
-                                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 h-24"
+                                    className="w-full border border-gray-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white/70 shadow-sm h-14"
                                 >
                                     {filter.options?.map((option) => (
                                         <option key={option.value} value={option.value}>
@@ -107,19 +115,19 @@ export default function FilterPanel({
                                         </option>
                                     ))}
                                 </select>
-                                <p className="text-xs text-gray-500 mt-1">
-                                    Giữ Ctrl (Windows) hoặc Cmd (Mac) để chọn nhiều danh mục
+                                <p className="text-[10px] text-gray-400 mt-0.5">
+                                    Giữ Ctrl (Windows) hoặc Cmd (Mac) để chọn nhiều
                                 </p>
                             </div>
                         )}
                         {filter.type === "date" && (
-                            <div className="flex gap-2">
+                            <div className="flex gap-1">
                                 <input
                                     type="date"
                                     placeholder={filter.placeholder || ""}
                                     value={localFilters[filter.key] || ""}
                                     onChange={(e) => handleChange(filter.key, e.target.value)}
-                                    className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                    className="w-full border border-gray-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-400 bg-white/70 shadow-sm"
                                 />
                                 {filter.key === "startDate" && (
                                     <input
@@ -127,7 +135,7 @@ export default function FilterPanel({
                                         placeholder="Ngày kết thúc"
                                         value={localFilters.endDate || ""}
                                         onChange={(e) => handleChange("endDate", e.target.value)}
-                                        className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                        className="w-full border border-gray-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-400 bg-white/70 shadow-sm"
                                     />
                                 )}
                             </div>
@@ -137,12 +145,14 @@ export default function FilterPanel({
 
                 {/* Date Field Selector */}
                 {!hideDateField && (localFilters.startDate || localFilters.endDate) && (
-                    <div className="flex flex-col gap-1">
-                        <label className="text-sm text-gray-600">Lọc theo trường ngày</label>
+                    <div className="flex flex-col gap-0.5 min-w-[90px] flex-grow">
+                        <label className="text-xs font-medium text-gray-500 flex items-center gap-1 mb-0.5">
+                            <Sliders className="w-3 h-3 text-blue-400" />Trường ngày
+                        </label>
                         <select
                             value={localFilters.dateField || "createdAt"}
                             onChange={(e) => handleChange("dateField", e.target.value)}
-                            className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                            className="w-full border border-gray-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white/70 shadow-sm"
                         >
                             <option value="createdAt">Ngày tạo</option>
                             <option value="updatedAt">Ngày cập nhật</option>
@@ -150,17 +160,16 @@ export default function FilterPanel({
                     </div>
                 )}
 
-                {/* Date Error */}
-                {dateError && <p className="text-red-500 text-xs">{dateError}</p>}
-
                 {/* Sort Options */}
                 {sortOptions.length > 0 && (
-                    <div className="flex flex-col gap-1">
-                        <label className="text-sm text-gray-600">Sắp xếp</label>
+                    <div className="flex flex-col gap-0.5 min-w-[90px] flex-grow">
+                        <label className="text-xs font-medium text-gray-500 flex items-center gap-1 mb-0.5">
+                            <Sliders className="w-3 h-3 text-blue-400" />Sắp xếp
+                        </label>
                         <select
                             value={localFilters.sort}
                             onChange={(e) => handleChange("sort", e.target.value)}
-                            className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+                            className="w-full border border-gray-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white/70 shadow-sm"
                         >
                             {sortOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
@@ -172,26 +181,28 @@ export default function FilterPanel({
                 )}
 
                 {/* Action Buttons */}
-                <div className="flex gap-2 mt-2">
+                <div className="flex gap-2 mt-1 mb-1">
                     <button
                         onClick={handleApplyFilters}
                         disabled={dateError}
-                        className={`px-4 py-1 rounded text-sm transition ${
-                            dateError
-                                ? "bg-gray-300 cursor-not-allowed"
-                                : "bg-blue-500 text-white hover:bg-blue-600"
-                        }`}
+                        className={`flex items-center gap-1 px-3 py-1 rounded-md text-xs font-semibold transition shadow focus:outline-none focus:ring-1 focus:ring-blue-400
+                            ${dateError
+                                ? "bg-gray-200 cursor-not-allowed text-gray-400"
+                                : "bg-gradient-to-r from-blue-500 to-emerald-500 text-white hover:from-blue-600 hover:to-emerald-600"}
+                        `}
                     >
-                        Áp dụng bộ lọc
+                        <Sliders className="w-3 h-3" /> Áp dụng
                     </button>
                     <button
                         onClick={handleResetFilters}
-                        className="bg-gray-500 text-white px-4 py-1 rounded text-sm hover:bg-gray-600 transition"
+                        className="flex items-center gap-1 bg-gradient-to-r from-gray-400 to-gray-600 text-white px-3 py-1 rounded-md text-xs font-semibold hover:from-gray-500 hover:to-gray-700 transition shadow focus:outline-none focus:ring-1 focus:ring-gray-400"
                     >
-                        Xóa bộ lọc
+                        <RefreshCw className="w-3 h-3" /> Xóa
                     </button>
                 </div>
             </div>
+            {/* Date Error */}
+            {dateError && <p className="text-red-500 text-xs font-semibold mt-1">{dateError}</p>}
         </div>
     );
 }

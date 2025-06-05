@@ -118,8 +118,17 @@ export default function CategoryPage() {
     }, [filters, sortOptions]);
 
     return (
-        <div className="min-h-screen relative pt-16 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
+        <div className="min-h-screen relative pt-16">
+            {/* Background Gradients */}
+            <div className="absolute inset-0 z-0 overflow-hidden">
+                <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-blue-200 to-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+                <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-emerald-200 to-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+                <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-br from-purple-200 to-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-white to-gray-50 opacity-90"></div>
+            </div>
+
             <div className="relative z-10 max-w-6xl mx-auto px-4">
+                
                 <h1 className="text-3xl font-bold text-gray-900 mb-6">
                     📁 Danh mục: {currentCategory?.name || slug.replace(/-/g, " ")}
                 </h1>

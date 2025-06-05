@@ -135,7 +135,12 @@ const NotificationPage = ({ className = "" }) => {
 
     return (
         // Container chính với gradient background
-        <div className={`pt-8 pb-16 ${className}`}>
+        <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden pt-8 pb-16 ${className}`}>
+            {/* Background decoration */}
+            <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl"></div>
+                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-cyan-400/20 to-blue-600/20 rounded-full blur-3xl"></div>
+            </div>
             {/* Nội dung chính */}
             <div className="relative z-10 pt-8 pb-16">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -1,22 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import {
-    FaBook,
-    FaGraduationCap,
-    FaPencilAlt,
-    FaLightbulb,
-    FaBrain,
-    FaChalkboardTeacher,
-    FaBookReader,
-    FaAtom,
-    FaUniversity,
-    FaUserGraduate,
-    FaSchool,
-    FaBookOpen,
-    FaDesktop,
-    FaCalculator,
-} from "react-icons/fa";
+
 import SearchBar from "../../components/Document/SearchBar";
 import FilterPanel from "../../components/Document/FilterPanel";
 import DocumentList from "../../components/Document/DocumentList";
@@ -166,56 +151,12 @@ const MyFavoritesDocuments = () => {
     );
 
     return (
-        <div className="min-h-screen relative -mt-16">
-            {/* Background Base */}
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
-                <div
-                    className="absolute inset-0 opacity-5"
-                    style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                        backgroundSize: "30px 30px",
-                    }}
-                />
-            </div>
-
-            {/* Animated Background Elements */}
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+            {/* Background decoration */}
             <div className="absolute inset-0 overflow-hidden">
-                {/* Tương tự MyDownloadedHistory, giữ nguyên animation */}
-                <div className="absolute w-full h-full">
-                    <div
-                        className="absolute w-96 h-96 bg-gradient-to-r from-emerald-200 to-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float-slow"
-                        style={{ top: "10%", left: "15%" }}
-                    />
-                    <div
-                        className="absolute text-emerald-600 opacity-50 animate-float-icon-1"
-                        style={{ top: "15%", left: "20%" }}
-                    >
-                        <FaGraduationCap className="w-20 h-20" />
-                    </div>
-                    {/* ... giữ nguyên các animation khác ... */}
-                </div>
-                <div className="absolute inset-0">
-                    {[
-                        {
-                            icon: FaBrain,
-                            color: "emerald-500",
-                            top: "35%",
-                            right: "35%",
-                            delay: "icon-4",
-                        },
-                        // ... giữ nguyên các icon khác ...
-                    ].map(({ icon: Icon, color, top, right, bottom, left, delay }, index) => (
-                        <div
-                            key={index}
-                            className={`absolute text-${color} opacity-30 animate-float-${delay}`}
-                            style={{ top, right, bottom, left }}
-                        >
-                            <Icon className="w-10 h-10" />
-                        </div>
-                    ))}
-                </div>
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl"></div>
+                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-cyan-400/20 to-blue-600/20 rounded-full blur-3xl"></div>
             </div>
-
             {/* Content */}
             <div className="relative z-10 pt-16">
                 <motion.div

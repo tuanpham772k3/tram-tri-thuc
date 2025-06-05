@@ -182,9 +182,14 @@ const RatingPage = () => {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl"></div>
+                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-cyan-400/20 to-blue-600/20 rounded-full blur-3xl"></div>
+            </div>
             {/* Header */}
-            <div className="bg-white shadow-sm border-b">
+            <div className="bg-white shadow-sm border-b relative z-10">
                 <div className="max-w-7xl mx-auto px-6 py-4">
                     <div className="flex items-center justify-between">
                         <div>
@@ -229,7 +234,7 @@ const RatingPage = () => {
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-6 py-8">
+            <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Sidebar - Danh sách tài liệu */}
                     <div className="lg:col-span-1">
