@@ -39,9 +39,25 @@ export default function DocumentCard({ document, type }) {
 
     const tags = document.tag ? document.tag.split(",").map((tag) => tag.trim()) : [];
 
+    // Hàm format ngày giờ
+    const formatDateTime = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleString("vi-VN", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    };
+
     return (
         <motion.div
-            whileHover={{ translateY: -5, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)" }}
+            whileHover={{
+                translateY: -5,
+                boxShadow:
+                    "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+            }}
             transition={{ duration: 0.2 }}
             className="relative h-full bg-white rounded-xl shadow-md p-6 flex flex-col justify-between border border-gray-100 hover:shadow-lg transition-all duration-300"
         >
@@ -60,29 +76,26 @@ export default function DocumentCard({ document, type }) {
                 </p>
 
                 {/* Dynamic date info based on type */}
-                {(type === "download" && document.downloadedAt) && (
+                {type === "download" && document.downloadedAt && (
                     <p className="text-xs text-gray-500 flex items-center gap-1 mt-2">
                         <Download size={12} className="text-blue-400" />
-                        Tải xuống:{" "}
-                        {new Date(document.downloadedAt).toLocaleDateString("vi-VN", { dateStyle: "medium", timeStyle: "short" })}
+                        Tải xuống: {formatDateTime(document.downloadedAt)}
                     </p>
                 )}
-                {(type === "favorite" && document.favoritedAt) && (
+                {type === "favorite" && document.favoritedAt && (
                     <p className="text-xs text-gray-500 flex items-center gap-1 mt-2">
                         <Heart size={12} className="text-red-400" />
-                        Yêu thích:{" "}
-                        {new Date(document.favoritedAt).toLocaleDateString("vi-VN", { dateStyle: "medium", timeStyle: "short" })}
+                        Yêu thích: {formatDateTime(document.favoritedAt)}
                     </p>
                 )}
-                {(type === "view" && document.viewedAt) && (
+                {type === "view" && document.viewedAt && (
                     <p className="text-xs text-gray-500 flex items-center gap-1 mt-2">
                         <Eye size={12} className="text-green-400" />
-                        Xem:{" "}
-                        {new Date(document.viewedAt).toLocaleDateString("vi-VN", { dateStyle: "medium", timeStyle: "short" })}
+                        Xem: {formatDateTime(document.viewedAt)}
                     </p>
                 )}
             </div>
-            
+
             {/* Tags */}
             {tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-4">
@@ -112,7 +125,10 @@ export default function DocumentCard({ document, type }) {
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                     >
-                        <Heart size={16} className={isFavorite ? "fill-red-600" : "fill-none stroke-gray-600"} />
+                        <Heart
+                            size={16}
+                            className={isFavorite ? "fill-red-600" : "fill-none stroke-gray-600"}
+                        />
                         <span>{favoriteCount}</span>
                     </motion.button>
                 </div>

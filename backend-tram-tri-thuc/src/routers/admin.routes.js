@@ -4,27 +4,38 @@ const authMiddleware = require("../middlewares/authMiddleware");
 const validate = require("../middlewares/validate");
 const { param, body, query } = require("express-validator");
 const isAdmin = require("../middlewares/isAdmin");
-const { getAllComments, forceDeleteComment } = require("../controller/admin.controller");
+const {
+    getViewStatsByMonth,
+    getUsersWithPagination,
+    getDocumentsWithPagination,
+    approveDocument,
+    rejectDocument,
+    getCategories,
+    createCategory,
+    getCategoryById,
+    updateCategory,
+    deleteCategory,
+    updateDocumentFeatured,
+    getSystemStats,
+} = require("../controller/admin.controller");
 
-// Comment: Lấy toàn bộ bình luận
-router.get(
-    "/comments",
-    authMiddleware,
-    isAdmin,
-    [
-        query("isReported").optional().isBoolean().withMessage("isReported phải là boolean"),
-        validate,
-    ],
-    getAllComments
-);
+//  thống kê lượt xem hằng tháng
+router.get("/viewstatistics", authMiddleware, isAdmin, getViewStatsByMonth);
+router.get("/totalinfo", authMiddleware, isAdmin, getSystemStats);
+// lấy danh sách người dùng
+router.get("/users", authMiddleware, isAdmin, getUsersWithPagination);
 
-// Comment: Xóa bình luận vi phạm
-router.delete(
-    "/comments/:commentId/force",
-    authMiddleware,
-    isAdmin,
-    [param("commentId").isMongoId().withMessage("ID bình luận không hợp lệ"), validate],
-    forceDeleteComment
-);
+// lấy tất cả các tài liệu
+router.get("/document", authMiddleware, isAdmin, getDocumentsWithPagination);
+router.put("/approveDocument", authMiddleware, isAdmin, approveDocument);
+router.put("/rejectDocument", authMiddleware, isAdmin, rejectDocument);
+router.put("/featuredDocument", authMiddleware, isAdmin, updateDocumentFeatured);
+
+// Category
+router.post("/categories", authMiddleware, isAdmin, createCategory);
+router.get("/categories", authMiddleware, isAdmin, getCategories);
+router.get("/categories/:categoryId", authMiddleware, isAdmin, getCategoryById);
+router.put("/categories/:categoryId", authMiddleware, isAdmin, updateCategory);
+router.delete("/categories/:categoryId", authMiddleware, isAdmin, deleteCategory);
 
 module.exports = router;

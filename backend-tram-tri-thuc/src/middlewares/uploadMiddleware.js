@@ -4,7 +4,7 @@ const fs = require("fs");
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const uploadDir = path.join(__dirname, "../../uploads");
+        const uploadDir = path.join(__dirname, "../../Uploads");
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
         }
@@ -18,14 +18,30 @@ const storage = multer.diskStorage({
 
 const fileFilter = (req, file, cb) => {
     const allowedTypes = [
+        // PDF
         "application/pdf",
+        // Images
         "image/jpeg",
         "image/png",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "application/vnd.ms-powerpoint",
-        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "image/gif",
+        "image/webp",
+        // Office Documents
+        "application/msword", // .doc
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+        "application/vnd.ms-excel", // .xls
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+        "application/vnd.ms-powerpoint", // .ppt
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation", // .pptx
+        // Media
+        "video/mp4",
+        "video/webm",
+        "audio/mpeg", // .mp3
+        "audio/wav",
+        // Text
+        "text/plain",
+        // Archives
         "application/zip",
+        "application/x-rar-compressed",
     ];
     if (allowedTypes.includes(file.mimetype)) {
         cb(null, true);
@@ -37,7 +53,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
     storage,
     fileFilter,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+    limits: { fileSize: 25 * 1024 * 1024 }, // Giới hạn 25MB
 }).fields([
     { name: "file", maxCount: 1 },
     { name: "thumbnail", maxCount: 1 },

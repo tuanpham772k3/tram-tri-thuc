@@ -1,16 +1,29 @@
+require("dotenv").config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 const cors = require("cors");
-const dotenv = require("dotenv");
 const connectDB = require("./config/db.config.js");
 const http = require("http");
 const socketIo = require("socket.io");
+const apiRoutes = require("./routers/index.js");
 
-dotenv.config();
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    // nếu có thể, thêm các domain production hoặc staging tại đây
+];
 
 // Cấu hình CORS
 const corsOptions = {
-    origin: process.env.CLIENT_URL || "http://localhost:5173", // Origin của frontend
+    origin: function (origin, callback) {
+        // Nếu không có origin (ví dụ: request từ Postman) thì cho phép
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("CORS policy: This origin is not allowed."));
+        }
+    },
     credentials: true, // Cho phép gửi cookie/credentials
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // Các method được phép
     allowedHeaders: ["Content-Type", "Authorization", "Cache-Control", "Pragma", "Expires"], // Headers được phép
@@ -20,7 +33,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: {
-        origin: process.env.CLIENT_URL || "http://localhost:5173",
+        origin: allowedOrigins,
         methods: ["GET", "POST"],
     },
 });
@@ -66,11 +79,12 @@ app.options("*", cors(corsOptions)); // Xử lý preflight request
 app.use(cookieParser());
 app.use(express.json());
 
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+
 // Connect to MongoDB
 connectDB();
 
 // Import routes
-const apiRoutes = require("./routers/index.js");
 const logger = require("./utils/logger.js");
 app.use("/api/v1", apiRoutes);
 

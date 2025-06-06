@@ -7,6 +7,7 @@ import RatingStars from "../components/Rating/RatingStar";
 import { fetchDocumentBySlug, toggleFavorite } from "../store/slices/documentSlice";
 import { motion } from "framer-motion";
 import { Heart, FileText, User, Calendar, Eye } from "lucide-react";
+import DocumentViewer from "../components/Document/DocumentViewer";
 
 export default function DocumentDetailPage() {
     const { slug } = useParams();
@@ -47,7 +48,9 @@ export default function DocumentDetailPage() {
                         <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-r-purple-400 rounded-full animate-spin animate-reverse"></div>
                     </div>
                     <div className="text-center">
-                        <p className="text-xl font-semibold text-gray-700 mb-2">Đang tải tài liệu...</p>
+                        <p className="text-xl font-semibold text-gray-700 mb-2">
+                            Đang tải tài liệu...
+                        </p>
                         <p className="text-sm text-gray-500">Vui lòng chờ trong giây lát</p>
                     </div>
                 </div>
@@ -87,12 +90,23 @@ export default function DocumentDetailPage() {
                         <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <FileText className="w-8 h-8 text-orange-500" />
                         </div>
-                        <h3 className="text-lg font-semibold text-orange-800 mb-2">Không tìm thấy tài liệu</h3>
-                        <p className="text-orange-600">Tài liệu bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
+                        <h3 className="text-lg font-semibold text-orange-800 mb-2">
+                            Không tìm thấy tài liệu
+                        </h3>
+                        <p className="text-orange-600">
+                            Tài liệu bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
+                        </p>
                     </div>
                 </motion.div>
             );
         }
+
+        // ✅ BƯỚC 1: Xác định URL của backend.
+        // Cách tốt nhất là dùng biến môi trường (ví dụ: VITE_API_URL=http://localhost:5000)
+        const backendUrl = "http://localhost:5000";
+
+        // ✅ BƯỚC 2: Tạo URL đầy đủ cho file để component DocumentViewer có thể truy cập.
+        const fullFileUrl = `${backendUrl}${currentDocument.fileUrl}`;
 
         return (
             <div className="max-w-6xl mx-auto space-y-8">
@@ -115,15 +129,24 @@ export default function DocumentDetailPage() {
                                     </h1>
                                 </div>
                             </div>
-                            
+
                             <div className="flex items-center space-x-6 text-sm text-gray-600 mb-4">
                                 <div className="flex items-center space-x-2">
                                     <User className="w-4 h-4" />
-                                    <span>Tác giả: <span className="font-medium">{currentDocument.uploaderId?.name || "Unknown"}</span></span>
+                                    <span>
+                                        Tác giả:{" "}
+                                        <span className="font-medium">
+                                            {currentDocument.uploaderId?.name || "Unknown"}
+                                        </span>
+                                    </span>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                     <Calendar className="w-4 h-4" />
-                                    <span>{new Date(currentDocument.createdAt).toLocaleDateString('vi-VN')}</span>
+                                    <span>
+                                        {new Date(currentDocument.createdAt).toLocaleDateString(
+                                            "vi-VN"
+                                        )}
+                                    </span>
                                 </div>
                             </div>
 
@@ -140,16 +163,16 @@ export default function DocumentDetailPage() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             className={`flex items-center space-x-2 px-6 py-3 rounded-2xl font-medium transition-all duration-300 ${
-                                isFavorite 
-                                    ? "bg-red-500 text-white shadow-lg shadow-red-500/25" 
+                                isFavorite
+                                    ? "bg-red-500 text-white shadow-lg shadow-red-500/25"
                                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                             }`}
                             onClick={handleToggleFavorite}
                             disabled={userLoading}
                         >
-                            <Heart 
-                                size={18} 
-                                className={`${isFavorite ? "fill-current" : "fill-none"} transition-all duration-300`} 
+                            <Heart
+                                size={18}
+                                className={`${isFavorite ? "fill-current" : "fill-none"} transition-all duration-300`}
                             />
                             <span>{favoriteCount} Yêu thích</span>
                         </motion.button>
@@ -161,47 +184,14 @@ export default function DocumentDetailPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
-                    className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 overflow-hidden"
                 >
-                    <div className="p-8">
-                        <div className="flex items-center space-x-3 mb-6">
-                            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-teal-600 rounded-xl flex items-center justify-center">
-                                <Eye className="w-5 h-5 text-white" />
-                            </div>
-                            <h3 className="text-2xl font-bold text-gray-800">Xem nội dung tài liệu</h3>
-                        </div>
-                        
-                        {currentDocument.fileUrl ? (
-                            currentDocument.fileType === "application/pdf" ? (
-                                <div className="relative bg-gray-50 rounded-2xl overflow-hidden" style={{ paddingTop: "70%" }}>
-                                    <iframe
-                                        src={currentDocument.fileUrl}
-                                        className="absolute top-0 left-0 w-full h-full border-0"
-                                        title="Document Viewer"
-                                        allowFullScreen
-                                    >
-                                        Trình duyệt của bạn không hỗ trợ hiển thị PDF.
-                                    </iframe>
-                                </div>
-                            ) : (
-                                <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-8 text-center">
-                                    <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <FileText className="w-8 h-8 text-yellow-600" />
-                                    </div>
-                                    <h4 className="text-lg font-semibold text-yellow-800 mb-2">Không thể xem trước</h4>
-                                    <p className="text-yellow-700">Không thể xem trước tài liệu loại này trực tiếp. Vui lòng tải xuống để xem.</p>
-                                </div>
-                            )
-                        ) : (
-                            <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8 text-center">
-                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <FileText className="w-8 h-8 text-gray-400" />
-                                </div>
-                                <h4 className="text-lg font-semibold text-gray-700 mb-2">Không có file đính kèm</h4>
-                                <p className="text-gray-600">Tài liệu này không có file đính kèm để xem trước.</p>
-                            </div>
-                        )}
-                    </div>
+                    <DocumentViewer
+                        fileUrl={fullFileUrl}
+                        fileType={currentDocument.mimeType}
+                        fileName={currentDocument.fileName || currentDocument.title}
+                        title="Xem nội dung tài liệu"
+                        height="700px"
+                    />
                 </motion.div>
 
                 {/* Comments Section */}

@@ -94,7 +94,7 @@ export const downloadDocument = createAsyncThunk(
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
 
-            showToast("success", "Tải tài liệu thành công.");
+            // showToast("success", "Tải tài liệu thành công.");
             return { id, fileName };
         } catch (error) {
             console.error("Download error:", error);
