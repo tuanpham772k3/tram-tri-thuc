@@ -1,10 +1,10 @@
 const winston = require("winston");
 
 const logger = winston.createLogger({
-    level: "info",// Ghi tất cả log từ info trở lên (info, warn, error)
+    level: "info", // Ghi tất cả log từ info trở lên (info, warn, error)
     format: winston.format.combine(
-        winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),// Thêm thời gian
-        winston.format.json()// Định dạng JSON cho log
+        winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // Thêm thời gian
+        winston.format.json() // Định dạng JSON cho log
     ),
     transports: [
         // Ghi lỗi vào error.log

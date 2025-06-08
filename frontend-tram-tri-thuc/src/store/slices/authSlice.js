@@ -11,9 +11,16 @@ export const registerThunk = createAsyncThunk(
     async (formData, { rejectWithValue }) => {
         try {
             const res = await customAxios.post("/auth/register", formData);
+            showToast(
+                "success",
+                res.data.message ||
+                    "Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản."
+            );
             return res.data.data;
         } catch (err) {
-            return rejectWithValue(err.response?.data || { message: "Lỗi đăng ký." });
+            const message = err.response?.data?.message || "Lỗi đăng ký.";
+            showToast("error", message);
+            return rejectWithValue({ message });
         }
     }
 );
@@ -29,6 +36,7 @@ export const loginThunk = createAsyncThunk(
             }
             localStorage.setItem("accessToken", res.data.data.accessToken);
             await dispatch(fetchUserInfo()).unwrap();
+            showToast("success", res.data.message || "Đăng nhập thành công!");
             return res.data.data;
         } catch (err) {
             const status = err.response?.status;
@@ -57,10 +65,13 @@ export const refreshTokenThunk = createAsyncThunk(
     async (_, { rejectWithValue, dispatch }) => {
         try {
             const res = await customAxios.post("/auth/refresh-token", {});
+            showToast("success", res.data.message || "Làm mới token thành công!");
             return res.data.data; // { accessToken }
         } catch (err) {
-            dispatch(logoutThunk()); // Đăng xuất nếu refresh thất bại
-            return rejectWithValue(err.response?.data || { message: "Làm mới token thất bại." });
+            dispatch(logoutThunk());
+            const message = err.response?.data?.message || "Làm mới token thất bại.";
+            showToast("error", "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+            return rejectWithValue({ message });
         }
     }
 );
@@ -69,9 +80,12 @@ export const refreshTokenThunk = createAsyncThunk(
 export const logoutThunk = createAsyncThunk("auth/logout", async (_, { rejectWithValue }) => {
     try {
         await customAxios.post("/auth/logout", {});
+        showToast("success", "Đăng xuất thành công!");
         return true;
     } catch (err) {
-        return rejectWithValue(err.response?.data || { message: "Lỗi đăng xuất." });
+        const message = err.response?.data?.message || "Lỗi đăng xuất.";
+        showToast("error", message);
+        return rejectWithValue({ message });
     }
 });
 
@@ -81,7 +95,10 @@ export const forgotPasswordThunk = createAsyncThunk(
     async (email, { rejectWithValue }) => {
         try {
             const res = await customAxios.post("/auth/forgot-password", { email });
-            showToast("success", res.data.message);
+            showToast(
+                "success",
+                res.data.message || "Link đặt lại mật khẩu đã được gửi tới email của bạn."
+            );
             return res.data;
         } catch (err) {
             const message = err.response?.data?.message || "Không thể gửi yêu cầu.";
@@ -97,15 +114,48 @@ export const resetPasswordThunk = createAsyncThunk(
     async ({ token, newPassword }, { rejectWithValue }) => {
         try {
             console.log("Sending reset password request", { token, newPassword });
-            const res = await customAxios.post("/auth/reset-password", {
+            const res = await customAxios.post(`/auth/reset-password`, {
                 token,
                 newPassword,
             });
             console.log("Reset password response", res.data);
-            showToast("success", res.data.message);
+            showToast("success", res.data.message || "Mật khẩu được đặt lại thành công!");
             return res.data;
         } catch (err) {
             const message = err.response?.data?.message || "Không thể đặt lại mật khẩu.";
+            showToast("error", message);
+            return rejectWithValue({ message });
+        }
+    }
+);
+
+// Xác thực email
+export const verifyEmailThunk = createAsyncThunk(
+    "auth/verifyEmail",
+    async ({ userId, verificationCode }, { rejectWithValue }) => {
+        try {
+            const res = await customAxios.post("/auth/verify-email", { userId, verificationCode });
+            showToast("success", res.data.message || "Xác thực email thành công!");
+            return res.data;
+        } catch (err) {
+            const message =
+                err.response?.data?.message || err.message || "Xác thực email thất bại.";
+            showToast("error", message);
+            return rejectWithValue({ message });
+        }
+    }
+);
+
+// Gửi lại email xác thực
+export const resendVerificationEmailThunk = createAsyncThunk(
+    "auth/resendVerificationEmail",
+    async (userId, { rejectWithValue }) => {
+        try {
+            const res = await customAxios.post(`/auth/resend-verification`, { userId });
+            showToast("success", res.data.message || "Gửi lại email xác thực thành công!");
+            return res.data;
+        } catch (err) {
+            const message = err.response?.data?.message || "Không thể gửi lại email xác thực.";
             showToast("error", message);
             return rejectWithValue({ message });
         }
@@ -120,6 +170,7 @@ const initialState = {
     loading: false,
     error: null,
     success: false,
+    resendSuccess: false,
 };
 
 // ========== Helpers ==========
@@ -128,17 +179,18 @@ const handlePending = (state) => {
     state.loading = true;
     state.error = null;
     state.success = false;
+    state.resendSuccess = false;
 };
 
 const handleRejected = (state, action, messageFallback) => {
     state.loading = false;
     state.success = false;
+    state.resendSuccess = false;
     const message = action.payload?.message || messageFallback;
     state.error = message;
     if (message.includes("304")) {
         state.error = "Lỗi server: Vui lòng thử lại.";
     }
-    showToast("error", state.error);
 };
 
 // ========== Slice ==========
@@ -151,11 +203,13 @@ const authSlice = createSlice({
             state.loading = false;
             state.error = null;
             state.success = false;
+            state.resendSuccess = false;
         },
 
         clearAuthState: (state) => {
             state.error = null;
             state.success = false;
+            state.resendSuccess = false;
         },
     },
     extraReducers: (builder) => {
@@ -167,8 +221,6 @@ const authSlice = createSlice({
                 state.accessToken = action.payload.accessToken;
                 state.isAuthenticated = true;
                 state.success = true;
-                localStorage.setItem("accessToken", action.payload.accessToken);
-                showToast("success", "Đăng nhập thành công.");
             })
             .addCase(loginThunk.rejected, (state, action) => {
                 handleRejected(state, action, "Đăng nhập thất bại.");
@@ -179,7 +231,6 @@ const authSlice = createSlice({
             .addCase(registerThunk.fulfilled, (state) => {
                 state.loading = false;
                 state.success = true;
-                showToast("success", "Đăng ký thành công. Vui lòng đăng nhập.");
             })
             .addCase(registerThunk.rejected, (state, action) => {
                 handleRejected(state, action, "Đăng ký thất bại.");
@@ -198,7 +249,6 @@ const authSlice = createSlice({
                 state.isAuthenticated = false;
                 localStorage.removeItem("user");
                 localStorage.removeItem("accessToken");
-                showToast("error", "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
             })
 
             // ========== LOGOUT ==========
@@ -208,7 +258,6 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.error = null;
                 localStorage.removeItem("accessToken");
-                showToast("success", "Đăng xuất thành công.");
             })
             .addCase(logoutThunk.rejected, (state, action) => {
                 handleRejected(state, action, "Đăng xuất thất bại.");
@@ -221,6 +270,7 @@ const authSlice = createSlice({
             .addCase(forgotPasswordThunk.pending, handlePending)
             .addCase(forgotPasswordThunk.fulfilled, (state) => {
                 state.loading = false;
+                state.success = true;
             })
             .addCase(forgotPasswordThunk.rejected, (state, action) => {
                 handleRejected(state, action, "Không thể gửi yêu cầu.");
@@ -230,9 +280,30 @@ const authSlice = createSlice({
             .addCase(resetPasswordThunk.pending, handlePending)
             .addCase(resetPasswordThunk.fulfilled, (state) => {
                 state.loading = false;
+                state.success = true;
             })
             .addCase(resetPasswordThunk.rejected, (state, action) => {
                 handleRejected(state, action, "Không thể đặt lại mật khẩu.");
+            })
+
+            // ===== VERIFY EMAIL =====
+            .addCase(verifyEmailThunk.pending, handlePending)
+            .addCase(verifyEmailThunk.fulfilled, (state) => {
+                state.loading = false;
+                state.success = true;
+            })
+            .addCase(verifyEmailThunk.rejected, (state, action) => {
+                handleRejected(state, action, "Xác thực email thất bại.");
+            })
+
+            // ===== RESEND VERIFICATION EMAIL =====
+            .addCase(resendVerificationEmailThunk.pending, handlePending)
+            .addCase(resendVerificationEmailThunk.fulfilled, (state) => {
+                state.loading = false;
+                state.resendSuccess = true;
+            })
+            .addCase(resendVerificationEmailThunk.rejected, (state, action) => {
+                handleRejected(state, action, "Không thể gửi lại email xác thực.");
             });
     },
 });

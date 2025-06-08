@@ -130,6 +130,7 @@ exports.getDocuments = async (req, res) => {
                 $project: {
                     _id: 1,
                     title: 1,
+                    fileName: 1,
                     slug: 1,
                     description: 1,
                     thumbnailUrl: 1,
@@ -557,6 +558,7 @@ exports.getMyDocuments = async (req, res) => {
                 $project: {
                     _id: 1,
                     title: 1,
+                    fileName: 1,
                     slug: 1,
                     description: 1,
                     thumbnailUrl: 1,
@@ -845,6 +847,7 @@ exports.getFeaturedDocuments = async (req, res) => {
                 $project: {
                     _id: 1,
                     title: 1,
+                    fileName: 1,
                     slug: 1,
                     description: 1,
                     thumbnailUrl: 1,

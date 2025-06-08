@@ -3,43 +3,37 @@ import { createBrowserRouter } from "react-router-dom";
 // Layouts
 import AuthLayout from "../components/Layout/AuthLayout";
 import MainLayout from "../components/Layout/MainLayout";
-import AdminLayout from "../components/Layout/AdminLayout";
 import UserProfilePage from "../components/Layout/UserProfilePage";
 
 // Pages – Public
-import HomePage from "../pages/Home/HomePage";
-import DocumentDetailPage from "../pages/DocumentDetailPage";
-import CategoryPage from "../pages/CategoryPage";
 import SearchPage from "../pages/SearchPage";
+import HomePage from "../pages/Home/HomePage";
+import CategoryPage from "../pages/CategoryPage";
+import DocumentDetailPage from "../pages/DocumentDetailPage";
 
 // Pages – Auth
 import Login from "../pages/Auth/Login";
 import Register from "../pages/Auth/Register";
-import ForgotPassword from "../pages/Auth/ForgotPassword";
+import VerifyEmail from "../pages/Auth/VerifyEmail";
 import ResetPassword from "../pages/Auth/ResetPassword";
+import ForgotPassword from "../pages/Auth/ForgotPassword";
 
 // Pages – User
-import MyDownloadedHistory from "../pages/User/MyDownloadedHistory";
-import MyFavoritesDocuments from "../pages/User/MyFavoritesDocuments";
-import MyViewedHistory from "../pages/User/MyViewedHistory";
 import ProfileInfo from "../pages/User/ProfileInfo";
 import NotificationPage from "../pages/NotificationPage";
+import MyViewedHistory from "../pages/User/MyViewedHistory";
+import MyDownloadedHistory from "../pages/User/MyDownloadedHistory";
+import MyFavoritesDocuments from "../pages/User/MyFavoritesDocuments";
 
 // Pages – Uploader
 import UploadPage from "../pages/Uploader/UploadPage";
 import MyDocumentsPage from "../pages/Uploader/MyDocumentsPage";
 import EditDocumentPage from "../pages/Uploader/EditDocumentPage";
 
-// Pages – Admin
-// import AdminDashboardPage from "@/pages/admin/AdminDashboardPage";
-// import UserManagementPage from "@/pages/admin/UserManagementPage";
-// import DocumentApprovalPage from "@/pages/admin/DocumentApprovalPage";
-
 // Route protection wrappers
-import ProtectedRoute from "./ProtectedRoute";
 import UploaderRoute from "./UploaderRoute";
-import AdminRoute from "./AdminRoute";
 import RatingPage from "../pages/RatingPage";
+import ProtectedRoute from "./ProtectedRoute";
 
 const router = createBrowserRouter([
     {
@@ -47,11 +41,11 @@ const router = createBrowserRouter([
         element: <MainLayout />,
         children: [
             { index: true, element: <HomePage /> },
-            { path: "documents/:slug", element: <DocumentDetailPage /> },
-            { path: "documents/:id", element: <DocumentDetailPage /> },
-            { path: "category/:slug", element: <CategoryPage /> },
-            { path: "search", element: <SearchPage /> },
             { path: "rating", element: <RatingPage /> },
+            { path: "search", element: <SearchPage /> },
+            { path: "category/:slug", element: <CategoryPage /> },
+            { path: "documents/:id", element: <DocumentDetailPage /> },
+            { path: "documents/:slug", element: <DocumentDetailPage /> },
         ],
     },
     {
@@ -60,8 +54,9 @@ const router = createBrowserRouter([
         children: [
             { path: "login", element: <Login /> },
             { path: "register", element: <Register /> },
-            { path: "forgot-password", element: <ForgotPassword /> },
+            { path: "verify/:userId", element: <VerifyEmail /> },
             { path: "reset-password", element: <ResetPassword /> },
+            { path: "forgot-password", element: <ForgotPassword /> },
         ],
     },
     {
@@ -77,9 +72,9 @@ const router = createBrowserRouter([
                 element: <UserProfilePage />,
                 children: [
                     { index: true, element: <ProfileInfo /> },
+                    { path: "views", element: <MyViewedHistory /> },
                     { path: "downloads", element: <MyDownloadedHistory /> },
                     { path: "favorites", element: <MyFavoritesDocuments /> },
-                    { path: "views", element: <MyViewedHistory /> },
                 ],
             },
             { path: "notifications", element: <NotificationPage /> },
@@ -98,19 +93,6 @@ const router = createBrowserRouter([
             { path: "edit-document/:documentId", element: <EditDocumentPage /> },
         ],
     },
-    // {
-    //     path: "/admin",
-    //     element: (
-    //         <AdminRoute>
-    //             <AdminLayout />
-    //         </AdminRoute>
-    //     ),
-    //     children: [
-    //         { index: true, element: <AdminDashboardPage /> },
-    //         { path: "users", element: <UserManagementPage /> },
-    //         { path: "approvals", element: <DocumentApprovalPage /> },
-    //     ],
-    // },
     {
         path: "*",
         element: <h1>404 – Không tìm thấy trang</h1>,

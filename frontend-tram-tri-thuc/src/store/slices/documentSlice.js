@@ -51,27 +51,39 @@ export const downloadDocument = createAsyncThunk(
     "documents/downloadDocument",
     async (id, { rejectWithValue, getState }) => {
         try {
-            // Lấy thông tin tài liệu để có fileName
+            let fileName;
+            let documentData = null;
+
+            // Lấy dữ liệu từ state
             const state = getState();
-            const documentData =
+            documentData =
                 state.documents.currentDocument ||
                 state.documents.documents.find((doc) => doc._id === id) ||
-                state.documents.myDocuments.find((doc) => doc._id === id);
+                state.documents.myDocuments.find((doc) => doc._id === id) ||
+                state.documents.featuredDocuments.find((doc) => doc._id === id);
 
-            const response = await customAxios.get(`/documents/${id}/download`, {
-                responseType: "blob",
-                timeout: 30000, // 30 second timeout
-            });
-
-            // Check if response is actually a blob
-            if (!(response.data instanceof Blob)) {
-                throw new Error("Invalid response format");
+            // Nếu không có fileName, gọi API để lấy chi tiết tài liệu
+            if (!documentData?.fileName) {
+                console.warn(`fileName missing for document ID: ${id}, fetching details`);
+                const response = await customAxios.get(`/documents/${id}`);
+                documentData = response.data.data;
+                fileName = documentData.fileName || `document-${id}`;
+            } else {
+                fileName = documentData.fileName;
             }
 
-            // Extract filename from response headers if available
-            const contentDisposition = response.headers["content-disposition"];
-            let fileName = documentData?.fileName || `document-${id}`;
+            // Tải file
+            const response = await customAxios.get(`/documents/${id}/download`, {
+                responseType: "blob",
+                timeout: 30000,
+            });
 
+            if (!(response.data instanceof Blob)) {
+                throw new Error("Định dạng phản hồi không hợp lệ");
+            }
+
+            // Lấy filename từ header Content-Disposition (fallback)
+            const contentDisposition = response.headers["content-disposition"];
             if (contentDisposition) {
                 const fileNameMatch = contentDisposition.match(
                     /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
@@ -81,24 +93,21 @@ export const downloadDocument = createAsyncThunk(
                 }
             }
 
-            // Create download link
+            // Tạo link tải xuống
             const url = window.URL.createObjectURL(response.data);
             const link = document.createElement("a");
             link.href = url;
             link.setAttribute("download", fileName);
             link.style.display = "none";
 
-            // Append to body, click, then remove
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
 
-            // showToast("success", "Tải tài liệu thành công.");
-            return { id, fileName };
+            return { id, fileName, document: documentData };
         } catch (error) {
-            console.error("Download error:", error);
-
+            console.error("Lỗi tải xuống:", error);
             let message;
             if (error.code === "ECONNABORTED") {
                 message = "Timeout: Quá trình tải xuống mất quá nhiều thời gian.";
@@ -123,7 +132,6 @@ export const downloadDocument = createAsyncThunk(
                             "Không thể tải tài liệu.";
                 }
             }
-
             showToast("error", message);
             return rejectWithValue({ message, status: error.response?.status });
         }
@@ -413,6 +421,7 @@ const documentSlice = createSlice({
         const normalizeDocument = (doc) => ({
             ...doc,
             _id: doc._id?.toString(),
+            thumbnailUrl: doc.thumbnailUrl || null,
             favoriteCount: doc.favoriteCount ?? 0,
             viewCount: doc.viewCount ?? 0,
             downloadCount: doc.downloadCount ?? 0,
@@ -468,8 +477,23 @@ const documentSlice = createSlice({
 
             // downloadDocument
             .addCase(downloadDocument.pending, handlePending)
-            .addCase(downloadDocument.fulfilled, (state) => {
+            .addCase(downloadDocument.fulfilled, (state, action) => {
                 state.loading = false;
+                if (action.payload.document) {
+                    const updatedDoc = normalizeDocument(action.payload.document);
+                    state.documents = state.documents.map((doc) =>
+                        doc._id === updatedDoc._id ? updatedDoc : doc
+                    );
+                    state.myDocuments = state.myDocuments.map((doc) =>
+                        doc._id === updatedDoc._id ? updatedDoc : doc
+                    );
+                    state.featuredDocuments = state.featuredDocuments.map((doc) =>
+                        doc._id === updatedDoc._id ? updatedDoc : doc
+                    );
+                    if (state.currentDocument?._id === updatedDoc._id) {
+                        state.currentDocument = updatedDoc;
+                    }
+                }
             })
             .addCase(downloadDocument.rejected, handleRejected)
 

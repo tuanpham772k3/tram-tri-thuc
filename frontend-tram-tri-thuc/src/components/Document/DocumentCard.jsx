@@ -4,6 +4,10 @@ import { Download, Heart, Eye, User, Tag } from "lucide-react";
 import { downloadDocument, toggleFavorite } from "../../store/slices/documentSlice";
 import { fetchFavoriteDocuments } from "../../store/slices/userSlice";
 import { motion } from "framer-motion";
+import defaultThumbnail from "../../assets/image2.jpg";
+
+// Thêm constant cho API URL
+const API_URL = "http://localhost:5000"; // hoặc URL của server của bạn
 
 export default function DocumentCard({ document, type }) {
     const dispatch = useDispatch();
@@ -51,6 +55,13 @@ export default function DocumentCard({ document, type }) {
         });
     };
 
+    // Tạo URL đầy đủ cho thumbnail
+    const getThumbnailUrl = (path) => {
+        if (!path) return defaultThumbnail;
+        if (path.startsWith("http")) return path;
+        return `${API_URL}${path}`;
+    };
+
     return (
         <motion.div
             whileHover={{
@@ -62,6 +73,23 @@ export default function DocumentCard({ document, type }) {
             className="relative h-full bg-white rounded-xl shadow-md p-6 flex flex-col justify-between border border-gray-100 hover:shadow-lg transition-all duration-300"
         >
             <div>
+                {/* Thêm ảnh đại diện */}
+                <Link to={`/documents/${document.slug}`} className="block mb-4">
+                    <div className="w-full h-40 rounded-lg overflow-hidden">
+                        <img
+                            src={getThumbnailUrl(document.thumbnailUrl)}
+                            alt={document.title}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                            onError={(e) => {
+                                if (e.target.src !== defaultThumbnail) {
+                                    e.target.src = defaultThumbnail;
+                                }
+                            }}
+                        />
+                    </div>
+                </Link>
+
                 <Link to={`/documents/${document.slug}`} className="block mb-2">
                     <h3 className="font-bold text-xl text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
                         {document.title}
