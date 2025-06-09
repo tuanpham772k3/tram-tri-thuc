@@ -3,8 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "../../store/slices/categorySlice";
 import { clearError, uploadDocument } from "../../store/slices/documentSlice";
 import showToast from "../../utils/toast";
-import { FaCloudUploadAlt, FaImage, FaTags, FaFolder, FaHeading, FaTrash, FaShieldAlt } from "react-icons/fa";
-import { MdDescription } from "react-icons/md";
+import { FaCloudUploadAlt, FaImage, FaTrash, FaShieldAlt } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function UploadForm() {
@@ -17,7 +16,7 @@ export default function UploadForm() {
         title: "",
         description: "",
         categoryId: "",
-        tag: "",
+        tags: "",
         file: null,
         thumbnail: null,
     });
@@ -85,7 +84,7 @@ export default function UploadForm() {
         data.append("title", formData.title);
         data.append("description", formData.description);
         data.append("categoryId", formData.categoryId);
-        data.append("tag", formData.tag);
+        data.append("tags", formData.tags);
         if (formData.file) data.append("file", formData.file);
         if (formData.thumbnail) data.append("thumbnail", formData.thumbnail);
 
@@ -96,7 +95,7 @@ export default function UploadForm() {
                 title: "",
                 description: "",
                 categoryId: "",
-                tag: "",
+                tags: "",
                 file: null,
                 thumbnail: null,
             });
@@ -134,31 +133,41 @@ export default function UploadForm() {
                 {/* Progress Steps */}
                 <div className="mb-8 flex items-center justify-center space-x-4">
                     <div className="flex items-center space-x-2">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
-                            step >= 1 ? "bg-green-500 text-white" : "bg-gray-300 text-gray-600"
-                        }`}>
+                        <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
+                                step >= 1 ? "bg-green-500 text-white" : "bg-gray-300 text-gray-600"
+                            }`}
+                        >
                             1
                         </div>
-                        <span className={`text-sm font-medium ${
-                            step >= 1 ? "text-green-500" : "text-gray-500"
-                        }`}>
+                        <span
+                            className={`text-sm font-medium ${
+                                step >= 1 ? "text-green-500" : "text-gray-500"
+                            }`}
+                        >
                             Thông tin chi tiết
                         </span>
                     </div>
                     <div className="w-12 h-1 rounded-full bg-gray-200">
-                        <div className={`h-full rounded-full transition-all duration-300 ${
-                            step >= 2 ? "bg-green-500 w-full" : "bg-gray-300 w-0"
-                        }`}></div>
+                        <div
+                            className={`h-full rounded-full transition-all duration-300 ${
+                                step >= 2 ? "bg-green-500 w-full" : "bg-gray-300 w-0"
+                            }`}
+                        ></div>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
-                            step >= 2 ? "bg-green-500 text-white" : "bg-gray-300 text-gray-600"
-                        }`}>
+                        <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
+                                step >= 2 ? "bg-green-500 text-white" : "bg-gray-300 text-gray-600"
+                            }`}
+                        >
                             2
                         </div>
-                        <span className={`text-sm font-medium ${
-                            step >= 2 ? "text-green-500" : "text-gray-500"
-                        }`}>
+                        <span
+                            className={`text-sm font-medium ${
+                                step >= 2 ? "text-green-500" : "text-gray-500"
+                            }`}
+                        >
                             Tệp đính kèm
                         </span>
                     </div>
@@ -180,8 +189,10 @@ export default function UploadForm() {
                                 </label>
                                 <input
                                     type="text"
-                                    value={formData.title}
-                                    onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
+                                    value={formData.title || ""}
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({ ...prev, title: e.target.value }))
+                                    }
                                     className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                                     placeholder="Nhập tên tài liệu"
                                 />
@@ -192,8 +203,13 @@ export default function UploadForm() {
                                     Danh mục <span className="text-red-500">*</span>
                                 </label>
                                 <select
-                                    value={formData.categoryId}
-                                    onChange={(e) => setFormData((prev) => ({ ...prev, categoryId: e.target.value }))}
+                                    value={formData.categoryId || ""}
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            categoryId: e.target.value,
+                                        }))
+                                    }
                                     className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 >
                                     <option value="">--Chọn danh mục--</option>
@@ -211,21 +227,27 @@ export default function UploadForm() {
                                 </label>
                                 <input
                                     type="text"
-                                    value={formData.tag}
-                                    onChange={(e) => setFormData((prev) => ({ ...prev, tag: e.target.value }))}
+                                    value={formData.tags || ""}
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({ ...prev, tags: e.target.value }))
+                                    }
                                     className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                                     placeholder="Nhập từ khóa, phân cách bằng dấu phẩy"
                                 />
                             </div>
-
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Mô tả
                                 </label>
                                 <textarea
                                     rows={4}
-                                    value={formData.description}
-                                    onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                                    value={formData.description || ""}
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            description: e.target.value,
+                                        }))
+                                    }
                                     className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
                                     placeholder="Nhập mô tả tài liệu"
                                 />
@@ -251,7 +273,9 @@ export default function UploadForm() {
                         >
                             <div
                                 className={`p-6 border-2 ${
-                                    dragActive.document ? "border-purple-500 bg-purple-50" : "border-gray-300"
+                                    dragActive.document
+                                        ? "border-purple-500 bg-purple-50"
+                                        : "border-gray-300"
                                 } border-dashed rounded-lg text-center`}
                                 onDragEnter={(e) => handleDrag(e, "document")}
                                 onDragLeave={(e) => handleDrag(e, "document")}
@@ -270,7 +294,9 @@ export default function UploadForm() {
                                         />
                                     </label>
                                     <p className="text-sm text-gray-500 mt-2">
-                                        {formData.file ? formData.file.name : "Kéo thả file hoặc nhấp để chọn"}
+                                        {formData.file
+                                            ? formData.file.name
+                                            : "Kéo thả file hoặc nhấp để chọn"}
                                     </p>
                                     <p className="text-sm text-gray-500 mt-1">
                                         Chỉ hỗ trợ định dạng PDF
@@ -294,7 +320,9 @@ export default function UploadForm() {
 
                             <div
                                 className={`p-6 border-2 ${
-                                    dragActive.thumbnail ? "border-purple-500 bg-purple-50" : "border-gray-300"
+                                    dragActive.thumbnail
+                                        ? "border-purple-500 bg-purple-50"
+                                        : "border-gray-300"
                                 } border-dashed rounded-lg text-center`}
                                 onDragEnter={(e) => handleDrag(e, "thumbnail")}
                                 onDragLeave={(e) => handleDrag(e, "thumbnail")}
@@ -348,12 +376,17 @@ export default function UploadForm() {
                                     onClick={handleSubmit}
                                     disabled={loading}
                                     className={`flex-1 py-3 rounded-lg font-semibold text-white transition-all ${
-                                        loading ? "bg-purple-400 cursor-not-allowed" : "bg-purple-600 hover:bg-purple-700"
+                                        loading
+                                            ? "bg-purple-400 cursor-not-allowed"
+                                            : "bg-purple-600 hover:bg-purple-700"
                                     }`}
                                 >
                                     {loading ? (
                                         <div className="flex items-center justify-center">
-                                            <svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24">
+                                            <svg
+                                                className="animate-spin h-5 w-5 mr-2 text-white"
+                                                viewBox="0 0 24 24"
+                                            >
                                                 <circle
                                                     className="opacity-25"
                                                     cx="12"
@@ -435,7 +468,9 @@ export default function UploadForm() {
                         <div>
                             <h4 className="font-medium text-gray-900 mb-2">Quyền sở hữu</h4>
                             <p className="text-sm text-gray-600">
-                                Bạn vẫn giữ toàn bộ quyền sở hữu đối với tài liệu của mình. Bằng việc upload, bạn cấp cho chúng tôi quyền lưu trữ và phân phối tài liệu theo điều khoản sử dụng.
+                                Bạn vẫn giữ toàn bộ quyền sở hữu đối với tài liệu của mình. Bằng
+                                việc upload, bạn cấp cho chúng tôi quyền lưu trữ và phân phối tài
+                                liệu theo điều khoản sử dụng.
                             </p>
                         </div>
 
@@ -475,4 +510,4 @@ export default function UploadForm() {
             </div>
         </motion.div>
     );
-}   
+}

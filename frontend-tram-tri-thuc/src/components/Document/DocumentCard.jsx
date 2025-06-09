@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Download, Heart, Eye, User, Tag } from "lucide-react";
 import { downloadDocument, toggleFavorite } from "../../store/slices/documentSlice";
 import { fetchFavoriteDocuments } from "../../store/slices/userSlice";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import defaultThumbnail from "../../assets/image2.jpg";
 
 // Thêm constant cho API URL
@@ -41,7 +41,7 @@ export default function DocumentCard({ document, type }) {
             });
     };
 
-    const tags = document.tag ? document.tag.split(",").map((tag) => tag.trim()) : [];
+    const tags = Array.isArray(document.tags) ? document.tags : [];
 
     // Hàm format ngày giờ
     const formatDateTime = (dateString) => {
@@ -74,7 +74,7 @@ export default function DocumentCard({ document, type }) {
         >
             <div>
                 {/* Thêm ảnh đại diện */}
-                <Link to={`/documents/${document.slug}`} className="block mb-4">
+                <Link to={`/documents/slug/${document.slug}`} className="block mb-4">
                     <div className="w-full h-40 rounded-lg overflow-hidden">
                         <img
                             src={getThumbnailUrl(document.thumbnailUrl)}
@@ -90,7 +90,7 @@ export default function DocumentCard({ document, type }) {
                     </div>
                 </Link>
 
-                <Link to={`/documents/${document.slug}`} className="block mb-2">
+                <Link to={`/documents/slug/${document.slug}`} className="block mb-2">
                     <h3 className="font-bold text-xl text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
                         {document.title}
                     </h3>

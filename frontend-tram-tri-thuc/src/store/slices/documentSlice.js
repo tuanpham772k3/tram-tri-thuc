@@ -36,6 +36,7 @@ export const fetchDocumentBySlug = createAsyncThunk(
     "documents/fetchDocumentBySlug",
     async (slug, { rejectWithValue }) => {
         try {
+            console.log("fetchDocumentBySlug called with slug:", slug);
             const response = await customAxios.get(`/documents/slug/${slug}`);
             return response.data.data; // document
         } catch (error) {
@@ -247,71 +248,6 @@ export const deleteDocument = createAsyncThunk(
                     break;
                 default:
                     message = error.response?.data?.message || "Không thể xóa tài liệu.";
-            }
-            showToast("error", message);
-            return rejectWithValue({ message, status: error.response?.status });
-        }
-    }
-);
-
-// Duyệt tài liệu (admin)
-export const approveDocument = createAsyncThunk(
-    "documents/approveDocument",
-    async (id, { rejectWithValue }) => {
-        try {
-            const response = await customAxios.patch(`/documents/approve/${id}`);
-            showToast("success", response.data.message);
-            return response.data.data; // document
-        } catch (error) {
-            let message;
-            switch (error.response?.status) {
-                case 400:
-                    message = "ID tài liệu không hợp lệ.";
-                    break;
-                case 401:
-                    message = "Vui lòng đăng nhập để duyệt tài liệu.";
-                    break;
-                case 403:
-                    message = "Chỉ admin mới có quyền duyệt tài liệu.";
-                    break;
-                case 404:
-                    message = "Tài liệu không tồn tại.";
-                    break;
-                default:
-                    message = error.response?.data?.message || "Không thể duyệt tài liệu.";
-            }
-            showToast("error", message);
-            return rejectWithValue({ message, status: error.response?.status });
-        }
-    }
-);
-
-// Gắn/bỏ nổi bật tài liệu (admin)
-export const featureDocument = createAsyncThunk(
-    "documents/featureDocument",
-    async (id, { rejectWithValue }) => {
-        try {
-            const response = await customAxios.patch(`/documents/feature/${id}`);
-            showToast("success", response.data.message);
-            return response.data.data; // document
-        } catch (error) {
-            let message;
-            switch (error.response?.status) {
-                case 400:
-                    message = "Tài liệu phải được duyệt để gắn nổi bật.";
-                    break;
-                case 401:
-                    message = "Vui lòng đăng nhập để gắn/bỏ nổi bật.";
-                    break;
-                case 403:
-                    message = "Chỉ admin mới có quyền gắn/bỏ nổi bật.";
-                    break;
-                case 404:
-                    message = "Tài liệu không tồn tại.";
-                    break;
-                default:
-                    message =
-                        error.response?.data?.message || "Không thể cập nhật trạng thái nổi bật.";
             }
             showToast("error", message);
             return rejectWithValue({ message, status: error.response?.status });
@@ -554,50 +490,6 @@ const documentSlice = createSlice({
                 }
             })
             .addCase(deleteDocument.rejected, handleRejected)
-
-            // approveDocument
-            .addCase(approveDocument.pending, handlePending)
-            .addCase(approveDocument.fulfilled, (state, action) => {
-                state.loading = false;
-                const updatedDoc = normalizeDocument(action.payload);
-                state.documents = state.documents.map((doc) =>
-                    doc._id === updatedDoc._id ? updatedDoc : doc
-                );
-                state.myDocuments = state.myDocuments.map((doc) =>
-                    doc._id === updatedDoc._id ? updatedDoc : doc
-                );
-                state.featuredDocuments = state.featuredDocuments.map((doc) =>
-                    doc._id === updatedDoc._id ? updatedDoc : doc
-                );
-                if (state.currentDocument?._id === updatedDoc._id) {
-                    state.currentDocument = updatedDoc;
-                }
-            })
-            .addCase(approveDocument.rejected, handleRejected)
-
-            // featureDocument
-            .addCase(featureDocument.pending, handlePending)
-            .addCase(featureDocument.fulfilled, (state, action) => {
-                state.loading = false;
-                const updatedDoc = normalizeDocument(action.payload);
-                state.documents = state.documents.map((doc) =>
-                    doc._id === updatedDoc._id ? updatedDoc : doc
-                );
-                state.myDocuments = state.myDocuments.map((doc) =>
-                    doc._id === updatedDoc._id ? updatedDoc : doc
-                );
-                if (updatedDoc.isFeatured) {
-                    state.featuredDocuments.push(updatedDoc);
-                } else {
-                    state.featuredDocuments = state.featuredDocuments.filter(
-                        (doc) => doc._id !== updatedDoc._id
-                    );
-                }
-                if (state.currentDocument?._id === updatedDoc._id) {
-                    state.currentDocument = updatedDoc;
-                }
-            })
-            .addCase(featureDocument.rejected, handleRejected)
 
             // toggleFavorite
             .addCase(toggleFavorite.pending, handlePending)

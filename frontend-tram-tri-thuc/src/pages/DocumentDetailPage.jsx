@@ -21,6 +21,7 @@ export default function DocumentDetailPage() {
     } = useSelector((state) => state.user);
 
     useEffect(() => {
+        console.log("Slug from useParams:", slug);
         dispatch(fetchDocumentBySlug(slug));
     }, [dispatch, slug]);
 
