@@ -1,32 +1,52 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import DownloadButton from "../components/Document/DownloadButton";
 import CommentSection from "../components/Document/CommentSection";
 import RatingStars from "../components/Rating/RatingStar";
-import { fetchDocumentBySlug, toggleFavorite } from "../store/slices/documentSlice";
+import {
+    fetchDocumentBySlug,
+    fetchRelatedDocuments,
+    toggleFavorite,
+} from "../store/slices/documentSlice";
 import { motion } from "framer-motion";
 import { Heart, FileText, User, Calendar, Eye } from "lucide-react";
 import DocumentViewer from "../components/Document/DocumentViewer";
+import DocumentList from "../components/Document/DocumentList";
 
 export default function DocumentDetailPage() {
     const { slug } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { currentDocument, loading, error } = useSelector((state) => state.documents);
+    const { currentDocument, relatedDocuments, relatedPagination, loading, error } = useSelector(
+        (state) => state.documents
+    );
     const {
         userInfo,
         favoriteDocuments = [],
         loading: userLoading,
     } = useSelector((state) => state.user);
 
+    // State cho phân trang và sắp xếp
+    const [relatedPage, setRelatedPage] = useState(1);
+    const [sort, setSort] = useState("relevance:desc");
+
     useEffect(() => {
         console.log("Slug from useParams:", slug);
         dispatch(fetchDocumentBySlug(slug));
     }, [dispatch, slug]);
 
-    const isFavorite = favoriteDocuments.some((fav) => fav._id === currentDocument?._id);
-    const favoriteCount = currentDocument?.favoriteCount ?? 0;
+    // Gọi fetchRelatedDocuments khi currentDocument đã có _id
+    useEffect(() => {
+        if (currentDocument?._id) {
+            dispatch(
+                fetchRelatedDocuments({
+                    id: currentDocument._id, // Sử dụng _id thay vì slug
+                    params: { sort, page: relatedPage },
+                })
+            );
+        }
+    }, [dispatch, currentDocument, sort, relatedPage]);
 
     const handleToggleFavorite = () => {
         if (!userInfo) {
@@ -39,6 +59,13 @@ export default function DocumentDetailPage() {
                 console.error("Toggle favorite failed:", error);
             });
     };
+
+    const handleRelatedPageChange = (page) => {
+        setRelatedPage(page);
+    };
+
+    const isFavorite = favoriteDocuments.some((fav) => fav._id === currentDocument?._id);
+    const favoriteCount = currentDocument?.favoriteCount ?? 0;
 
     const renderContent = () => {
         if (loading) {
@@ -102,11 +129,7 @@ export default function DocumentDetailPage() {
             );
         }
 
-        // ✅ BƯỚC 1: Xác định URL của backend.
-        // Cách tốt nhất là dùng biến môi trường (ví dụ: VITE_API_URL=http://localhost:5000)
         const backendUrl = "http://localhost:5000";
-
-        // ✅ BƯỚC 2: Tạo URL đầy đủ cho file để component DocumentViewer có thể truy cập.
         const fullFileUrl = `${backendUrl}${currentDocument.fileUrl}`;
 
         return (
@@ -192,6 +215,22 @@ export default function DocumentDetailPage() {
                         fileName={currentDocument.fileName || currentDocument.title}
                         title="Xem nội dung tài liệu"
                         height="700px"
+                    />
+                </motion.div>
+
+                {/* Related Documents Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.4 }}
+                    className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20"
+                >
+                    <h2 className="text-2xl font-bold mb-4">Tài liệu liên quan</h2>
+                    <DocumentList
+                        documents={relatedDocuments}
+                        pagination={relatedPagination}
+                        onPageChange={handleRelatedPageChange}
+                        isLoading={loading}
                     />
                 </motion.div>
 

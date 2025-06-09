@@ -14,6 +14,7 @@ const {
     deleteDocument,
     getFeaturedDocuments,
     toggleFavorite,
+    getRelatedDocuments,
 } = require("../controller/document.controller");
 const { documentListLimiter } = require("../middlewares/rateLimit");
 
@@ -46,5 +47,8 @@ router.delete("/:id", authMiddleware, isUploader, deleteDocument);
 
 // Thêm/xoá tài liệu yêu thích
 router.post("/:id/favorite", authMiddleware, toggleFavorite);
+
+// Lấy danh sách tài liệu liên quan theo tags
+router.get("/:id/related", getRelatedDocuments);
 
 module.exports = router;

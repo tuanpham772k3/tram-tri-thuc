@@ -308,15 +308,32 @@ export const toggleFavorite = createAsyncThunk(
     }
 );
 
+// Thêm async thunk để lấy danh sách tài liệu liên quan
+export const fetchRelatedDocuments = createAsyncThunk(
+    "documents/fetchRelatedDocuments",
+    async ({ id, params }, { rejectWithValue }) => {
+        try {
+            const response = await customAxios.get(`/documents/${id}/related`, { params });
+            return response.data.data; // { totalItems, totalPages, currentPage, items }
+        } catch (error) {
+            const message =
+                error.response?.data?.message || "Không thể lấy danh sách tài liệu liên quan";
+            showToast("error", message);
+            return rejectWithValue(message);
+        }
+    }
+);
+
 // ========== Slice ==========
 
 const documentSlice = createSlice({
     name: "documents",
     initialState: {
-        documents: [], // Danh sách tài liệu công khai
-        featuredDocuments: [], // Danh sách tài liệu nổi bật
-        currentDocument: null, // Chi tiết tài liệu hiện tại
-        myDocuments: [], // Danh sách tài liệu của user
+        documents: [],
+        featuredDocuments: [],
+        currentDocument: null,
+        myDocuments: [],
+        relatedDocuments: [],
         loading: false,
         error: null,
         pagination: {
@@ -329,9 +346,16 @@ const documentSlice = createSlice({
             totalItems: 0,
             totalPages: 0,
             currentPage: 1,
-            limit: 10,
+            limit: 12,
         },
         myDocumentsPagination: {
+            totalItems: 0,
+            totalPages: 0,
+            currentPage: 1,
+            limit: 10,
+        },
+        relatedPagination: {
+            // Thêm state cho phân trang tài liệu liên quan
             totalItems: 0,
             totalPages: 0,
             currentPage: 1,
@@ -510,7 +534,21 @@ const documentSlice = createSlice({
                     state.currentDocument = updatedDoc;
                 }
             })
-            .addCase(toggleFavorite.rejected, handleRejected);
+            .addCase(toggleFavorite.rejected, handleRejected)
+
+            // fetchRelatedDocuments
+            .addCase(fetchRelatedDocuments.pending, handlePending)
+            .addCase(fetchRelatedDocuments.fulfilled, (state, action) => {
+                state.loading = false;
+                state.relatedDocuments = action.payload.items?.map(normalizeDocument) || [];
+                state.relatedPagination = {
+                    totalItems: action.payload.totalItems || 0,
+                    totalPages: action.payload.totalPages || 0,
+                    currentPage: action.payload.currentPage || 1,
+                    limit: action.payload.limit || state.relatedPagination.limit,
+                };
+            })
+            .addCase(fetchRelatedDocuments.rejected, handleRejected);
     },
 });
 

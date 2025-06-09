@@ -1007,3 +1007,142 @@ exports.toggleFavorite = async (req, res) => {
         res.status(500).json({ success: false, message: "Lỗi khi cập nhật yêu thích." });
     }
 };
+
+// GET /api/documents/:id/related
+exports.getRelatedDocuments = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { sort = "relevance:desc", page, limit } = req.query;
+
+        // Validation
+        if (!Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: "ID tài liệu không hợp lệ." });
+        }
+        if (page && (!Number.isInteger(Number(page)) || Number(page) < 1)) {
+            return res.status(400).json({ success: false, message: "Số trang không hợp lệ." });
+        }
+        if (
+            limit &&
+            (!Number.isInteger(Number(limit)) || Number(limit) < 1 || Number(limit) > 50)
+        ) {
+            return res.status(400).json({ success: false, message: "Giới hạn không hợp lệ." });
+        }
+        if (sort && !/^(relevance|viewCount|downloadCount|createdAt):(asc|desc)$/.test(sort)) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Định dạng sắp xếp không hợp lệ." });
+        }
+
+        // Tìm tài liệu gốc
+        const document = await Document.findById(id).lean();
+        if (!document) {
+            return res.status(404).json({ success: false, message: "Tài liệu không tồn tại." });
+        }
+        if (!document.tags || document.tags.length === 0) {
+            return res.status(200).json({
+                success: true,
+                data: { totalItems: 0, totalPages: 0, currentPage: 1, items: [] },
+            });
+        }
+
+        // Pagination
+        const pagination = getPagination({ page, limit, defaultLimit: 10 });
+
+        // Xây dựng query
+        const query = {
+            _id: { $ne: document._id }, // Loại trừ tài liệu gốc
+            tags: { $in: document.tags }, // Tìm tài liệu có ít nhất một tag trùng
+            status: "approved", // Chỉ lấy tài liệu đã duyệt
+            isPublic: true, // Chỉ lấy tài liệu công khai
+        };
+
+        // Xử lý sắp xếp
+        const sortOptions = {};
+        if (sort) {
+            const [field, order] = sort.split(":");
+            if (field === "relevance") {
+                // Sắp xếp theo số tag trùng (ưu tiên cao)
+                sortOptions.tagMatchCount = order === "desc" ? -1 : 1;
+                sortOptions.viewCount = -1; // Tie-breaker: lượt xem
+            } else {
+                sortOptions[field] = order === "desc" ? -1 : 1;
+            }
+        } else {
+            sortOptions.tagMatchCount = -1; // Mặc định: sắp xếp theo mức độ liên quan
+            sortOptions.viewCount = -1;
+        }
+
+        // Aggregation pipeline
+        const documents = await Document.aggregate([
+            { $match: query },
+            // Tính số tag trùng
+            {
+                $addFields: {
+                    tagMatchCount: {
+                        $size: { $setIntersection: ["$tags", document.tags] },
+                    },
+                },
+            },
+            // Lookup dữ liệu liên quan
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "categoryId",
+                    foreignField: "_id",
+                    as: "category",
+                },
+            },
+            { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "uploaderId",
+                    foreignField: "_id",
+                    as: "uploader",
+                },
+            },
+            { $unwind: { path: "$uploader", preserveNullAndEmptyArrays: true } },
+            // Projection
+            {
+                $project: {
+                    _id: 1,
+                    slug: 1,
+                    tags: 1,
+                    title: 1,
+                    format: 1,
+                    fileName: 1,
+                    description: 1,
+                    thumbnailUrl: 1,
+                    downloadCount: 1,
+                    favoriteCount: 1,
+                    viewCount: 1,
+                    createdAt: 1,
+                    tagMatchCount: 1,
+                    category: {
+                        _id: "$category._id",
+                        name: "$category.name",
+                        slug: "$category.slug",
+                    },
+                    uploader: { _id: "$uploader._id", name: "$uploader.name" },
+                },
+            },
+            // Sắp xếp
+            { $sort: sortOptions },
+            // Phân trang
+            { $skip: pagination.skip },
+            { $limit: pagination.limit },
+        ]);
+
+        // Đếm tổng số tài liệu
+        const totalDocs = await Document.countDocuments(query);
+        const pagingData = getPagingData(documents, totalDocs, pagination.page, pagination.limit);
+
+        res.status(200).json({ success: true, data: pagingData });
+    } catch (error) {
+        logger.error("Get related documents error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Không thể lấy danh sách tài liệu liên quan.",
+        });
+    }
+};

@@ -11,6 +11,7 @@ import showToast from "../../utils/toast";
 
 // Import hero background image
 import heroBackground from "../../assets/images/library-bg.jpg";
+import Footer from "../../components/Layout/Footer/Footer";
 
 export default function HomePage() {
     const dispatch = useDispatch();
@@ -195,10 +196,7 @@ export default function HomePage() {
             <div className="container mx-auto px-4 py-12">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                     {/* Sidebar */}
-                    <motion.aside
-                        variants={itemVariants}
-                        className="lg:col-span-1"
-                    >
+                    <motion.aside variants={itemVariants} className="lg:col-span-1">
                         <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24">
                             <h2 className="text-xl font-semibold mb-4 text-gray-900">Danh Mục</h2>
                             <CategorySidebar />
@@ -246,6 +244,7 @@ export default function HomePage() {
                     </main>
                 </div>
             </div>
+            <Footer />
         </div>
     );
 }
