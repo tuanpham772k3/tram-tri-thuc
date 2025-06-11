@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Download, Heart, Eye, User, Tag } from "lucide-react";
+import { Download, Heart, Eye, User, Tag, Bookmark } from "lucide-react";
 import { downloadDocument, toggleFavorite } from "../../store/slices/documentSlice";
 import { fetchFavoriteDocuments } from "../../store/slices/userSlice";
 import { AnimatePresence, motion } from "framer-motion";
@@ -72,6 +72,18 @@ export default function DocumentCard({ document, type }) {
             transition={{ duration: 0.2 }}
             className="relative h-full bg-white rounded-xl shadow-md p-6 flex flex-col justify-between border border-gray-100 hover:shadow-lg transition-all duration-300"
         >
+            {/* Thêm cờ nổi bật */}
+            {document.isFeatured && (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute top-0 right-0 bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-bl-lg shadow-md"
+                    aria-label="Tài liệu nổi bật"
+                >
+                    Nổi bật
+                </motion.div>
+            )}
             <div>
                 {/* Thêm ảnh đại diện */}
                 <Link to={`/documents/slug/${document.slug}`} className="block mb-4">
@@ -99,9 +111,6 @@ export default function DocumentCard({ document, type }) {
                         {document.uploader?.name || "Người đăng ẩn danh"}
                     </p>
                 </Link>
-                <p className="text-sm text-gray-700 mt-2 line-clamp-3">
-                    {document.description || "Không có mô tả cho tài liệu này."}
-                </p>
 
                 {/* Dynamic date info based on type */}
                 {type === "download" && document.downloadedAt && (
@@ -112,7 +121,7 @@ export default function DocumentCard({ document, type }) {
                 )}
                 {type === "favorite" && document.favoritedAt && (
                     <p className="text-xs text-gray-500 flex items-center gap-1 mt-2">
-                        <Heart size={12} className="text-red-400" />
+                        <Bookmark size={12} className="text-red-400" />
                         Yêu thích: {formatDateTime(document.favoritedAt)}
                     </p>
                 )}
@@ -143,19 +152,19 @@ export default function DocumentCard({ document, type }) {
             <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
                 <div className="flex items-center gap-4 text-sm text-gray-600">
                     <div className="flex items-center gap-1">
-                        <Eye size={16} className="text-gray-500" />
+                        <Eye size={21} className="text-gray-500" />
                         <span>{document.viewCount || 0}</span>
                     </div>
                     <motion.button
-                        className={`flex items-center gap-1 ${isFavorite ? "text-red-600" : "text-gray-600"} hover:text-red-800 transition-colors`}
+                        className={`flex items-center gap-1 ${isFavorite ? "text-yellow-300" : "text-gray-600"} hover:text-yellow-500 transition-colors`}
                         onClick={handleToggleFavorite}
                         disabled={userLoading}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                     >
-                        <Heart
-                            size={16}
-                            className={isFavorite ? "fill-red-600" : "fill-none stroke-gray-600"}
+                        <Bookmark
+                            size={21}
+                            className={isFavorite ? "fill-yellow-300" : "fill-none stroke-gray-600"}
                         />
                         <span>{favoriteCount}</span>
                     </motion.button>
@@ -166,7 +175,7 @@ export default function DocumentCard({ document, type }) {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                 >
-                    <Download size={16} />
+                    <Download size={21} />
                     Tải xuống ({document.downloadCount || 0})
                 </motion.button>
             </div>

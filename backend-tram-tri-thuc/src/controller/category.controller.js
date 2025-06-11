@@ -130,15 +130,16 @@ exports.getCategoryBySlug = async (req, res) => {
             {
                 $project: {
                     _id: 1,
-                    title: 1,
+                    tags: 1,
                     slug: 1,
+                    title: 1,
+                    format: 1,
+                    isFeatured: 1,
                     description: 1,
                     thumbnailUrl: 1,
-                    format: 1,
-                    viewCount: 1,
                     downloadCount: 1,
                     favoriteCount: 1,
-                    tags: 1,
+                    viewCount: 1,
                     createdAt: 1,
                     category: {
                         _id: "$category._id",

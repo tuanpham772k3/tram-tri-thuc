@@ -242,15 +242,16 @@ class UserService {
                     $project: {
                         documentId: {
                             _id: "$document._id",
-                            title: "$document.title",
+                            tags: "$document.tags",
                             slug: "$document.slug",
+                            title: "$document.title",
+                            format: "$document.format",
+                            isFeatured: "$document.isFeatured",
                             description: "$document.description",
                             thumbnailUrl: "$document.thumbnailUrl",
-                            format: "$document.format",
-                            tags: "$document.tags",
-                            viewCount: "$document.viewCount",
                             downloadCount: "$document.downloadCount",
                             favoriteCount: "$document.favoriteCount",
+                            viewCount: "$document.viewCount",
                             createdAt: "$document.createdAt",
                             category: {
                                 _id: { $ifNull: ["$document.category._id", null] },
@@ -415,14 +416,15 @@ class UserService {
                 {
                     $project: {
                         _id: "$document._id",
-                        title: "$document.title",
                         slug: "$document.slug",
+                        title: "$document.title",
+                        format: "$document.format",
+                        isFeatured: "$document.isFeatured",
                         description: "$document.description",
                         thumbnailUrl: "$document.thumbnailUrl",
-                        format: "$document.format",
-                        viewCount: "$document.viewCount",
                         downloadCount: "$document.downloadCount",
                         favoriteCount: "$document.favoriteCount",
+                        viewCount: "$document.viewCount",
                         createdAt: "$document.createdAt",
                         favoritedAt: 1,
                         category: {
@@ -582,14 +584,15 @@ class UserService {
                 {
                     $project: {
                         _id: "$document._id",
-                        title: "$document.title",
                         slug: "$document.slug",
+                        title: "$document.title",
+                        format: "$document.format",
+                        isFeatured: "$document.isFeatured",
                         description: "$document.description",
                         thumbnailUrl: "$document.thumbnailUrl",
-                        format: "$document.format",
-                        viewCount: "$document.viewCount",
                         downloadCount: "$document.downloadCount",
                         favoriteCount: "$document.favoriteCount",
+                        viewCount: "$document.viewCount",
                         createdAt: "$document.createdAt",
                         downloadedAt: 1,
                         category: {

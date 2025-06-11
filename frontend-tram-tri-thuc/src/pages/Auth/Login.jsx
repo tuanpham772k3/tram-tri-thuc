@@ -29,6 +29,7 @@ const Login = () => {
         }),
         onSubmit: async ({ email, password, remember }) => {
             await dispatch(loginThunk({ email, password, remember }));
+            
         },
     });
 

@@ -282,6 +282,7 @@ export const toggleFavorite = createAsyncThunk(
             }
             const response = await customAxios.post(`/documents/${docId}/favorite`);
             showToast("success", response.data.data.message);
+            console.log("toggleFavorite response:", response.data.data);
             return response.data.data; // { document, favoriteDocuments, isFavorite, message }
         } catch (error) {
             let message;
@@ -340,7 +341,7 @@ const documentSlice = createSlice({
             totalItems: 0,
             totalPages: 0,
             currentPage: 1,
-            limit: 10,
+            limit: 12,
         },
         featuredPagination: {
             totalItems: 0,
@@ -352,14 +353,14 @@ const documentSlice = createSlice({
             totalItems: 0,
             totalPages: 0,
             currentPage: 1,
-            limit: 10,
+            limit: 12,
         },
         relatedPagination: {
             // Thêm state cho phân trang tài liệu liên quan
             totalItems: 0,
             totalPages: 0,
             currentPage: 1,
-            limit: 10,
+            limit: 12,
         },
     },
     reducers: {

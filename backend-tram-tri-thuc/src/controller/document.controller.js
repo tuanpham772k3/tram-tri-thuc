@@ -162,6 +162,7 @@ exports.getDocuments = async (req, res) => {
                     title: 1,
                     format: 1,
                     fileName: 1,
+                    isFeatured: 1,
                     description: 1,
                     thumbnailUrl: 1,
                     downloadCount: 1,
@@ -902,6 +903,7 @@ exports.getFeaturedDocuments = async (req, res) => {
                     title: 1,
                     format: 1,
                     fileName: 1,
+                    isFeatured: 1,
                     description: 1,
                     thumbnailUrl: 1,
                     downloadCount: 1,
@@ -975,7 +977,7 @@ exports.toggleFavorite = async (req, res) => {
 
         const updatedDocument = await Document.findById(docId)
             .select(
-                "title description slug categoryId uploaderId viewCount downloadCount favoriteCount createdAt tags"
+                "title description thumbnailUrl slug categoryId uploaderId viewCount downloadCount favoriteCount createdAt tags"
             )
             .populate("categoryId", "name slug")
             .populate("uploaderId", "name email")

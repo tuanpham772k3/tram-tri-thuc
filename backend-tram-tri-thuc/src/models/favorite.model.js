@@ -9,7 +9,6 @@ const favoriteSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Đảm bảo mỗi user chỉ yêu thích một tài liệu một lần
 favoriteSchema.index({ userId: 1, documentId: 1 }, { unique: true });
 
 const Favorite = mongoose.models.Favorite || mongoose.model("Favorite", favoriteSchema);
