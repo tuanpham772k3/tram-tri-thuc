@@ -15,11 +15,16 @@ const {
     getFeaturedDocuments,
     toggleFavorite,
     getRelatedDocuments,
+    getVipDocuments,
 } = require("../controller/document.controller");
 const { documentListLimiter } = require("../middlewares/rateLimit");
+const { checkVipAccess } = require("../middlewares/auth.middleware");
 
 // Lấy danh sách tài liệu của người dùng hiện tại
 router.get("/me", authMiddleware, isUploader, getMyDocuments);
+
+//Lấy danh sách tài liệu vip
+router.get("/vip", authMiddleware, checkVipAccess, getVipDocuments);
 
 // Lấy tài liệu nổi bật
 router.get("/featured", getFeaturedDocuments);
@@ -49,6 +54,6 @@ router.delete("/:id", authMiddleware, isUploader, deleteDocument);
 router.post("/:id/favorite", authMiddleware, toggleFavorite);
 
 // Lấy danh sách tài liệu liên quan theo tags
-router.get("/:id/related", getRelatedDocuments);
+router.get("/:id/related", authMiddleware, getRelatedDocuments);
 
 module.exports = router;

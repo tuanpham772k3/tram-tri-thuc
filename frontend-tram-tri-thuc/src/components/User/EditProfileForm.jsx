@@ -17,12 +17,21 @@ const EditProfileForm = () => {
         () => ({
             name: userInfo?.name || "",
             avatar: userInfo?.avatar || "",
+            phone: userInfo?.phone || "",
+            address: userInfo?.address || "",
+            country: userInfo?.country || "",
         }),
         [userInfo]
     );
 
     const [formData, setFormData] = useState(initialFormData);
-    const [formErrors, setFormErrors] = useState({ name: "", avatar: "" });
+    const [formErrors, setFormErrors] = useState({
+        name: "",
+        avatar: "",
+        phone: "",
+        address: "",
+        country: "",
+    });
     const [avatarPreview, setAvatarPreview] = useState(userInfo?.avatar || "");
     const [isEditing, setIsEditing] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -31,12 +40,24 @@ const EditProfileForm = () => {
     useEffect(() => {
         setFormData(initialFormData);
         setAvatarPreview(userInfo?.avatar || "");
-        setFormErrors({ name: "", avatar: "" });
+        setFormErrors({
+            name: "",
+            avatar: "",
+            phone: "",
+            address: "",
+            country: "",
+        });
     }, [initialFormData, userInfo]);
 
     const validateForm = () => {
         let isValid = true;
-        const errors = { name: "", avatar: "" };
+        const errors = {
+            name: "",
+            avatar: "",
+            phone: "",
+            address: "",
+            country: "",
+        };
 
         if (!formData.name.trim()) {
             errors.name = "Tên không được để trống";
@@ -45,6 +66,16 @@ const EditProfileForm = () => {
 
         if (formData.avatar && !/^https?:\/\/.*\.(png|jpg|jpeg|gif|webp)$/i.test(formData.avatar)) {
             errors.avatar = "Avatar phải là URL hình ảnh hợp lệ";
+            isValid = false;
+        }
+
+        if (formData.phone && !/^\+?\d{8,15}$/.test(formData.phone)) {
+            errors.phone = "Số điện thoại không hợp lệ (8-15 chữ số)";
+            isValid = false;
+        }
+
+        if (formData.country && !/^[\p{L}\s]{2,100}$/u.test(formData.country)) {
+            errors.country = "Quốc gia không hợp lệ";
             isValid = false;
         }
 
@@ -69,7 +100,13 @@ const EditProfileForm = () => {
     const handleReset = () => {
         setFormData(initialFormData);
         setAvatarPreview(userInfo?.avatar || "");
-        setFormErrors({ name: "", avatar: "" });
+        setFormErrors({
+            name: "",
+            avatar: "",
+            phone: "",
+            address: "",
+            country: "",
+        });
         setIsEditing(false);
     };
 
@@ -78,6 +115,12 @@ const EditProfileForm = () => {
         setFormData({ ...formData, avatar: url });
         setAvatarPreview(url);
         setFormErrors({ ...formErrors, avatar: "" });
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+        setFormErrors({ ...formErrors, [name]: "" });
     };
 
     const handleLogout = async () => {
@@ -129,7 +172,9 @@ const EditProfileForm = () => {
                                 </div>
                                 {isEditing && (
                                     <button
-                                        onClick={() => document.getElementById("avatar-input").focus()}
+                                        onClick={() =>
+                                            document.getElementById("avatar-input").focus()
+                                        }
                                         className="absolute bottom-2 right-2 bg-white p-2 rounded-xl shadow-lg border border-gray-100 hover:border-blue-400 hover:text-blue-600"
                                     >
                                         <FaCamera className="w-4 h-4" />
@@ -140,7 +185,9 @@ const EditProfileForm = () => {
                                 <h2 className="text-2xl font-bold text-gray-900 mb-1">
                                     {userInfo?.name || "Người dùng"}
                                 </h2>
-                                <p className="text-gray-500">{userInfo?.email || "Chưa có email"}</p>
+                                <p className="text-gray-500">
+                                    {userInfo?.email || "Chưa có email"}
+                                </p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4 md:self-start">
@@ -182,6 +229,7 @@ const EditProfileForm = () => {
                                 <input
                                     id="avatar-input"
                                     type="text"
+                                    name="avatar"
                                     value={formData.avatar}
                                     onChange={handleAvatarChange}
                                     className={`w-full px-4 py-3 bg-white border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
@@ -200,10 +248,9 @@ const EditProfileForm = () => {
                                 </label>
                                 <input
                                     type="text"
+                                    name="name"
                                     value={formData.name}
-                                    onChange={(e) =>
-                                        setFormData({ ...formData, name: e.target.value })
-                                    }
+                                    onChange={handleInputChange}
                                     className={`w-full px-4 py-3 bg-white border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                         formErrors.name ? "border-red-500" : "border-gray-200"
                                     }`}
@@ -211,6 +258,67 @@ const EditProfileForm = () => {
                                 />
                                 {formErrors.name && (
                                     <p className="mt-2 text-sm text-red-500">{formErrors.name}</p>
+                                )}
+                            </div>
+
+                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Số điện thoại
+                                </label>
+                                <input
+                                    type="text"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
+                                    className={`w-full px-4 py-3 bg-white border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                        formErrors.phone ? "border-red-500" : "border-gray-200"
+                                    }`}
+                                    placeholder="Nhập số điện thoại của bạn"
+                                />
+                                {formErrors.phone && (
+                                    <p className="mt-2 text-sm text-red-500">{formErrors.phone}</p>
+                                )}
+                            </div>
+
+                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Địa chỉ
+                                </label>
+                                <input
+                                    type="text"
+                                    name="address"
+                                    value={formData.address}
+                                    onChange={handleInputChange}
+                                    className={`w-full px-4 py-3 bg-white border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                        formErrors.address ? "border-red-500" : "border-gray-200"
+                                    }`}
+                                    placeholder="Nhập địa chỉ của bạn"
+                                />
+                                {formErrors.address && (
+                                    <p className="mt-2 text-sm text-red-500">
+                                        {formErrors.address}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Quốc gia
+                                </label>
+                                <input
+                                    type="text"
+                                    name="country"
+                                    value={formData.country}
+                                    onChange={handleInputChange}
+                                    className={`w-full px-4 py-3 bg-white border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                        formErrors.country ? "border-red-500" : "border-gray-200"
+                                    }`}
+                                    placeholder="Nhập quốc gia của bạn"
+                                />
+                                {formErrors.country && (
+                                    <p className="mt-2 text-sm text-red-500">
+                                        {formErrors.country}
+                                    </p>
                                 )}
                             </div>
 
@@ -264,12 +372,38 @@ const EditProfileForm = () => {
                     ) : (
                         <div className="space-y-6">
                             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                                <h3 className="text-sm font-medium text-gray-500 mb-2">URL Avatar</h3>
-                                <p className="text-gray-900">{formData.avatar || "Chưa có URL avatar"}</p>
+                                <h3 className="text-sm font-medium text-gray-500 mb-2">
+                                    URL Avatar
+                                </h3>
+                                <p className="text-gray-900">
+                                    {formData.avatar || "Chưa có URL avatar"}
+                                </p>
                             </div>
                             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                                <h3 className="text-sm font-medium text-gray-500 mb-2">Tên hiển thị</h3>
+                                <h3 className="text-sm font-medium text-gray-500 mb-2">
+                                    Tên hiển thị
+                                </h3>
                                 <p className="text-gray-900">{formData.name || "Chưa có tên"}</p>
+                            </div>
+                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                                <h3 className="text-sm font-medium text-gray-500 mb-2">
+                                    Số điện thoại
+                                </h3>
+                                <p className="text-gray-900">
+                                    {formData.phone || "Chưa có số điện thoại"}
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                                <h3 className="text-sm font-medium text-gray-500 mb-2">Địa chỉ</h3>
+                                <p className="text-gray-900">
+                                    {formData.address || "Chưa có địa chỉ"}
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                                <h3 className="text-sm font-medium text-gray-500 mb-2">Quốc gia</h3>
+                                <p className="text-gray-900">
+                                    {formData.country || "Chưa có quốc gia"}
+                                </p>
                             </div>
                         </div>
                     )}
@@ -309,7 +443,8 @@ const EditProfileForm = () => {
                                     Xác nhận xóa tài khoản
                                 </h3>
                                 <p className="text-gray-600 mb-8">
-                                    Bạn có chắc muốn xóa tài khoản? Hành động này không thể hoàn tác và tất cả dữ liệu của bạn sẽ bị xóa vĩnh viễn.
+                                    Bạn có chắc muốn xóa tài khoản? Hành động này không thể hoàn tác
+                                    và tất cả dữ liệu của bạn sẽ bị xóa vĩnh viễn.
                                 </p>
                                 <div className="flex justify-end gap-3">
                                     <button

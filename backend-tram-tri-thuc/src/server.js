@@ -7,6 +7,7 @@ const connectDB = require("./config/db.config.js");
 const http = require("http");
 const socketIo = require("socket.io");
 const apiRoutes = require("./routers/index.js");
+const logger = require("./utils/logger.js");
 
 const allowedOrigins = [
     "http://localhost:5173",
@@ -74,6 +75,7 @@ app.use((req, res, next) => {
     next();
 });
 
+
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions)); // Xử lý preflight request
 app.use(cookieParser());
@@ -85,7 +87,6 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 connectDB();
 
 // Import routes
-const logger = require("./utils/logger.js");
 app.use("/api/v1", apiRoutes);
 
 app.get("/", (req, res) => {

@@ -14,16 +14,16 @@ import {
     Clock,
     ThumbsUp,
 } from "lucide-react";
-import DownloadButton from "../components/Document/DownloadButton";
-import CommentSection from "../components/Document/CommentSection";
-import RatingStars from "../components/Rating/RatingStar";
-import DocumentViewer from "../components/Document/DocumentViewer";
-import DocumentList from "../components/Document/DocumentList";
+import DownloadButton from "../../components/Document/DownloadButton";
+import CommentSection from "../../components/Document/CommentSection";
+import RatingStars from "../../components/Rating/RatingStar";
+import DocumentViewer from "../../components/Document/DocumentViewer";
+import DocumentList from "../../components/Document/DocumentList";
 import {
     fetchDocumentBySlug,
     fetchRelatedDocuments,
     toggleFavorite,
-} from "../store/slices/documentSlice";
+} from "../../store/slices/documentSlice";
 
 export default function DocumentDetailPage() {
     const { slug } = useParams();

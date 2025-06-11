@@ -10,6 +10,8 @@ const {
     getUsers,
     getUserDownloads,
     deleteMyAccount,
+    CallBack,
+    PaymentZaloPay,
 } = require("../controller/user.controller");
 const validate = require("../middlewares/validate");
 const { query } = require("express-validator");
@@ -34,5 +36,9 @@ router.get("/me/downloads", authMiddleware, getUserDownloads);
 
 // Danh sách tài liệu yêu thích
 router.get("/me/favorites", authMiddleware, getUserFavorites);
+
+// thanh toán
+router.post("/paymentZaloPay", authMiddleware, PaymentZaloPay);
+router.post("/callback", CallBack);
 
 module.exports = router;

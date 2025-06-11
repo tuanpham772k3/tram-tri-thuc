@@ -70,7 +70,7 @@ class UserService {
     static async updateUserInfo(userId, updateData) {
         try {
             // Có thể lọc các trường cho phép update ở đây nếu cần
-            const allowedFields = ["name", "avatar", "email"];
+            const allowedFields = ["name", "avatar", "phone", "address", "country"];
             const filteredData = {};
             allowedFields.forEach((field) => {
                 if (updateData[field] !== undefined) filteredData[field] = updateData[field];
@@ -247,6 +247,7 @@ class UserService {
                             title: "$document.title",
                             format: "$document.format",
                             isFeatured: "$document.isFeatured",
+                            accessLevel: "$document.accessLevel",
                             description: "$document.description",
                             thumbnailUrl: "$document.thumbnailUrl",
                             downloadCount: "$document.downloadCount",
@@ -420,6 +421,7 @@ class UserService {
                         title: "$document.title",
                         format: "$document.format",
                         isFeatured: "$document.isFeatured",
+                        accessLevel: "$document.accessLevel",
                         description: "$document.description",
                         thumbnailUrl: "$document.thumbnailUrl",
                         downloadCount: "$document.downloadCount",
@@ -587,12 +589,13 @@ class UserService {
                         slug: "$document.slug",
                         title: "$document.title",
                         format: "$document.format",
-                        isFeatured: "$document.isFeatured",
                         description: "$document.description",
+                        accessLevel: "$document.accessLevel",
+                        isFeatured: "$document.isFeatured",
                         thumbnailUrl: "$document.thumbnailUrl",
+                        viewCount: "$document.viewCount",
                         downloadCount: "$document.downloadCount",
                         favoriteCount: "$document.favoriteCount",
-                        viewCount: "$document.viewCount",
                         createdAt: "$document.createdAt",
                         downloadedAt: 1,
                         category: {

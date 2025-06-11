@@ -18,8 +18,6 @@ const documentSchema = new mongoose.Schema(
                 "image/webp",
                 "application/msword",
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                "application/vnd.ms-excel",
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 "application/vnd.ms-powerpoint",
                 "application/vnd.openxmlformats-officedocument.presentationml.presentation",
                 "video/mp4",
@@ -31,18 +29,15 @@ const documentSchema = new mongoose.Schema(
                 "application/x-rar-compressed",
             ],
         },
-        status: {
-            type: String,
-            enum: ["pending", "approved", "rejected"],
-            default: "pending",
-        },
+        status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
+        accessLevel: { type: String, enum: ["free", "vip"], default: "free" },
         format: { type: String, required: true },
         size: { type: Number, required: true },
         slug: { type: String, required: true, unique: true },
         thumbnailUrl: { type: String },
         tags: [{ type: String, trim: true, maxlength: 50 }],
         uploaderId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-        categoryId: { type: Schema.Types.ObjectId, ref: "Category", required: true },
+        categoryId: { type: Schema.Types.ObjectId, ref: "Category" },
         isPublic: { type: Boolean, default: true },
         isFeatured: { type: Boolean, default: false },
         viewCount: { type: Number, default: 0 },
@@ -60,6 +55,7 @@ documentSchema.index({
     status: 1,
     isPublic: 1,
     isFeatured: 1,
+    accessLevel: 1,
 });
 
 const Document = mongoose.models.Document || mongoose.model("Document", documentSchema);

@@ -420,9 +420,7 @@ exports.downloadDocument = async (req, res) => {
 // POST /api/documents
 exports.uploadDocument = async (req, res) => {
     try {
-        const { title, description, categoryId, tags } = req.body;
-        console.log(req.body);
-        console.log("Received tag:", tags);
+        const { title, description, categoryId, tags, accessLevel } = req.body;
         const file = req.files?.file?.[0];
         const thumbnail = req.files?.thumbnail?.[0];
 
@@ -441,8 +439,17 @@ exports.uploadDocument = async (req, res) => {
                 .status(400)
                 .json({ success: false, message: "Tags không hợp lệ. Tags phải là chuỗi." });
         }
-        if (!categoryId || !Types.ObjectId.isValid(categoryId)) {
-            return res.status(400).json({ success: false, message: "ID danh mục không hợp lệ." });
+
+        if (!accessLevel || !["free", "vip"].includes(accessLevel)) {
+            return res
+                .status(400)
+                .json({ success: false, message: "accessLevel phải là 'free' hoặc 'vip'." });
+        }
+        // Validate categoryId
+        if (accessLevel === "free" && (!categoryId || !Types.ObjectId.isValid(categoryId))) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Danh mục là bắt buộc cho tài liệu miễn phí." });
         }
 
         const filePath = path.join(__dirname, "../../uploads", file.filename);
@@ -452,7 +459,7 @@ exports.uploadDocument = async (req, res) => {
                 .json({ success: false, message: "File tài liệu không tồn tại." });
         }
 
-        if (!(await Category.findById(categoryId))) {
+        if (accessLevel === "free" && categoryId && !(await Category.findById(categoryId))) {
             if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
             if (
                 thumbnail &&
@@ -483,9 +490,11 @@ exports.uploadDocument = async (req, res) => {
             thumbnailUrl: thumbnail ? `/uploads/${thumbnail.filename}` : null,
             tags: tags ? tags.split(",").map((t) => t.trim()) : [],
             uploaderId: req.user._id,
-            categoryId,
-            isPublic: false,
+            categoryId:
+                accessLevel === "free" && categoryId ? new Types.ObjectId(categoryId) : null,
+            isPublic: accessLevel === "free",
             status: "pending",
+            accessLevel: accessLevel || "free",
         });
 
         await document.save();
@@ -503,7 +512,7 @@ exports.uploadDocument = async (req, res) => {
         if (req.files?.thumbnail?.[0]) {
             const thumbnailPath = path.join(
                 __dirname,
-                "../../Uploads",
+                "../../uploads",
                 req.files.thumbnail[0].filename
             );
             if (fs.existsSync(thumbnailPath)) fs.unlinkSync(thumbnailPath);
@@ -1011,10 +1020,12 @@ exports.toggleFavorite = async (req, res) => {
 };
 
 // GET /api/documents/:id/related
+// GET /api/documents/:id/related
 exports.getRelatedDocuments = async (req, res) => {
     try {
         const { id } = req.params;
         const { sort = "relevance:desc", page, limit } = req.query;
+        const user = req.user; // Lấy thông tin user từ authMiddleware
 
         // Validation
         if (!Types.ObjectId.isValid(id)) {
@@ -1047,6 +1058,9 @@ exports.getRelatedDocuments = async (req, res) => {
             });
         }
 
+        // Kiểm tra quyền truy cập VIP
+        const hasVipAccess = user && (user.isVip === "active" || user.role === "admin");
+
         // Pagination
         const pagination = getPagination({ page, limit, defaultLimit: 10 });
 
@@ -1055,7 +1069,7 @@ exports.getRelatedDocuments = async (req, res) => {
             _id: { $ne: document._id }, // Loại trừ tài liệu gốc
             tags: { $in: document.tags }, // Tìm tài liệu có ít nhất một tag trùng
             status: "approved", // Chỉ lấy tài liệu đã duyệt
-            isPublic: true, // Chỉ lấy tài liệu công khai
+            // Bỏ isPublic: true để lấy cả tài liệu VIP
         };
 
         // Xử lý sắp xếp
@@ -1063,7 +1077,6 @@ exports.getRelatedDocuments = async (req, res) => {
         if (sort) {
             const [field, order] = sort.split(":");
             if (field === "relevance") {
-                // Sắp xếp theo số tag trùng (ưu tiên cao)
                 sortOptions.tagMatchCount = order === "desc" ? -1 : 1;
                 sortOptions.viewCount = -1; // Tie-breaker: lượt xem
             } else {
@@ -1075,7 +1088,7 @@ exports.getRelatedDocuments = async (req, res) => {
         }
 
         // Aggregation pipeline
-        const documents = await Document.aggregate([
+        let documents = await Document.aggregate([
             { $match: query },
             // Tính số tag trùng
             {
@@ -1113,6 +1126,7 @@ exports.getRelatedDocuments = async (req, res) => {
                     title: 1,
                     format: 1,
                     fileName: 1,
+                    isFeatured: 1,
                     description: 1,
                     thumbnailUrl: 1,
                     downloadCount: 1,
@@ -1120,6 +1134,7 @@ exports.getRelatedDocuments = async (req, res) => {
                     viewCount: 1,
                     createdAt: 1,
                     tagMatchCount: 1,
+                    accessLevel: 1, // Thêm accessLevel để lọc sau
                     category: {
                         _id: "$category._id",
                         name: "$category.name",
@@ -1135,8 +1150,21 @@ exports.getRelatedDocuments = async (req, res) => {
             { $limit: pagination.limit },
         ]);
 
-        // Đếm tổng số tài liệu
-        const totalDocs = await Document.countDocuments(query);
+        // Lọc tài liệu VIP nếu user không có quyền
+        if (!hasVipAccess) {
+            documents = documents.filter((doc) => doc.accessLevel !== "vip");
+        }
+
+        // Đếm tổng số tài liệu (sau khi lọc VIP nếu cần)
+        let totalDocs = await Document.countDocuments(query);
+        if (!hasVipAccess) {
+            const vipDocs = await Document.countDocuments({
+                ...query,
+                accessLevel: "vip",
+            });
+            totalDocs -= vipDocs; // Trừ số tài liệu VIP nếu user không có quyền
+        }
+
         const pagingData = getPagingData(documents, totalDocs, pagination.page, pagination.limit);
 
         res.status(200).json({ success: true, data: pagingData });
@@ -1146,5 +1174,185 @@ exports.getRelatedDocuments = async (req, res) => {
             success: false,
             message: "Không thể lấy danh sách tài liệu liên quan.",
         });
+    }
+};
+
+exports.getVipDocuments = async (req, res) => {
+    try {
+        logger.info("req.user in getVipDocuments:", {
+            userId: req.user?._id,
+            role: req.user?.role,
+            isVip: req.user?.isVip,
+            email: req.user?.email,
+        });
+
+        const { search, uploader, format, sort, startDate, endDate, dateField, page, limit } =
+            req.query;
+
+        // Validation
+        if (page && (!Number.isInteger(Number(page)) || Number(page) < 1)) {
+            return res.status(400).json({ success: false, message: "Số trang không hợp lệ." });
+        }
+        if (
+            limit &&
+            (!Number.isInteger(Number(limit)) || Number(limit) < 1 || Number(limit) > 100)
+        ) {
+            return res.status(400).json({ success: false, message: "Giới hạn không hợp lệ." });
+        }
+        if (search && (typeof search !== "string" || search.trim().length > 100)) {
+            return res.status(400).json({ success: false, message: "Từ khóa tìm kiếm quá dài." });
+        }
+        if (uploader && !Types.ObjectId.isValid(uploader)) {
+            return res
+                .status(400)
+                .json({ success: false, message: "ID người tải lên không hợp lệ." });
+        }
+        if (sort && !/^(viewCount|downloadCount|createdAt|averageRating):(asc|desc)$/.test(sort)) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Định dạng sắp xếp không hợp lệ." });
+        }
+
+        // Kiểm tra quyền truy cập VIP (tùy chọn, giả sử user có quyền)
+        if (req.user.role !== "admin" && req.user.isVip !== "active") {
+            return res
+                .status(403)
+                .json({ success: false, message: "Bạn không có quyền truy cập tài liệu VIP." });
+        }
+
+        const pagination = getPagination({ page, limit });
+        const query = { status: "approved", isPublic: false, accessLevel: "vip" };
+
+        // Lọc theo uploader
+        if (uploader) {
+            query.uploaderId = new Types.ObjectId(uploader);
+        }
+
+        // Lọc theo format
+        if (format) {
+            const validFormats = ["pdf", "docx", "pptx", "zip"];
+            if (!validFormats.includes(format.toLowerCase())) {
+                return res.status(400).json({ success: false, message: "Định dạng không hợp lệ." });
+            }
+            query.format = format.toLowerCase();
+        }
+
+        // Lọc theo khoảng ngày
+        if (startDate && endDate) {
+            const validDateFields = ["createdAt", "updatedAt"];
+            const selectedDateField = validDateFields.includes(dateField) ? dateField : "createdAt";
+
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                return res
+                    .status(400)
+                    .json({ success: false, message: "Định dạng ngày không hợp lệ." });
+            }
+            if (start > end) {
+                return res
+                    .status(400)
+                    .json({ success: false, message: "Ngày bắt đầu phải trước ngày kết thúc." });
+            }
+
+            query[selectedDateField] = {
+                $gte: start,
+                $lte: end,
+            };
+        }
+
+        // Sắp xếp
+        const validSortFields = ["viewCount", "downloadCount", "averageRating", "createdAt"];
+        const sortOptions = {};
+        if (sort) {
+            const [field, order] = sort.split(":");
+            if (!validSortFields.includes(field)) {
+                return res
+                    .status(400)
+                    .json({ success: false, message: "Trường sắp xếp không hợp lệ." });
+            }
+            sortOptions[field] = order === "desc" ? -1 : 1;
+        } else {
+            sortOptions.createdAt = -1;
+        }
+
+        const documents = await Document.aggregate([
+            { $match: query },
+            {
+                $lookup: {
+                    from: "ratings",
+                    localField: "_id",
+                    foreignField: "documentId",
+                    as: "ratings",
+                },
+            },
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "categoryId",
+                    foreignField: "_id",
+                    as: "category",
+                },
+            },
+            { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "uploaderId",
+                    foreignField: "_id",
+                    as: "uploader",
+                },
+            },
+            { $unwind: { path: "$uploader", preserveNullAndEmptyArrays: true } },
+            {
+                $match: search
+                    ? {
+                          $or: [
+                              { title: { $regex: search, $options: "i" } },
+                              { description: { $regex: search, $options: "i" } },
+                              { tags: { $regex: search, $options: "i" } },
+                              { "uploader.name": { $regex: search, $options: "i" } },
+                          ],
+                      }
+                    : {},
+            },
+            {
+                $project: {
+                    _id: 1,
+                    slug: 1,
+                    tags: 1,
+                    title: 1,
+                    format: 1,
+                    fileName: 1,
+                    isFeatured: 1,
+                    description: 1,
+                    thumbnailUrl: 1,
+                    downloadCount: 1,
+                    favoriteCount: 1,
+                    viewCount: 1,
+                    createdAt: 1,
+                    accessLevel: 1,
+                    category: {
+                        _id: "$category._id",
+                        name: "$category.name",
+                        slug: "$category.slug",
+                    },
+                    uploader: { _id: "$uploader._id", name: "$uploader.name" },
+                    averageRating: { $avg: "$ratings.score" },
+                    totalRatings: { $size: "$ratings" },
+                },
+            },
+            { $sort: sortOptions },
+            { $skip: pagination.skip },
+            { $limit: pagination.limit },
+        ]);
+
+        const totalDocs = await Document.countDocuments(query);
+        const pagingData = getPagingData(documents, totalDocs, pagination.page, pagination.limit);
+
+        res.status(200).json({ success: true, data: pagingData });
+    } catch (error) {
+        logger.error("Get VIP documents error:", error);
+        res.status(500).json({ success: false, message: "Không thể lấy danh sách tài liệu VIP." });
     }
 };

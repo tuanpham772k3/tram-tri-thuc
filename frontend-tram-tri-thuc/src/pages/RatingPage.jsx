@@ -3,10 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { debounce } from "lodash";
-import { Search, TrendingUp, Eye, Award, Heart, User, BookOpen, Filter } from "lucide-react";
+import { Search, TrendingUp, Eye, Award, User, BookOpen, Filter } from "lucide-react";
 import { FaFilePdf, FaFileWord, FaFilePowerpoint, FaFileArchive } from "react-icons/fa";
-import { Button, Input } from "antd";
-import { fetchDocuments, fetchDocumentById, toggleFavorite } from "../store/slices/documentSlice";
+import { Input, Button } from "antd";
+import {
+    fetchDocuments,
+    fetchVipDocuments,
+    fetchDocumentById,
+} from "../store/slices/documentSlice";
 import {
     fetchRatingsByDocument,
     fetchAverageRating,
@@ -29,12 +33,14 @@ const formatIcons = {
 // Trang chính quản lý danh sách tài liệu và đánh giá
 const RatingPage = () => {
     const dispatch = useDispatch();
-    const { documentId } = useParams();
     const {
         documents,
+        vipDocuments,
         currentDocument,
         loading: docLoading,
         error: docError,
+        pagination,
+        vipPagination,
     } = useSelector((state) => state.documents);
     const {
         ratings,
@@ -55,6 +61,10 @@ const RatingPage = () => {
     const [sortBy, setSortBy] = useState("averageRating:desc");
     const [selectedDocument, setSelectedDocument] = useState(null);
     const [isFiltering, setIsFiltering] = useState(false);
+    const [accessLevelFilter, setAccessLevelFilter] = useState("free");
+
+    // Kiểm tra quyền truy cập VIP
+    const hasVipAccess = userInfo && (userInfo.isVip === "active" || userInfo.role === "admin");
 
     // Debounce tìm kiếm
     const debouncedSearch = useMemo(() => debounce((value) => setSearchTerm(value), 50), []);
@@ -71,18 +81,22 @@ const RatingPage = () => {
             page: 1,
             limit: 10,
             search: searchTerm,
-            category: filterCategory === "all" ? "" : filterCategory,
             sort: sortBy,
         };
-        console.log("Fetching documents with params:", params); // Debug
-        dispatch(fetchDocuments(params)).finally(() => setIsFiltering(false));
-    }, [dispatch, searchTerm, filterCategory, sortBy]);
+        // Chỉ thêm category vào params nếu không phải chế độ VIP
+        if (accessLevelFilter !== "vip" && filterCategory !== "all") {
+            params.category = filterCategory;
+        }
+        console.log("Fetching documents with params:", params);
+        const fetchAction = accessLevelFilter === "vip" ? fetchVipDocuments : fetchDocuments;
+        dispatch(fetchAction(params)).finally(() => setIsFiltering(false));
+    }, [dispatch, searchTerm, filterCategory, sortBy, accessLevelFilter]);
 
     // Debug filterCategory
     useEffect(() => {
-        console.log("Current filterCategory:", filterCategory); // Debug
+        console.log("Current filterCategory:", filterCategory);
         const selectedCat = categories.find((cat) => cat.slug === filterCategory);
-        console.log("Selected category:", selectedCat); // Debug
+        console.log("Selected category:", selectedCat);
     }, [filterCategory, categories]);
 
     // Đồng bộ selectedDocument với currentDocument
@@ -111,6 +125,7 @@ const RatingPage = () => {
         dispatch(fetchRatingsByDocument({ documentId: docId, params: { page: 1, limit: 10 } }));
         dispatch(fetchAverageRating(docId));
         dispatch(fetchRatingDistribution(docId));
+        setSelectedDocument(null);
     };
 
     // Xử lý gửi đánh giá
@@ -129,6 +144,20 @@ const RatingPage = () => {
                 toast.error(result.payload.message);
             }
         });
+    };
+
+    // Xử lý chuyển đổi accessLevel
+    const handleToggleAccessLevel = (level) => {
+        if (level === "vip" && !hasVipAccess) {
+            toast.error("Bạn cần tài khoản VIP để xem tài liệu VIP!");
+            return;
+        }
+        setAccessLevelFilter(level);
+        setSelectedDocument(null);
+        // Reset filterCategory khi chuyển sang VIP
+        if (level === "vip") {
+            setFilterCategory("all");
+        }
     };
 
     // Render danh sách tài liệu
@@ -151,7 +180,8 @@ const RatingPage = () => {
                                 {doc.title}
                             </h4>
                             <p className="text-xs text-gray-500 mb-2">
-                                {doc.uploaderId?.name || "Ẩn danh"} • {doc.categoryId?.name}
+                                {doc.uploaderId?.name || "Ẩn danh"} •{" "}
+                                {doc.categoryId?.name || "Không có danh mục"}
                             </p>
                             <div className="flex items-center space-x-1 mb-2">
                                 <RatingStar
@@ -181,6 +211,10 @@ const RatingPage = () => {
         </div>
     );
 
+    // Chọn danh sách tài liệu để hiển thị
+    const displayedDocuments = accessLevelFilter === "vip" ? vipDocuments : documents;
+    const displayedPagination = accessLevelFilter === "vip" ? vipPagination : pagination;
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
             {/* Background decoration */}
@@ -191,12 +225,27 @@ const RatingPage = () => {
             {/* Header */}
             <div className="bg-white shadow-sm border-b relative z-10">
                 <div className="max-w-7xl mx-auto px-6 py-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between flex-wrap gap-4">
                         <div>
                             <h1 className="text-2xl font-bold text-gray-900">Hệ thống Đánh giá</h1>
                             <p className="text-gray-600 mt-1">Quản lý thư viện tài liệu online</p>
                         </div>
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-4 flex-wrap gap-2">
+                            {/* Toggle accessLevel */}
+                            <div className="flex space-x-2">
+                                <Button
+                                    type={accessLevelFilter === "free" ? "primary" : "default"}
+                                    onClick={() => handleToggleAccessLevel("free")}
+                                >
+                                    Tài liệu Miễn phí
+                                </Button>
+                                <Button
+                                    type={accessLevelFilter === "vip" ? "primary" : "default"}
+                                    onClick={() => handleToggleAccessLevel("vip")}
+                                >
+                                    Tài liệu VIP
+                                </Button>
+                            </div>
                             <div className="relative">
                                 <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 <Input
@@ -209,8 +258,12 @@ const RatingPage = () => {
                             <select
                                 value={filterCategory}
                                 onChange={(e) => setFilterCategory(e.target.value)}
-                                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                disabled={catLoading}
+                                className={`px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                                    accessLevelFilter === "vip"
+                                        ? "opacity-50 cursor-not-allowed"
+                                        : ""
+                                }`}
+                                disabled={catLoading || accessLevelFilter === "vip"}
                             >
                                 <option value="all">Tất cả danh mục</option>
                                 {categories.map((cat) => (
@@ -252,14 +305,18 @@ const RatingPage = () => {
                                     <p className="text-gray-500 text-sm text-center py-8">
                                         Đang tải tài liệu...
                                     </p>
-                                ) : documents.length === 0 ? (
+                                ) : displayedDocuments.length === 0 ? (
                                     <p className="text-gray-500 text-sm text-center py-8">
-                                        Không có tài liệu trong danh mục{" "}
-                                        {categories.find((cat) => cat.slug === filterCategory)
-                                            ?.name || ""}
+                                        {accessLevelFilter === "vip"
+                                            ? "Không có tài liệu VIP nào"
+                                            : `Không có tài liệu trong danh mục ${
+                                                  categories.find(
+                                                      (cat) => cat.slug === filterCategory
+                                                  )?.name || ""
+                                              }`}
                                     </p>
                                 ) : (
-                                    renderDocumentList(documents)
+                                    renderDocumentList(displayedDocuments)
                                 )}
                             </div>
                         </div>
@@ -298,12 +355,14 @@ const RatingPage = () => {
                                                             {selectedDocument.format.toUpperCase()}
                                                         </span>
                                                     </div>
-                                                    <div className="flex items-center space-x-1">
-                                                        <Filter className="w-4 h-4" />
-                                                        <span>
-                                                            {selectedDocument.categoryId?.name}
-                                                        </span>
-                                                    </div>
+                                                    {accessLevelFilter !== "vip" && (
+                                                        <div className="flex items-center space-x-1">
+                                                            <Filter className="w-4 h-4" />
+                                                            <span>
+                                                                {selectedDocument.categoryId?.name}
+                                                            </span>
+                                                        </div>
+                                                    )}
                                                 </div>
                                                 <div className="grid grid-cols-3 gap-4 text-center">
                                                     <div className="bg-blue-50 p-3 rounded-lg">

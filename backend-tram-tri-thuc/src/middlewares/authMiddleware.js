@@ -27,7 +27,7 @@ const authMiddleware = async (req, res, next) => {
             });
         }
 
-        const user = await User.findById(decoded.id).select("_id email role isActive");
+        const user = await User.findById(decoded.id).select("_id email role isActive isVip");
         if (!user) {
             return res.status(401).json({
                 success: false,
@@ -42,7 +42,7 @@ const authMiddleware = async (req, res, next) => {
             });
         }
 
-        req.user = { _id: user._id, email: user.email, role: user.role };
+        req.user = { _id: user._id, email: user.email, role: user.role, isVip: user.isVip };
         next();
     } catch (error) {
         logger.error("Authentication error", {

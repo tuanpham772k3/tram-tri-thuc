@@ -9,7 +9,7 @@ import UserProfilePage from "../components/Layout/UserProfilePage";
 import SearchPage from "../pages/SearchPage";
 import HomePage from "../pages/Home/HomePage";
 import CategoryPage from "../pages/CategoryPage";
-import DocumentDetailPage from "../pages/DocumentDetailPage";
+import DocumentDetailPage from "../pages/Document/DocumentDetailPage";
 
 // Pages – Auth
 import Login from "../pages/Auth/Login";
@@ -34,18 +34,15 @@ import EditDocumentPage from "../pages/Uploader/EditDocumentPage";
 import UploaderRoute from "./UploaderRoute";
 import RatingPage from "../pages/RatingPage";
 import ProtectedRoute from "./ProtectedRoute";
+import Checkout from "../pages/Checkout/Checkout";
+import UpgradeAccount from "../pages/UpgradeAccount/UpgradeAccount";
+import DocumentVipPage from "../pages/Document/DocumentVipPage";
 
 const router = createBrowserRouter([
     {
         path: "/",
         element: <MainLayout />,
-        children: [
-            { index: true, element: <HomePage /> },
-            { path: "rating", element: <RatingPage /> },
-            { path: "search", element: <SearchPage /> },
-            { path: "category/:slug", element: <CategoryPage /> },
-            { path: "documents/slug/:slug", element: <DocumentDetailPage /> },
-        ],
+        children: [{ index: true, element: <HomePage /> }],
     },
     {
         path: "/auth",
@@ -77,6 +74,23 @@ const router = createBrowserRouter([
                 ],
             },
             { path: "notifications", element: <NotificationPage /> },
+        ],
+    },
+    {
+        path: "/",
+        element: (
+            <ProtectedRoute>
+                <MainLayout />
+            </ProtectedRoute>
+        ),
+        children: [
+            { path: "upgradeAccount", element: <UpgradeAccount /> },
+            { path: "payment", element: <Checkout /> },
+            { path: "rating", element: <RatingPage /> },
+            { path: "search", element: <SearchPage /> },
+            { path: "category/:slug", element: <CategoryPage /> },
+            { path: "documents/slug/:slug", element: <DocumentDetailPage /> },
+            { path: "/documents/vip", element: <DocumentVipPage /> },
         ],
     },
     {

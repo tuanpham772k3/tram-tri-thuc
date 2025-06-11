@@ -95,14 +95,27 @@ export default function HomePage() {
         setFilters((prev) => ({ ...prev, page: newPage }));
     }, []);
 
-    // Filter configuration
+    // Filter configuration - Tối ưu cho layout gọn
     const filtersConfig = useMemo(
         () => [
             {
+                key: "search",
+                label: "Tìm kiếm",
+                type: "search",
+                placeholder: "Tìm kiếm tài liệu...",
+                icon: "🔍",
+            },
+            {
                 key: "startDate",
-                label: "Ngày bắt đầu",
+                label: "Từ ngày",
                 type: "date",
                 placeholder: "Chọn ngày bắt đầu",
+            },
+            {
+                key: "endDate",
+                label: "Đến ngày",
+                type: "date",
+                placeholder: "Chọn ngày kết thúc",
             },
         ],
         []
@@ -135,9 +148,9 @@ export default function HomePage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Hero Section */}
+            {/* Hero Section với bộ lọc được tối ưu */}
             <div
-                className="relative bg-cover bg-center min-h-[600px] flex items-center"
+                className="relative bg-cover bg-center min-h-[450px] flex items-center"
                 style={{
                     backgroundImage: `url(${heroBackground})`,
                 }}
@@ -145,8 +158,8 @@ export default function HomePage() {
                 {/* Dark overlay */}
                 <div className="absolute inset-0 bg-black/50"></div>
 
-                <div className="container mx-auto px-4 py-16 relative z-10">
-                    <div className="max-w-4xl mx-auto text-center">
+                <div className="container mx-auto px-4 pt-16 pb-0 relative z-10">
+                    <div className="max-w-5xl mx-auto text-center">
                         <motion.h1
                             className="text-4xl md:text-6xl font-bold mb-6 text-white drop-shadow-lg"
                             initial={{ opacity: 0, y: 20 }}
@@ -156,44 +169,186 @@ export default function HomePage() {
                             Khám Phá Kho Tàng Tri Thức
                         </motion.h1>
                         <motion.p
-                            className="text-xl md:text-2xl mb-8 text-gray-100 drop-shadow-lg"
+                            className="text-xl md:text-2xl mb-10 text-gray-100 drop-shadow-lg max-w-3xl mx-auto"
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: 0.2 }}
                         >
                             Truy cập hàng nghìn tài liệu chất lượng cao từ cộng đồng học thuật
                         </motion.p>
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.4 }}
-                            className="max-w-2xl mx-auto"
-                        >
-                            {categoriesLoading ? (
-                                <div className="flex justify-center items-center h-10">
-                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
-                                </div>
-                            ) : (
-                                <FilterPanel
-                                    filtersConfig={filtersConfig}
-                                    sortOptions={sortOptions}
-                                    onFilterChange={handleFilterChange}
-                                    defaultFilters={{
-                                        startDate: "",
-                                        endDate: "",
-                                        dateField: "createdAt",
-                                        sort: "createdAt:desc",
-                                    }}
-                                    className="backdrop-blur-sm bg-white/10 rounded-lg p-4"
-                                />
-                            )}
-                        </motion.div>
                     </div>
                 </div>
             </div>
 
+            {/* Bộ lọc được di chuyển đến đây, giữa Hero Section và Main Content */}
+            <div className="container mx-auto px-4 py-4">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4 }}
+                    className="max-w-4xl mx-auto mt-[-6rem] relative z-20"
+                >
+                    {categoriesLoading ? (
+                        <div className="flex justify-center items-center h-16 backdrop-blur-sm bg-white/10 rounded-2xl">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
+                        </div>
+                    ) : (
+                        <div className="backdrop-blur-md bg-gradient-to-br from-white/20 to-gray-100/10 rounded-2xl p-6 border border-gray-200/20 shadow-lg">
+                            {/* Search bar chính */}
+                            <div className="mb-6">
+                                <div className="relative max-w-2xl mx-auto">
+                                    <input
+                                        type="text"
+                                        placeholder="Tìm kiếm tài liệu..."
+                                        className="w-full px-6 py-3 text-lg rounded-full border-0 bg-white/95 text-gray-800 backdrop-blur-sm shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300 placeholder-gray-500"
+                                        value={filters.search}
+                                        onChange={(e) =>
+                                            handleFilterChange({
+                                                ...filters,
+                                                search: e.target.value,
+                                            })
+                                        }
+                                    />
+                                    <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600">
+                                        <svg
+                                            className="w-6 h-6"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                            />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Bộ lọc nâng cao - compact layout */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+                                {/* Date From */}
+                                <div className="relative">
+                                    <input
+                                        type="date"
+                                        className="w-full px-4 py-2.5 rounded-xl border-0 bg-white/90 text-gray-800 backdrop-blur-sm shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300"
+                                        value={filters.startDate}
+                                        onChange={(e) =>
+                                            handleFilterChange({
+                                                ...filters,
+                                                startDate: e.target.value,
+                                            })
+                                        }
+                                    />
+                                    <label className="absolute -top-2 left-3 px-2 bg-white/90 text-sm font-medium text-gray-600 rounded">
+                                        Từ ngày
+                                    </label>
+                                </div>
+
+                                {/* Date To */}
+                                <div className="relative">
+                                    <input
+                                        type="date"
+                                        className="w-full px-4 py-2.5 rounded-xl border-0 bg-white/90 text-gray-800 backdrop-blur-sm shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300"
+                                        value={filters.endDate}
+                                        onChange={(e) =>
+                                            handleFilterChange({
+                                                ...filters,
+                                                endDate: e.target.value,
+                                            })
+                                        }
+                                    />
+                                    <label className="absolute -top-2 left-3 px-2 bg-white/90 text-sm font-medium text-gray-600 rounded">
+                                        Đến ngày
+                                    </label>
+                                </div>
+
+                                {/* Sort */}
+                                <div className="relative">
+                                    <select
+                                        className="w-full px-4 py-2.5 rounded-xl border-0 bg-white/90 text-gray-800 backdrop-blur-sm shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300 appearance-none cursor-pointer"
+                                        value={filters.sort}
+                                        onChange={(e) =>
+                                            handleFilterChange({ ...filters, sort: e.target.value })
+                                        }
+                                    >
+                                        {sortOptions.map((option) => (
+                                            <option
+                                                key={option.value}
+                                                value={option.value}
+                                                className="text-gray-800"
+                                            >
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <label className="absolute -top-2 left-3 px-2 bg-white/90 text-sm font-medium text-gray-600 rounded">
+                                        Sắp xếp
+                                    </label>
+                                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-600">
+                                        <svg
+                                            className="w-5 h-5"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M19 9l-7 7-7-7"
+                                            />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Clear filters button */}
+                            {(filters.search ||
+                                filters.startDate ||
+                                filters.endDate ||
+                                filters.sort !== "createdAt:desc") && (
+                                <div className="mt-6 text-center">
+                                    <button
+                                        onClick={() =>
+                                            handleFilterChange({
+                                                search: "",
+                                                startDate: "",
+                                                endDate: "",
+                                                dateField: "createdAt",
+                                                sort: "createdAt:desc",
+                                                page: 1,
+                                                limit: 6,
+                                            })
+                                        }
+                                        className="inline-flex items-center px-5 py-2 text-sm font-medium text-gray-700 bg-white/80 hover:bg-gray-100 rounded-xl shadow-md transition-all duration-200 hover:shadow-lg"
+                                    >
+                                        <svg
+                                            className="w-4 h-4 mr-2"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M6 18L18 6M6 6l12 12"
+                                            />
+                                        </svg>
+                                        Xóa bộ lọc
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </motion.div>
+            </div>
+
             {/* Main Content */}
-            <div className="container mx-auto px-4 py-12">
+            <div className="container mx-auto px-4 pt-0 py-12">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                     {/* Sidebar */}
                     <motion.aside variants={itemVariants} className="lg:col-span-1">
@@ -213,6 +368,12 @@ export default function HomePage() {
                                 <h2 className="text-2xl font-bold text-gray-900">
                                     Tài Liệu Nổi Bật
                                 </h2>
+                                {/* Hiển thị số lượng kết quả */}
+                                {featuredPagination?.total && (
+                                    <span className="text-sm text-gray-500">
+                                        {featuredPagination.total} tài liệu
+                                    </span>
+                                )}
                             </div>
 
                             {loading && (
@@ -228,8 +389,28 @@ export default function HomePage() {
                             )}
 
                             {!loading && !error && featuredDocuments?.length === 0 && (
-                                <div className="bg-gray-50 p-6 rounded-lg text-center">
-                                    <p className="text-gray-600">Chưa có tài liệu nổi bật.</p>
+                                <div className="bg-gray-50 p-8 rounded-lg text-center">
+                                    <div className="text-gray-400 mb-4">
+                                        <svg
+                                            className="w-16 h-16 mx-auto"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={1}
+                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <p className="text-gray-600 text-lg mb-2">
+                                        Không tìm thấy tài liệu
+                                    </p>
+                                    <p className="text-gray-500 text-sm">
+                                        Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc
+                                    </p>
                                 </div>
                             )}
 

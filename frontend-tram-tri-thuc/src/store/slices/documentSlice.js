@@ -16,6 +16,34 @@ export const fetchDocuments = createAsyncThunk(
     }
 );
 
+export const fetchVipDocuments = createAsyncThunk(
+    "documents/fetchVipDocuments",
+    async (params, { rejectWithValue }) => {
+        try {
+            const response = await customAxios.get("/documents/vip", { params });
+            return response.data.data; // { totalItems, totalPages, currentPage, items }
+        } catch (error) {
+            let message;
+            switch (error.response?.status) {
+                case 401:
+                    message = "Vui lòng đăng nhập để xem tài liệu VIP.";
+                    break;
+                case 403:
+                    message = "Bạn không có quyền truy cập tài liệu VIP.";
+                    break;
+                case 400:
+                    message = "Tham số không hợp lệ.";
+                    break;
+                default:
+                    message =
+                        error.response?.data?.message || "Không thể lấy danh sách tài liệu VIP.";
+            }
+            showToast("error", message);
+            return rejectWithValue({ message, status: error.response?.status });
+        }
+    }
+);
+
 // Lấy chi tiết tài liệu theo ID
 export const fetchDocumentById = createAsyncThunk(
     "documents/fetchDocumentById",
@@ -335,6 +363,7 @@ const documentSlice = createSlice({
         currentDocument: null,
         myDocuments: [],
         relatedDocuments: [],
+        vipDocuments: [],
         loading: false,
         error: null,
         pagination: {
@@ -356,7 +385,12 @@ const documentSlice = createSlice({
             limit: 12,
         },
         relatedPagination: {
-            // Thêm state cho phân trang tài liệu liên quan
+            totalItems: 0,
+            totalPages: 0,
+            currentPage: 1,
+            limit: 12,
+        },
+        vipPagination: {
             totalItems: 0,
             totalPages: 0,
             currentPage: 1,
@@ -406,6 +440,20 @@ const documentSlice = createSlice({
             })
             .addCase(fetchDocuments.rejected, handleRejected)
 
+            // fetchVipDocuments
+            .addCase(fetchVipDocuments.pending, handlePending)
+            .addCase(fetchVipDocuments.fulfilled, (state, action) => {
+                state.loading = false;
+                state.vipDocuments = action.payload.items?.map(normalizeDocument) || [];
+                state.vipPagination = {
+                    totalItems: action.payload.totalItems || 0,
+                    totalPages: action.payload.totalPages || 0,
+                    currentPage: action.payload.currentPage || 1,
+                    limit: action.payload.limit || state.vipPagination.limit,
+                };
+            })
+            .addCase(fetchVipDocuments.rejected, handleRejected)
+
             // fetchFeaturedDocuments
             .addCase(fetchFeaturedDocuments.pending, handlePending)
             .addCase(fetchFeaturedDocuments.fulfilled, (state, action) => {
@@ -443,6 +491,9 @@ const documentSlice = createSlice({
                 if (action.payload.document) {
                     const updatedDoc = normalizeDocument(action.payload.document);
                     state.documents = state.documents.map((doc) =>
+                        doc._id === updatedDoc._id ? updatedDoc : doc
+                    );
+                    state.vipDocuments = state.vipDocuments.map((doc) =>
                         doc._id === updatedDoc._id ? updatedDoc : doc
                     );
                     state.myDocuments = state.myDocuments.map((doc) =>
@@ -489,6 +540,9 @@ const documentSlice = createSlice({
                 state.myDocuments = state.myDocuments.map((doc) =>
                     doc._id === updatedDoc._id ? updatedDoc : doc
                 );
+                state.vipDocuments = state.vipDocuments.map((doc) =>
+                    doc._id === updatedDoc._id ? updatedDoc : doc
+                );
                 state.documents = state.documents.map((doc) =>
                     doc._id === updatedDoc._id ? updatedDoc : doc
                 );
@@ -523,6 +577,9 @@ const documentSlice = createSlice({
                 const { document } = action.payload;
                 const updatedDoc = normalizeDocument(document);
                 state.documents = state.documents.map((doc) =>
+                    doc._id === updatedDoc._id ? updatedDoc : doc
+                );
+                state.vipDocuments = state.vipDocuments.map((doc) =>
                     doc._id === updatedDoc._id ? updatedDoc : doc
                 );
                 state.myDocuments = state.myDocuments.map((doc) =>

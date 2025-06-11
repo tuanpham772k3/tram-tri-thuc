@@ -24,7 +24,7 @@ export const updateUserInfo = createAsyncThunk(
     "user/updateUserInfo",
     async (data, { rejectWithValue, dispatch }) => {
         try {
-            const allowedFields = ["name", "avatar", "email"];
+            const allowedFields = ["name", "avatar", "phone", "address", "country"];
             const filteredData = {};
             allowedFields.forEach((field) => {
                 if (data[field] !== undefined) filteredData[field] = data[field];

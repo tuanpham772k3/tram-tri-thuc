@@ -84,6 +84,18 @@ export default function DocumentCard({ document, type }) {
                     Nổi bật
                 </motion.div>
             )}
+            {/* Thêm huy hiệu VIP */}
+            {document.accessLevel === "vip" && (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: 0.1 }} // Delay nhẹ để tránh trùng animation với huy hiệu Nổi bật
+                    className="absolute top-0 left-0 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-xs font-semibold px-3 py-1 rounded-br-lg shadow-md"
+                    aria-label="Tài liệu VIP"
+                >
+                    VIP
+                </motion.div>
+            )}
             <div>
                 {/* Thêm ảnh đại diện */}
                 <Link to={`/documents/slug/${document.slug}`} className="block mb-4">

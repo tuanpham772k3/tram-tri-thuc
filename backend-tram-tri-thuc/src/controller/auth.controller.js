@@ -162,6 +162,7 @@ exports.login = async (req, res) => {
                     email: user.email,
                     role: user.role,
                     avatar: user.avatar,
+                    isVip: user.isVip,
                 },
                 accessToken,
             },

@@ -19,6 +19,7 @@ export default function UploadForm() {
         tags: "",
         file: null,
         thumbnail: null,
+        accessLevel: "free", // Thêm accessLevel, mặc định là "free"
     });
     const [dragActive, setDragActive] = useState({ document: false, thumbnail: false });
     const [previewUrl, setPreviewUrl] = useState(null);
@@ -75,16 +76,26 @@ export default function UploadForm() {
     };
 
     const handleSubmit = async () => {
-        if (!formData.title || !formData.categoryId || !formData.file) {
-            showToast("error", "Vui lòng điền đầy đủ tiêu đề, danh mục và file PDF");
+        // Chỉ yêu cầu categoryId nếu accessLevel là "free"
+        if (
+            !formData.title ||
+            !formData.file ||
+            (formData.accessLevel === "free" && !formData.categoryId)
+        ) {
+            showToast(
+                "error",
+                "Vui lòng điền đầy đủ tiêu đề, file PDF" +
+                    (formData.accessLevel === "free" ? " và danh mục" : "")
+            );
             return;
         }
 
         const data = new FormData();
         data.append("title", formData.title);
         data.append("description", formData.description);
-        data.append("categoryId", formData.categoryId);
+        if (formData.categoryId) data.append("categoryId", formData.categoryId); // Chỉ append nếu có
         data.append("tags", formData.tags);
+        data.append("accessLevel", formData.accessLevel); // Thêm accessLevel
         if (formData.file) data.append("file", formData.file);
         if (formData.thumbnail) data.append("thumbnail", formData.thumbnail);
 
@@ -98,6 +109,7 @@ export default function UploadForm() {
                 tags: "",
                 file: null,
                 thumbnail: null,
+                accessLevel: "free", // Reset về mặc định
             });
             setPreviewUrl(null);
             setStep(1);
@@ -107,10 +119,15 @@ export default function UploadForm() {
     };
 
     const nextStep = () => {
-        if (formData.title && formData.categoryId) {
+        // Chỉ yêu cầu categoryId nếu accessLevel là "free"
+        if (formData.title && (formData.accessLevel === "vip" || formData.categoryId)) {
             setStep(2);
         } else {
-            showToast("error", "Vui lòng điền tiêu đề và chọn danh mục");
+            showToast(
+                "error",
+                "Vui lòng điền tiêu đề" +
+                    (formData.accessLevel === "free" ? " và chọn danh mục" : "")
+            );
         }
     };
 
@@ -200,7 +217,31 @@ export default function UploadForm() {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Danh mục <span className="text-red-500">*</span>
+                                    Mức độ truy cập <span className="text-red-500">*</span>
+                                </label>
+                                <select
+                                    value={formData.accessLevel || "free"}
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            accessLevel: e.target.value,
+                                            categoryId:
+                                                e.target.value === "vip" ? "" : prev.categoryId, // Reset categoryId nếu chọn VIP
+                                        }))
+                                    }
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                >
+                                    <option value="free">Miễn phí</option>
+                                    <option value="vip">VIP</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Danh mục{" "}
+                                    {formData.accessLevel === "free" && (
+                                        <span className="text-red-500">*</span>
+                                    )}
                                 </label>
                                 <select
                                     value={formData.categoryId || ""}
@@ -210,7 +251,12 @@ export default function UploadForm() {
                                             categoryId: e.target.value,
                                         }))
                                     }
-                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    disabled={formData.accessLevel === "vip"} // Vô hiệu hóa nếu là VIP
+                                    className={`w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                                        formData.accessLevel === "vip"
+                                            ? "bg-gray-100 cursor-not-allowed"
+                                            : ""
+                                    }`}
                                 >
                                     <option value="">--Chọn danh mục--</option>
                                     {categories.map((cat) => (
@@ -219,6 +265,11 @@ export default function UploadForm() {
                                         </option>
                                     ))}
                                 </select>
+                                {formData.accessLevel === "vip" && (
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        Tài liệu VIP không yêu cầu chọn danh mục
+                                    </p>
+                                )}
                             </div>
 
                             <div>
