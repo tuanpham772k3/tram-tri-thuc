@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 
-import SearchBar from "../../components/Document/SearchBar";
-import FilterPanel from "../../components/Document/FilterPanel";
+import SearchBar from "../../components/Common/SearchBar";
+import FilterPanel from "../../components/Common/FilterPanel";
 import DocumentList from "../../components/Document/DocumentList";
 import { fetchVipDocuments, clearError } from "../../store/slices/documentSlice";
 import { fetchCategories } from "../../store/slices/categorySlice";

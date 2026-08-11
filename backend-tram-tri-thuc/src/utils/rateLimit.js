@@ -1,6 +1,6 @@
 // config/rateLimit.config.js
 const rateLimit = require("express-rate-limit");
-const logger = require("../utils/logger");
+const logger = require("./logger");
 
 const createRateLimiter = (windowMs, max, message) =>
     rateLimit({
@@ -32,12 +32,6 @@ module.exports = {
         "Quá nhiều yêu cầu đăng ký, vui lòng thử lại sau 1 giờ."
     ),
 
-    documentListLimiter: createRateLimiter(
-        60 * 1000, // 1 phút
-        100,
-        "Quá nhiều yêu cầu lấy danh sách tài liệu, vui lòng thử lại sau 1 phút."
-    ),
-
     categoryListLimiter: createRateLimiter(
         60 * 1000, // 1 phút
         100,
@@ -56,5 +50,4 @@ module.exports = {
         5,
         "Bạn đã gửi quá nhiều yêu cầu, vui lòng thử lại sau 1 phút."
     ),
-
 };

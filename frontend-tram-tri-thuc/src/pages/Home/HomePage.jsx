@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import FilterPanel from "../../components/Document/FilterPanel";
-import CategorySidebar from "../../components/Document/CategorySidebar";
+import FilterPanel from "../../components/Common/FilterPanel";
+import CategorySidebar from "../../components/Category/CategorySidebar";
 import DocumentList from "../../components/Document/DocumentList";
 import { fetchFeaturedDocuments, clearError } from "../../store/slices/documentSlice";
 import { fetchCategories } from "../../store/slices/categorySlice";

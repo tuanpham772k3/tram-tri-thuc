@@ -1,9 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const authMiddleware = require("../middlewares/authMiddleware");
-const validate = require("../middlewares/validate");
-const { param, body, query } = require("express-validator");
-const isAdmin = require("../middlewares/isAdmin");
 const {
     getViewStatsByMonth,
     getUsersWithPagination,
@@ -18,6 +14,7 @@ const {
     updateDocumentFeatured,
     getSystemStats,
 } = require("../controller/admin.controller");
+const { authMiddleware, isAdmin } = require("../middlewares/auth.middleware");
 
 //  thống kê lượt xem hằng tháng
 router.get("/viewstatistics", authMiddleware, isAdmin, getViewStatsByMonth);

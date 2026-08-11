@@ -6,10 +6,7 @@ import MainLayout from "../components/Layout/MainLayout";
 import UserProfilePage from "../components/Layout/UserProfilePage";
 
 // Pages – Public
-import SearchPage from "../pages/SearchPage";
 import HomePage from "../pages/Home/HomePage";
-import CategoryPage from "../pages/CategoryPage";
-import DocumentDetailPage from "../pages/Document/DocumentDetailPage";
 
 // Pages – Auth
 import Login from "../pages/Auth/Login";
@@ -20,10 +17,17 @@ import ForgotPassword from "../pages/Auth/ForgotPassword";
 
 // Pages – User
 import ProfileInfo from "../pages/User/ProfileInfo";
-import NotificationPage from "../pages/NotificationPage";
+import NotificationPage from "../pages/Notification/NotificationPage";
 import MyViewedHistory from "../pages/User/MyViewedHistory";
 import MyDownloadedHistory from "../pages/User/MyDownloadedHistory";
 import MyFavoritesDocuments from "../pages/User/MyFavoritesDocuments";
+import CategoryPage from "../pages/Category/CategoryPage";
+import DocumentDetailPage from "../pages/Document/DocumentDetailPage";
+import SearchPage from "../pages/Search/SearchPage";
+import RatingPage from "../pages/Rating/RatingPage";
+import Checkout from "../pages/Checkout/Checkout";
+import UpgradeAccount from "../pages/UpgradeAccount/UpgradeAccount";
+import DocumentVipPage from "../pages/Document/DocumentVipPage";
 
 // Pages – Uploader
 import UploadPage from "../pages/Uploader/UploadPage";
@@ -32,11 +36,7 @@ import EditDocumentPage from "../pages/Uploader/EditDocumentPage";
 
 // Route protection wrappers
 import UploaderRoute from "./UploaderRoute";
-import RatingPage from "../pages/RatingPage";
 import ProtectedRoute from "./ProtectedRoute";
-import Checkout from "../pages/Checkout/Checkout";
-import UpgradeAccount from "../pages/UpgradeAccount/UpgradeAccount";
-import DocumentVipPage from "../pages/Document/DocumentVipPage";
 
 const router = createBrowserRouter([
     {

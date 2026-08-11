@@ -8,8 +8,8 @@ import { FiEdit2, FiTrash2, FiUpload, FiClock, FiCheck, FiFileText } from "react
 
 import useDebounce from "../../utils/useDebounce";
 import { fetchCategories } from "../../store/slices/categorySlice";
-import SearchBar from "../../components/Document/SearchBar";
-import FilterPanel from "../../components/Document/FilterPanel";
+import SearchBar from "../../components/Common/SearchBar";
+import FilterPanel from "../../components/Common/FilterPanel";
 import Pagination from "../../components/Common/Pagination";
 
 export default function MyDocumentsPage() {
@@ -172,7 +172,7 @@ export default function MyDocumentsPage() {
 
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 {/* Header Section */}
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
@@ -195,10 +195,7 @@ export default function MyDocumentsPage() {
                                 Quản lý và theo dõi các tài liệu bạn đã đăng tải một cách dễ dàng
                             </p>
                         </div>
-                        <motion.div
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                             <Link
                                 to="/uploader/upload"
                                 className="group relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white rounded-2xl font-semibold shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 overflow-hidden"
@@ -294,16 +291,20 @@ export default function MyDocumentsPage() {
                                                         </h3>
                                                         <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500">
                                                             <span>
-                                                                Đăng ngày: {new Date(doc.createdAt).toLocaleDateString("vi-VN")}
+                                                                Đăng ngày:{" "}
+                                                                {new Date(
+                                                                    doc.createdAt
+                                                                ).toLocaleDateString("vi-VN")}
                                                             </span>
                                                             <span className="flex items-center">
                                                                 <span
                                                                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                                                         doc.status === "approved"
                                                                             ? "bg-green-100 text-green-800"
-                                                                            : doc.status === "pending"
-                                                                            ? "bg-yellow-100 text-yellow-800"
-                                                                            : "bg-red-100 text-red-800"
+                                                                            : doc.status ===
+                                                                                "pending"
+                                                                              ? "bg-yellow-100 text-yellow-800"
+                                                                              : "bg-red-100 text-red-800"
                                                                     }`}
                                                                 >
                                                                     {doc.status === "approved" ? (
@@ -314,8 +315,8 @@ export default function MyDocumentsPage() {
                                                                     {doc.status === "approved"
                                                                         ? "Đã duyệt"
                                                                         : doc.status === "pending"
-                                                                        ? "Chờ duyệt"
-                                                                        : "Bị từ chối"}
+                                                                          ? "Chờ duyệt"
+                                                                          : "Bị từ chối"}
                                                                 </span>
                                                             </span>
                                                         </div>

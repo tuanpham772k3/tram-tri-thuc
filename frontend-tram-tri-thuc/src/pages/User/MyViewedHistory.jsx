@@ -2,8 +2,8 @@ import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 
-import SearchBar from "../../components/Document/SearchBar";
-import FilterPanel from "../../components/Document/FilterPanel";
+import SearchBar from "../../components/Common/SearchBar";
+import FilterPanel from "../../components/Common/FilterPanel";
 import DocumentList from "../../components/Document/DocumentList";
 import { fetchViewedHistory } from "../../store/slices/userSlice";
 import { fetchCategories } from "../../store/slices/categorySlice";

@@ -5,10 +5,10 @@
  */
 function getPagination(queryParams) {
     const DEFAULT_PAGE = 1;
-    const DEFAULT_LIMIT = 10;
+    const DEFAULT_LIMIT = 12;
 
     let page = parseInt(queryParams.page, 10);
-    let limit = parseInt(queryParams.limit, 10);
+    let limit = parseInt(queryParams.limit, 12);
 
     if (isNaN(page) || page < 1) page = DEFAULT_PAGE;
     if (isNaN(limit) || limit < 1 || limit > 100) limit = DEFAULT_LIMIT; // giới hạn max 100

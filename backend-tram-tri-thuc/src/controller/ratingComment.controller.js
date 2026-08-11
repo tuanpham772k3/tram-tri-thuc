@@ -1,3 +1,4 @@
+const { Types } = require("mongoose");
 const Rating = require("../models/rating.model");
 const Comment = require("../models/comment.model");
 const Document = require("../models/document.model");
@@ -5,41 +6,52 @@ const User = require("../models/user.model");
 const logger = require("../utils/logger");
 const { getPagination, getPagingData } = require("../utils/paginate");
 const { notifyDocumentOwner } = require("../utils/notification");
-const { Types } = require("mongoose");
 
 // Lấy danh sách đánh giá của tài liệu
 exports.getRatingsByDocument = async (req, res) => {
     try {
         const { documentId } = req.params;
         const { page, limit, skip } = getPagination(req.query);
-        const {
-            minScore,
-            maxScore,
-            dateFrom,
-            dateTo,
-            sortBy = "createdAt",
-            sortOrder = "desc",
-        } = req.query;
+        const { minScore, maxScore, dateFrom, dateTo, sortBy = "createdAt", sortOrder = "desc" } = req.query;
 
-        // Kiểm tra tài liệu tồn tại và đã duyệt
+        // Validation
+        if (!Types.ObjectId.isValid(documentId)) {
+            return res.status(400).json({ success: false, message: "ID tài liệu không hợp lệ" });
+        }
+        if (minScore && (isNaN(parseInt(minScore)) || minScore < 1 || minScore > 5)) {
+            return res.status(400).json({ success: false, message: "Số sao tối thiểu phải từ 1 đến 5" });
+        }
+        if (maxScore && (isNaN(parseInt(maxScore)) || maxScore < 1 || maxScore > 5)) {
+            return res.status(400).json({ success: false, message: "Số sao tối đa phải từ 1 đến 5" });
+        }
+        if (minScore && maxScore && parseInt(minScore) > parseInt(maxScore)) {
+            return res.status(400).json({ success: false, message: "minScore không được lớn hơn maxScore" });
+        }
+        if (dateFrom && isNaN(new Date(dateFrom).getTime())) {
+            return res.status(400).json({ success: false, message: "Ngày bắt đầu không hợp lệ" });
+        }
+        if (dateTo && isNaN(new Date(dateTo).getTime())) {
+            return res.status(400).json({ success: false, message: "Ngày kết thúc không hợp lệ" });
+        }
+        if (sortBy && !["createdAt", "score"].includes(sortBy)) {
+            return res.status(400).json({ success: false, message: "Sắp xếp chỉ hỗ trợ createdAt hoặc score" });
+        }
+        if (sortOrder && !["asc", "desc"].includes(sortOrder)) {
+            return res.status(400).json({ success: false, message: "Thứ tự sắp xếp chỉ hỗ trợ asc hoặc desc" });
+        }
+
+        // Kiểm tra tài liệu
         const document = await Document.findById(documentId);
         if (!document || document.status !== "approved") {
-            return res.status(404).json({
-                success: false,
-                message: "Tài liệu không tồn tại hoặc chưa được duyệt.",
-            });
+            return res.status(404).json({ success: false, message: "Tài liệu không tồn tại hoặc chưa được duyệt" });
         }
 
         // Xây dựng điều kiện lọc
         const matchConditions = { documentId: new Types.ObjectId(documentId) };
-        if (minScore)
-            matchConditions.score = { ...matchConditions.score, $gte: parseInt(minScore) };
-        if (maxScore)
-            matchConditions.score = { ...matchConditions.score, $lte: parseInt(maxScore) };
-        if (dateFrom)
-            matchConditions.createdAt = { ...matchConditions.createdAt, $gte: new Date(dateFrom) };
-        if (dateTo)
-            matchConditions.createdAt = { ...matchConditions.createdAt, $lte: new Date(dateTo) };
+        if (minScore) matchConditions.score = { $gte: parseInt(minScore) };
+        if (maxScore) matchConditions.score = { ...matchConditions.score, $lte: parseInt(maxScore) };
+        if (dateFrom) matchConditions.createdAt = { $gte: new Date(dateFrom) };
+        if (dateTo) matchConditions.createdAt = { ...matchConditions.createdAt, $lte: new Date(dateTo) };
 
         // Lấy danh sách đánh giá
         const ratings = await Rating.aggregate([
@@ -65,10 +77,7 @@ exports.getRatingsByDocument = async (req, res) => {
                         _id: "$user._id",
                         name: "$user.name",
                         avatar: {
-                            $ifNull: [
-                                "$user.avatar",
-                                { $toUpper: { $substrCP: ["$user.name", 0, 1] } },
-                            ],
+                            $ifNull: ["$user.avatar", { $toUpper: { $substrCP: ["$user.name", 0, 1] } }],
                         },
                     },
                 },
@@ -84,24 +93,24 @@ exports.getRatingsByDocument = async (req, res) => {
         res.status(200).json({ success: true, data: pagingData });
     } catch (error) {
         logger.error(`Get ratings error: ${error.message}`);
-        res.status(500).json({
-            success: false,
-            message: "Không thể lấy danh sách đánh giá.",
-        });
+        res.status(500).json({ success: false, message: "Không thể lấy danh sách đánh giá" });
     }
 };
 
-// Lấy điểm trung bình đánh giá của tài liệu
+// Lấy điểm trung bình đánh giá
 exports.getAverageRating = async (req, res) => {
     try {
         const { documentId } = req.params;
 
+        // Validation
+        if (!Types.ObjectId.isValid(documentId)) {
+            return res.status(400).json({ success: false, message: "ID tài liệu không hợp lệ" });
+        }
+
+        // Kiểm tra tài liệu
         const document = await Document.findById(documentId);
         if (!document || document.status !== "approved") {
-            return res.status(404).json({
-                success: false,
-                message: "Tài liệu không tồn tại hoặc chưa được duyệt.",
-            });
+            return res.status(404).json({ success: false, message: "Tài liệu không tồn tại hoặc chưa được duyệt" });
         }
 
         const avgRating = await Rating.aggregate([
@@ -112,36 +121,33 @@ exports.getAverageRating = async (req, res) => {
         const avgScore = avgRating.length > 0 ? parseFloat(avgRating[0].avgScore.toFixed(1)) : 0;
         const totalRatings = avgRating.length > 0 ? avgRating[0].totalRatings : 0;
 
-        res.status(200).json({
-            success: true,
-            data: { avgScore, totalRatings },
-        });
+        res.status(200).json({ success: true, data: { avgScore, totalRatings } });
     } catch (error) {
         logger.error(`Get average rating error: ${error.message}`);
-        res.status(500).json({
-            success: false,
-            message: "Không thể lấy điểm trung bình đánh giá.",
-        });
+        res.status(500).json({ success: false, message: "Không thể lấy điểm trung bình đánh giá" });
     }
 };
 
-// Lấy phân phối đánh giá của tài liệu
+// Lấy phân phối đánh giá
 exports.getRatingDistribution = async (req, res) => {
     try {
         const { documentId } = req.params;
 
+        // Validation
+        if (!Types.ObjectId.isValid(documentId)) {
+            return res.status(400).json({ success: false, message: "ID tài liệu không hợp lệ" });
+        }
+
+        // Kiểm tra tài liệu
         const document = await Document.findById(documentId);
         if (!document || document.status !== "approved") {
-            return res.status(404).json({
-                success: false,
-                message: "Tài liệu không tồn tại hoặc chưa được duyệt.",
-            });
+            return res.status(404).json({ success: false, message: "Tài liệu không tồn tại hoặc chưa được duyệt" });
         }
 
         const distribution = await Rating.aggregate([
             { $match: { documentId: new Types.ObjectId(documentId) } },
             { $group: { _id: "$score", count: { $sum: 1 } } },
-            { $sort: { _id: -1 } }, // Sắp xếp từ 5 sao xuống 1 sao
+            { $sort: { _id: -1 } },
         ]);
 
         const totalRatings = distribution.reduce((sum, item) => sum + item.count, 0);
@@ -154,31 +160,34 @@ exports.getRatingDistribution = async (req, res) => {
             };
         });
 
-        res.status(200).json({
-            success: true,
-            data: distributionData,
-        });
+        res.status(200).json({ success: true, data: distributionData });
     } catch (error) {
         logger.error(`Get rating distribution error: ${error.message}`);
-        res.status(500).json({
-            success: false,
-            message: "Không thể lấy phân phối đánh giá.",
-        });
+        res.status(500).json({ success: false, message: "Không thể lấy phân phối đánh giá" });
     }
 };
 
-// Tạo mới đánh giá
+// Tạo hoặc cập nhật đánh giá
 exports.createOrUpdateRating = async (req, res) => {
     try {
         const { documentId } = req.params;
         const { score, review } = req.body;
 
+        // Validation
+        if (!Types.ObjectId.isValid(documentId)) {
+            return res.status(400).json({ success: false, message: "ID tài liệu không hợp lệ" });
+        }
+        if (!score || isNaN(score) || score < 1 || score > 5) {
+            return res.status(400).json({ success: false, message: "Số sao phải từ 1 đến 5" });
+        }
+        if (review && (typeof review !== "string" || review.length > 500)) {
+            return res.status(400).json({ success: false, message: "Nhận xét tối đa 500 ký tự" });
+        }
+
+        // Kiểm tra tài liệu
         const document = await Document.findById(documentId);
         if (!document || document.status !== "approved") {
-            return res.status(404).json({
-                success: false,
-                message: "Tài liệu không tồn tại hoặc chưa được duyệt.",
-            });
+            return res.status(404).json({ success: false, message: "Tài liệu không tồn tại hoặc chưa được duyệt" });
         }
 
         const rating = await Rating.findOneAndUpdate(
@@ -187,7 +196,7 @@ exports.createOrUpdateRating = async (req, res) => {
             { new: true, upsert: true }
         );
 
-        // Cập nhật averageRating và totalRatings trong Document
+        // Cập nhật averageRating và totalRatings
         const avgRating = await Rating.aggregate([
             { $match: { documentId: new Types.ObjectId(documentId) } },
             { $group: { _id: null, avgScore: { $avg: "$score" }, totalRatings: { $sum: 1 } } },
@@ -196,10 +205,7 @@ exports.createOrUpdateRating = async (req, res) => {
         const avgScore = avgRating.length > 0 ? parseFloat(avgRating[0].avgScore.toFixed(1)) : 0;
         const totalRatings = avgRating.length > 0 ? avgRating[0].totalRatings : 0;
 
-        await Document.findByIdAndUpdate(documentId, {
-            averageRating: avgScore,
-            totalRatings,
-        });
+        await Document.findByIdAndUpdate(documentId, { averageRating: avgScore, totalRatings });
 
         const user = await User.findById(req.user._id).select("name");
         await notifyDocumentOwner({
@@ -209,17 +215,11 @@ exports.createOrUpdateRating = async (req, res) => {
             actionUserName: user.name || req.user.email,
         });
 
-        logger.info(
-            `Rating ${rating._id} upserted by ${req.user.email} for document ${documentId}`
-        );
-        res.status(201).json({
-            success: true,
-            message: "Đánh giá thành công.",
-            data: rating,
-        });
+        logger.info(`Rating ${rating._id} upserted by ${req.user.email} for document ${documentId}`);
+        res.status(201).json({ success: true, message: "Đánh giá thành công", data: rating });
     } catch (error) {
         logger.error(`Create rating error: ${error.message}`);
-        res.status(500).json({ success: false, message: "Không thể gửi đánh giá." });
+        res.status(500).json({ success: false, message: "Không thể gửi đánh giá" });
     }
 };
 
@@ -228,15 +228,23 @@ exports.deleteRating = async (req, res) => {
     try {
         const { documentId } = req.params;
 
-        const rating = await Rating.findOneAndDelete({ documentId, userId: req.user._id });
-        if (!rating) {
-            return res.status(404).json({
-                success: false,
-                message: "Đánh giá không tồn tại.",
-            });
+        // Validation
+        if (!Types.ObjectId.isValid(documentId)) {
+            return res.status(400).json({ success: false, message: "ID tài liệu không hợp lệ" });
         }
 
-        // Cập nhật averageRating và totalRatings trong Document
+        // Kiểm tra tài liệu
+        const document = await Document.findById(documentId);
+        if (!document || document.status !== "approved") {
+            return res.status(404).json({ success: false, message: "Tài liệu không tồn tại hoặc chưa được duyệt" });
+        }
+
+        const rating = await Rating.findOneAndDelete({ documentId, userId: req.user._id });
+        if (!rating) {
+            return res.status(404).json({ success: false, message: "Đánh giá không tồn tại" });
+        }
+
+        // Cập nhật averageRating và totalRatings
         const avgRating = await Rating.aggregate([
             { $match: { documentId: new Types.ObjectId(documentId) } },
             { $group: { _id: null, avgScore: { $avg: "$score" }, totalRatings: { $sum: 1 } } },
@@ -245,52 +253,47 @@ exports.deleteRating = async (req, res) => {
         const avgScore = avgRating.length > 0 ? parseFloat(avgRating[0].avgScore.toFixed(1)) : 0;
         const totalRatings = avgRating.length > 0 ? avgRating[0].totalRatings : 0;
 
-        await Document.findByIdAndUpdate(documentId, {
-            averageRating: avgScore,
-            totalRatings,
-        });
+        await Document.findByIdAndUpdate(documentId, { averageRating: avgScore, totalRatings });
 
         logger.info(`Rating deleted by ${req.user.email} for document ${documentId}`);
-        res.status(200).json({
-            success: true,
-            message: "Xóa đánh giá thành công.",
-        });
+        res.status(200).json({ success: true, message: "Xóa đánh giá thành công" });
     } catch (error) {
         logger.error(`Delete rating error: ${error.message}`);
-        res.status(500).json({
-            success: false,
-            message: "Không thể xóa đánh giá.",
-        });
+        res.status(500).json({ success: false, message: "Không thể xóa đánh giá" });
     }
 };
 
-// Tạo mới bình luận
+// Tạo bình luận
 exports.createComment = async (req, res) => {
     try {
         const { documentId } = req.params;
         const { content, parentCommentId } = req.body;
 
-        const document = await Document.findById(documentId);
-        if (!document || document.status !== "approved") {
-            return res.status(404).json({
-                success: false,
-                message: "Tài liệu không tồn tại hoặc chưa được duyệt.",
-            });
+        // Validation
+        if (!Types.ObjectId.isValid(documentId)) {
+            return res.status(400).json({ success: false, message: "ID tài liệu không hợp lệ" });
+        }
+        if (!content || typeof content !== "string" || content.length > 500) {
+            return res.status(400).json({ success: false, message: "Bình luận không được rỗng và tối đa 500 ký tự" });
+        }
+        if (parentCommentId && !Types.ObjectId.isValid(parentCommentId)) {
+            return res.status(400).json({ success: false, message: "ID bình luận cha không hợp lệ" });
         }
 
+        // Kiểm tra tài liệu
+        const document = await Document.findById(documentId);
+        if (!document || document.status !== "approved") {
+            return res.status(404).json({ success: false, message: "Tài liệu không tồn tại hoặc chưa được duyệt" });
+        }
+
+        // Kiểm tra bình luận cha
         if (parentCommentId) {
             const parentComment = await Comment.findById(parentCommentId);
             if (!parentComment || parentComment.isDeleted) {
-                return res.status(404).json({
-                    success: false,
-                    message: "Bình luận cha không tồn tại, đã bị xóa hoặc chưa được duyệt.",
-                });
+                return res.status(404).json({ success: false, message: "Bình luận cha không tồn tại hoặc đã bị xóa" });
             }
             if (parentComment.documentId.toString() !== documentId) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Bình luận cha không thuộc tài liệu này.",
-                });
+                return res.status(400).json({ success: false, message: "Bình luận cha không thuộc tài liệu này" });
             }
         }
 
@@ -311,36 +314,37 @@ exports.createComment = async (req, res) => {
         });
 
         logger.info(`Comment created by ${req.user.email} for document ${documentId}`);
-        res.status(201).json({
-            success: true,
-            message: "Bình luận thành công.",
-            data: comment,
-        });
+        res.status(201).json({ success: true, message: "Bình luận thành công", data: comment });
     } catch (error) {
         logger.error(`Create comment error: ${error.message}`);
-        res.status(500).json({
-            success: false,
-            message: "Không thể gửi bình luận.",
-        });
+        res.status(500).json({ success: false, message: "Không thể gửi bình luận" });
     }
 };
 
-// Lấy danh sách bình luận của tài liệu
+// Lấy danh sách bình luận
 exports.getCommentsByDocument = async (req, res) => {
     try {
         const { documentId } = req.params;
         const { page, limit, skip } = getPagination(req.query);
         const { sortBy = "createdAt", sortOrder = "desc" } = req.query;
 
-        const document = await Document.findById(documentId);
-        if (!document || document.status !== "approved") {
-            return res.status(404).json({
-                success: false,
-                message: "Tài liệu không tồn tại hoặc chưa được duyệt.",
-            });
+        // Validation
+        if (!Types.ObjectId.isValid(documentId)) {
+            return res.status(400).json({ success: false, message: "ID tài liệu không hợp lệ" });
+        }
+        if (sortBy && !["createdAt"].includes(sortBy)) {
+            return res.status(400).json({ success: false, message: "Sắp xếp chỉ hỗ trợ createdAt" });
+        }
+        if (sortOrder && !["asc", "desc"].includes(sortOrder)) {
+            return res.status(400).json({ success: false, message: "Thứ tự sắp xếp chỉ hỗ trợ asc hoặc desc" });
         }
 
-        // Aggregation để lấy bình luận và replies
+        // Kiểm tra tài liệu
+        const document = await Document.findById(documentId);
+        if (!document || document.status !== "approved") {
+            return res.status(404).json({ success: false, message: "Tài liệu không tồn tại hoặc chưa được duyệt" });
+        }
+
         const comments = await Comment.aggregate([
             {
                 $match: {
@@ -372,6 +376,7 @@ exports.getCommentsByDocument = async (req, res) => {
                         {
                             $project: {
                                 _id: 1,
+                               uber: 1,
                                 content: 1,
                                 createdAt: 1,
                                 updatedAt: 1,
@@ -419,10 +424,7 @@ exports.getCommentsByDocument = async (req, res) => {
         res.status(200).json({ success: true, data: pagingData });
     } catch (error) {
         logger.error(`Get comments error: ${error.message}`);
-        res.status(500).json({
-            success: false,
-            message: "Không thể lấy danh sách bình luận.",
-        });
+        res.status(500).json({ success: false, message: "Không thể lấy danh sách bình luận" });
     }
 };
 
@@ -433,19 +435,21 @@ exports.updateComment = async (req, res) => {
         const { content } = req.body;
         const isAdmin = req.user.role === "admin";
 
+        // Validation
+        if (!Types.ObjectId.isValid(commentId)) {
+            return res.status(400).json({ success: false, message: "ID bình luận không hợp lệ" });
+        }
+        if (!content || typeof content !== "string" || content.length > 500) {
+            return res.status(400).json({ success: false, message: "Bình luận không được rỗng và tối đa 500 ký tự" });
+        }
+
         const comment = await Comment.findById(commentId);
         if (!comment || comment.isDeleted) {
-            return res.status(404).json({
-                success: false,
-                message: "Bình luận không tồn tại.",
-            });
+            return res.status(404).json({ success: false, message: "Bình luận không tồn tại" });
         }
 
         if (!isAdmin && comment.userId.toString() !== req.user._id.toString()) {
-            return res.status(403).json({
-                success: false,
-                message: "Bạn không có quyền cập nhật bình luận này.",
-            });
+            return res.status(403).json({ success: false, message: "Bạn không có quyền cập nhật bình luận này" });
         }
 
         comment.content = content;
@@ -454,91 +458,70 @@ exports.updateComment = async (req, res) => {
         await comment.save();
 
         logger.info(`Comment updated by ${req.user.email} for comment ${commentId}`);
-        res.status(200).json({
-            success: true,
-            message: "Cập nhật bình luận thành công.",
-            data: comment,
-        });
+        res.status(200).json({ success: true, message: "Cập nhật bình luận thành công", data: comment });
     } catch (error) {
         logger.error(`Update comment error: ${error.message}`);
-        res.status(500).json({
-            success: false,
-            message: "Không thể cập nhật bình luận.",
-        });
+        res.status(500).json({ success: false, message: "Không thể cập nhật bình luận" });
     }
 };
 
-// Xóa bình luận(chủ comment)
+// Xóa bình luận
 exports.deleteComment = async (req, res) => {
     try {
         const { commentId } = req.params;
-        // const userId = req.user._id;
         const isAdmin = req.user.role === "admin";
+
+        // Validation
+        if (!Types.ObjectId.isValid(commentId)) {
+            return res.status(400).json({ success: false, message: "ID bình luận không hợp lệ" });
+        }
 
         const comment = await Comment.findById(commentId);
         if (!comment || comment.isDeleted) {
-            return res.status(404).json({
-                success: false,
-                message: "Bình luận không tồn tại.",
-            });
+            return res.status(404).json({ success: false, message: "Bình luận không tồn tại" });
         }
 
         if (!isAdmin && comment.userId.toString() !== req.user._id.toString()) {
-            return res.status(403).json({
-                success: false,
-                message: "Bạn không có quyền xóa bình luận này.",
-            });
+            return res.status(403).json({ success: false, message: "Bạn không có quyền xóa bình luận này" });
         }
 
         comment.isDeleted = true;
         await comment.save();
+
         logger.info(`Comment deleted by ${req.user.email} for comment ${commentId}`);
-        res.status(200).json({
-            success: true,
-            message: "Xóa bình luận thành công.",
-        });
+        res.status(200).json({ success: true, message: "Xóa bình luận thành công" });
     } catch (error) {
         logger.error(`Delete comment error: ${error.message}`);
-        res.status(500).json({
-            success: false,
-            message: "Không thể xóa bình luận.",
-        });
+        res.status(500).json({ success: false, message: "Không thể xóa bình luận" });
     }
 };
 
-// Báo cáo bình luận vi phạm
+// Báo cáo bình luận
 exports.reportComment = async (req, res) => {
     try {
         const { commentId } = req.params;
 
+        // Validation
+        if (!Types.ObjectId.isValid(commentId)) {
+            return res.status(400).json({ success: false, message: "ID bình luận không hợp lệ" });
+        }
+
         const comment = await Comment.findById(commentId);
         if (!comment || comment.isDeleted) {
-            return res.status(404).json({
-                success: false,
-                message: "Bình luận không tồn tại hoặc đã bị xóa.",
-            });
+            return res.status(404).json({ success: false, message: "Bình luận không tồn tại hoặc đã bị xóa" });
         }
 
         if (comment.isReported) {
-            return res.status(400).json({
-                success: false,
-                message: "Bình luận này đã được báo cáo.",
-            });
+            return res.status(400).json({ success: false, message: "Bình luận này đã được báo cáo" });
         }
 
         comment.isReported = true;
         await comment.save();
 
         logger.info(`Comment ${commentId} reported by user ${req.user.email}`);
-        res.status(200).json({
-            success: true,
-            message: "Báo cáo bình luận thành công.",
-        });
+        res.status(200).json({ success: false, message: "Báo cáo bình luận thành công" });
     } catch (error) {
         logger.error(`Report comment error: ${error.message}`);
-        res.status(500).json({
-            success: false,
-            message: "Không thể báo cáo bình luận.",
-        });
+        res.status(500).json({ success: false, message: "Không thể báo cáo bình luận" });
     }
 };

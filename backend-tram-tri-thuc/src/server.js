@@ -6,7 +6,7 @@ const cors = require("cors");
 const connectDB = require("./config/db.config.js");
 const http = require("http");
 const socketIo = require("socket.io");
-const apiRoutes = require("./routers/index.js");
+const apiRoutes = require("./utils/index.js");
 const logger = require("./utils/logger.js");
 
 const allowedOrigins = [

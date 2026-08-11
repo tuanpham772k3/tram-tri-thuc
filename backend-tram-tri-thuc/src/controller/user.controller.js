@@ -171,7 +171,7 @@ async function PaymentZaloPay(req, res) {
         amount: price,
         description: `Lazada - Payment for the order #${transID}`,
         bank_code: "",
-        callback_url: `https://9ced-14-245-247-150.ngrok-free.app/api/v1/users/callback?idUser=${idUser}&numberDate=${numberDate}`,
+        callback_url: `https://6faf-14-191-240-204.ngrok-free.app/api/v1/users/callback?idUser=${idUser}&numberDate=${numberDate}`,
     };
 
     // appid|app_trans_id|appuser|amount|apptime|embeddata|item

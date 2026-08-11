@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Bell, FileText, Star, Upload, User, ChevronRight } from "lucide-react";
+import { Bell, FileText, Star, Upload, User, ChevronRight, Crown, Gem } from "lucide-react";
 
 export default function Sidebar() {
     return (
@@ -83,7 +83,7 @@ export default function Sidebar() {
                                         ? "bg-blue-500/20"
                                         : "bg-slate-700/50 group-hover:bg-slate-600/50"}`}
                             >
-                                <User className="w-[18px] h-[18px]" />
+                                <Crown className="w-[18px] h-[18px]" />
                             </div>
                             <span className="font-medium flex-1">Gói nâng cấp</span>
                             <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-50 transition-opacity duration-300" />
@@ -110,7 +110,7 @@ export default function Sidebar() {
                                         ? "bg-blue-500/20"
                                         : "bg-slate-700/50 group-hover:bg-slate-600/50"}`}
                             >
-                                <User className="w-[18px] h-[18px]" />
+                                <Gem className="w-[18px] h-[18px]" />
                             </div>
                             <span className="font-medium flex-1">Tài liệu VIP</span>
                             <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-50 transition-opacity duration-300" />

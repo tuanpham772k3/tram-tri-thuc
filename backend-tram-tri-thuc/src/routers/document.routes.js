@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const isUploader = require("../middlewares/isUploader");
-const authMiddleware = require("../middlewares/authMiddleware");
-const uploadMiddleware = require("../middlewares/uploadMiddleware");
+const uploadMiddleware = require("../middlewares/upload.middleware");
 const {
     getDocuments,
     getDocumentById,
@@ -17,8 +15,7 @@ const {
     getRelatedDocuments,
     getVipDocuments,
 } = require("../controller/document.controller");
-const { documentListLimiter } = require("../middlewares/rateLimit");
-const { checkVipAccess } = require("../middlewares/auth.middleware");
+const { checkVipAccess, authMiddleware, isUploader } = require("../middlewares/auth.middleware");
 
 // Lấy danh sách tài liệu của người dùng hiện tại
 router.get("/me", authMiddleware, isUploader, getMyDocuments);
@@ -30,7 +27,7 @@ router.get("/vip", authMiddleware, checkVipAccess, getVipDocuments);
 router.get("/featured", getFeaturedDocuments);
 
 // Lấy danh sách tài liệu với các tùy chọn lọc, phân trang, tìm kiếm
-router.get("/", documentListLimiter, getDocuments);
+router.get("/", getDocuments);
 
 // Lấy thông tin chi tiết của tài liệu theo ID
 router.get("/:id", authMiddleware, getDocumentById);

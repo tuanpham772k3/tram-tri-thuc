@@ -4,12 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
-import SearchBar from "../components/Document/SearchBar";
-import FilterPanel from "../components/Document/FilterPanel";
-import DocumentList from "../components/Document/DocumentList";
-import { fetchDocuments, clearError } from "../store/slices/documentSlice";
-import { fetchCategories } from "../store/slices/categorySlice";
-import useDebounce from "../utils/useDebounce";
+import SearchBar from "../../components/Common/SearchBar";
+import FilterPanel from "../../components/Common/FilterPanel";
+import DocumentList from "../../components/Document/DocumentList";
+import { fetchDocuments, clearError } from "../../store/slices/documentSlice";
+import { fetchCategories } from "../../store/slices/categorySlice";
+import useDebounce from "../../utils/useDebounce";
 import { toast } from "react-toastify";
 
 const SearchPage = () => {

@@ -10,17 +10,17 @@ import {
     fetchDocuments,
     fetchVipDocuments,
     fetchDocumentById,
-} from "../store/slices/documentSlice";
+} from "../../store/slices/documentSlice";
 import {
     fetchRatingsByDocument,
     fetchAverageRating,
     fetchRatingDistribution,
     createOrUpdateRating,
     deleteRating,
-} from "../store/slices/ratingSlice";
-import { fetchCategories } from "../store/slices/categorySlice";
-import DetailedRating from "../components/Rating/DetailedRating";
-import RatingStar from "../components/Rating/RatingStar";
+} from "../../store/slices/ratingSlice";
+import { fetchCategories } from "../../store/slices/categorySlice";
+import DetailedRating from "../../components/Rating/DetailedRating";
+import RatingStar from "../../components/Rating/RatingStar";
 
 // Emoji cho từng loại tài liệu
 const formatIcons = {
@@ -180,8 +180,7 @@ const RatingPage = () => {
                                 {doc.title}
                             </h4>
                             <p className="text-xs text-gray-500 mb-2">
-                                {doc.uploaderId?.name || "Ẩn danh"} •{" "}
-                                {doc.categoryId?.name || "Không có danh mục"}
+                                {doc.uploader?.name || "Ẩn danh"} • {doc.category?.name}
                             </p>
                             <div className="flex items-center space-x-1 mb-2">
                                 <RatingStar

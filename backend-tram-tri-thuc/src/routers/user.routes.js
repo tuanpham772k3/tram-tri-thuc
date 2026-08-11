@@ -1,7 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const isAdmin = require("../middlewares/isAdmin");
-const authMiddleware = require("../middlewares/authMiddleware");
 const {
     getUserInfo,
     updateUserInfo,
@@ -13,8 +11,7 @@ const {
     CallBack,
     PaymentZaloPay,
 } = require("../controller/user.controller");
-const validate = require("../middlewares/validate");
-const { query } = require("express-validator");
+const { isAdmin, authMiddleware } = require("../middlewares/auth.middleware");
 
 // Lấy danh sách người dùng(admin)
 router.get("/", authMiddleware, isAdmin, getUsers);

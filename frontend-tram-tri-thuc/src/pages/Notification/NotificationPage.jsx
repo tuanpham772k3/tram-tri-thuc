@@ -9,8 +9,8 @@ import {
     markAllNotificationsAsRead,
     deleteNotification,
     clearNotificationError,
-} from "../store/slices/notificationSlice";
-import showToast from "../utils/toast";
+} from "../../store/slices/notificationSlice";
+import showToast from "../../utils/toast";
 import PropTypes from "prop-types";
 
 // Component hiển thị danh sách thông báo với bộ lọc, bulk actions, và modal xóa
@@ -135,7 +135,9 @@ const NotificationPage = ({ className = "" }) => {
 
     return (
         // Container chính với gradient background
-        <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden pt-8 pb-16 ${className}`}>
+        <div
+            className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden pt-8 pb-16 ${className}`}
+        >
             {/* Background decoration */}
             <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl"></div>

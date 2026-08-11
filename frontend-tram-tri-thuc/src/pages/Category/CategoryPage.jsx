@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCategoryBySlug, fetchCategories, clearError } from "../store/slices/categorySlice";
-import DocumentList from "../components/Document/DocumentList";
-import SearchBar from "../components/Document/SearchBar";
-import FilterPanel from "../components/Document/FilterPanel";
-import useDebounce from "../utils/useDebounce";
-import showToast from "../utils/toast";
+import { fetchCategoryBySlug, fetchCategories, clearError } from "../../store/slices/categorySlice";
+import DocumentList from "../../components/Document/DocumentList";
+import SearchBar from "../../components/Common/SearchBar";
+import FilterPanel from "../../components/Common/FilterPanel";
+import useDebounce from "../../utils/useDebounce";
+import showToast from "../../utils/toast";
 
 export default function CategoryPage() {
     const { slug } = useParams();

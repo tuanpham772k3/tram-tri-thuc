@@ -2,30 +2,50 @@ const Notification = require("../models/notification.model");
 const User = require("../models/user.model");
 const logger = require("../utils/logger");
 const { getPagination, getPagingData } = require("../utils/paginate");
+const mongoose = require("mongoose");
 
+// Hàm validate MongoDB ObjectId
+const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
+
+// Tạo thông báo
 exports.createNotification = async (req, res) => {
     try {
         const { userId, type, message, link } = req.body;
 
+        // Validation
+        if (!isValidObjectId(userId)) {
+            return res.status(400).json({ success: false, message: "ID người dùng không hợp lệ." });
+        }
+        if (!["new_comment", "document_approved", "new_rating", "system"].includes(type)) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Loại thông báo không hợp lệ." });
+        }
+        if (!message || typeof message !== "string" || message.trim() === "") {
+            return res.status(400).json({ success: false, message: "Nội dung không được rỗng." });
+        }
+        if (!link || typeof link !== "string" || link.trim() === "") {
+            return res.status(400).json({ success: false, message: "Link không được rỗng." });
+        }
+
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "Người dùng không tồn tại.",
-            });
+            return res.status(404).json({ success: false, message: "Người dùng không tồn tại." });
         }
 
         const notification = new Notification({
             userId,
             type,
-            message,
-            link,
+            message: message.trim(),
+            link: link.trim(),
         });
 
         await notification.save();
 
-        // Gửi thông báo qua WebSocket tới userId
-        req.io.to(userId).emit("newNotification", notification);
+        // Gửi thông báo qua WebSocket nếu có
+        if (req.io) {
+            req.io.to(userId).emit("newNotification", notification);
+        }
         logger.info(`Notification created for user ${userId}, type: ${type}`);
 
         res.status(201).json({
@@ -35,66 +55,82 @@ exports.createNotification = async (req, res) => {
         });
     } catch (error) {
         logger.error(`Create notification error: ${error.message}`);
-        res.status(500).json({
-            success: false,
-            message: "Không thể gửi thông báo.",
-        });
+        res.status(500).json({ success: false, message: "Lỗi server khi tạo thông báo." });
     }
 };
 
+// Lấy danh sách thông báo của người dùng
 exports.getNotifications = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { page, limit, skip } = getPagination(req.query);
-        const unreadOnly = req.query.unreadOnly ? JSON.parse(req.query.unreadOnly) : undefined;
-        const sort = req.query.sort || "-createdAt";
+        const { page = 1, limit = 10, unreadOnly, sort = "-createdAt" } = req.query;
 
+        // Validation
+        if (isNaN(page) || page < 1) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Trang phải là số nguyên dương." });
+        }
+        if (isNaN(limit) || limit < 1) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Giới hạn phải là số nguyên dương." });
+        }
+        if (unreadOnly && !["true", "false"].includes(unreadOnly)) {
+            return res.status(400).json({ success: false, message: "unreadOnly phải là boolean." });
+        }
+        if (sort && !["createdAt", "-createdAt"].includes(sort)) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Sort phải là createdAt hoặc -createdAt." });
+        }
+
+        const { skip } = getPagination({ page, limit });
         const query = { userId };
-        if (unreadOnly) query.isRead = false;
+        if (unreadOnly === "true") query.isRead = false;
 
         const notifications = await Notification.find(query)
             .sort(sort)
             .skip(skip)
-            .limit(limit)
+            .limit(Number(limit))
             .lean();
 
         const total = await Notification.countDocuments(query);
-        const pagingData = getPagingData(notifications, total, page, limit);
+        const pagingData = getPagingData(notifications, total, Number(page), Number(limit));
 
-        res.status(200).json({
-            success: true,
-            data: pagingData,
-        });
+        res.status(200).json({ success: true, data: pagingData });
     } catch (error) {
         logger.error(`Get notifications error: ${error.message}`);
         res.status(500).json({
             success: false,
-            message: "Không thể lấy danh sách thông báo.",
+            message: "Lỗi server khi lấy danh sách thông báo.",
         });
     }
 };
 
+// Đánh dấu thông báo là đã đọc
 exports.markNotificationAsRead = async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.user._id;
 
-        const notification = await Notification.findById(id);
-        if (!notification) {
-            return res.status(404).json({
-                success: false,
-                message: "Thông báo không tồn tại.",
-            });
+        // Validation
+        if (!isValidObjectId(id)) {
+            return res.status(400).json({ success: false, message: "ID thông báo không hợp lệ." });
         }
 
+        const notification = await Notification.findById(id);
+        if (!notification) {
+            return res.status(404).json({ success: false, message: "Thông báo không tồn tại." });
+        }
         if (notification.userId.toString() !== userId.toString()) {
-            return res.status(403).json({
-                success: false,
-                message: "Bạn không có quyền cập nhật thông báo này.",
-            });
+            return res
+                .status(403)
+                .json({ success: false, message: "Bạn không có quyền cập nhật thông báo này." });
         }
 
         notification.isRead = true;
+        notification.updatedAt = new Date();
         await notification.save();
 
         logger.info(`Notification ${id} marked as read by user ${userId}`);
@@ -107,15 +143,21 @@ exports.markNotificationAsRead = async (req, res) => {
         logger.error(`Mark notification read error: ${error.message}`);
         res.status(500).json({
             success: false,
-            message: "Không thể đánh dấu thông báo đã đọc.",
+            message: "Lỗi server khi đánh dấu thông báo đã đọc.",
         });
     }
 };
 
+// Đánh dấu thông báo là chưa đọc
 exports.markAsUnread = async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.user._id;
+
+        // Validation
+        if (!isValidObjectId(id)) {
+            return res.status(400).json({ success: false, message: "ID thông báo không hợp lệ." });
+        }
 
         const notification = await Notification.findOneAndUpdate(
             { _id: id, userId },
@@ -131,90 +173,81 @@ exports.markAsUnread = async (req, res) => {
         }
 
         logger.info(`Notification ${id} marked as unread by user ${userId}`);
-        return res.status(200).json({
+        res.status(200).json({
             success: true,
             message: "Đánh dấu thông báo chưa đọc.",
             data: notification,
         });
     } catch (error) {
-        logger.error("Error marking notification as unread:", error);
-        return res.status(500).json({
+        logger.error(`Mark notification unread error: ${error.message}`);
+        res.status(500).json({
             success: false,
             message: "Lỗi server khi đánh dấu thông báo chưa đọc.",
         });
     }
 };
 
+// Đánh dấu tất cả thông báo là đã đọc
 exports.markAllNotificationsAsRead = async (req, res) => {
     try {
         const userId = req.user._id;
 
-        await Notification.updateMany({ userId, isRead: false }, { $set: { isRead: true } });
+        await Notification.updateMany(
+            { userId, isRead: false },
+            { $set: { isRead: true, updatedAt: new Date() } }
+        );
 
         logger.info(`All notifications marked as read for user ${userId}`);
-        res.status(200).json({
-            success: true,
-            message: "Đánh dấu tất cả thông báo đã đọc.",
-        });
+        res.status(200).json({ success: true, message: "Đánh dấu tất cả thông báo đã đọc." });
     } catch (error) {
         logger.error(`Mark all notifications read error: ${error.message}`);
         res.status(500).json({
             success: false,
-            message: "Không thể đánh dấu tất cả thông báo đã đọc.",
+            message: "Lỗi server khi đánh dấu tất cả thông báo đã đọc.",
         });
     }
 };
 
+// Xóa thông báo
 exports.deleteNotification = async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.user._id;
 
-        const notification = await Notification.findById(id);
-        if (!notification) {
-            return res.status(404).json({
-                success: false,
-                message: "Thông báo không tồn tại.",
-            });
+        // Validation
+        if (!isValidObjectId(id)) {
+            return res.status(400).json({ success: false, message: "ID thông báo không hợp lệ." });
         }
 
+        const notification = await Notification.findById(id);
+        if (!notification) {
+            return res.status(404).json({ success: false, message: "Thông báo không tồn tại." });
+        }
         if (notification.userId.toString() !== userId.toString()) {
-            return res.status(403).json({
-                success: false,
-                message: "Bạn không có quyền xóa thông báo này.",
-            });
+            return res
+                .status(403)
+                .json({ success: false, message: "Bạn không có quyền xóa thông báo này." });
         }
 
         await notification.deleteOne();
         logger.info(`Notification ${id} deleted by user ${userId}`);
-        res.status(200).json({
-            success: true,
-            message: "Xóa thông báo thành công.",
-        });
+        res.status(200).json({ success: true, message: "Xóa thông báo thành công." });
     } catch (error) {
         logger.error(`Delete notification error: ${error.message}`);
-        res.status(500).json({
-            success: false,
-            message: "Không thể xóa thông báo.",
-        });
+        res.status(500).json({ success: false, message: "Lỗi server khi xóa thông báo." });
     }
 };
 
+// Xóa tất cả thông báo của người dùng
 exports.deleteAllNotifications = async (req, res) => {
     try {
         const userId = req.user._id;
 
         await Notification.deleteMany({ userId });
         logger.info(`All notifications deleted for user ${userId}`);
-        res.status(200).json({
-            success: true,
-            message: "Xóa tất cả thông báo thành công.",
-        });
+        res.status(200).json({ success: true, message: "Xóa tất cả thông báo thành công." });
     } catch (error) {
         logger.error(`Delete all notifications error: ${error.message}`);
-        res.status(500).json({
-            success: false,
-            message: "Không thể xóa tất cả thông báo.",
-        });
+        res.status(500).json({ success: false, message: "Lỗi server khi xóa tất cả thông báo." });
     }
 };

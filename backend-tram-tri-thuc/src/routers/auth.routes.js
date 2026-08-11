@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const authMiddleware = require("../middlewares/authMiddleware");
-const { forgotPasswordLimiter, loginLimiter } = require("../middlewares/rateLimit");
+const { forgotPasswordLimiter, loginLimiter } = require("../utils/rateLimit");
 const {
     register,
     forgotPassword,
@@ -12,6 +11,7 @@ const {
     verifyEmail,
     resendVerificationEmail,
 } = require("../controller/auth.controller");
+const { authMiddleware } = require("../middlewares/auth.middleware");
 
 // API Đăng ký
 router.post("/register", register);

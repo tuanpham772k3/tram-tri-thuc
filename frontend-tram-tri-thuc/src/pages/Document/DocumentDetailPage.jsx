@@ -14,8 +14,8 @@ import {
     Clock,
     ThumbsUp,
 } from "lucide-react";
-import DownloadButton from "../../components/Document/DownloadButton";
-import CommentSection from "../../components/Document/CommentSection";
+import DownloadButton from "../../components/Common/DownloadButton";
+import CommentSection from "../../components/Comment/CommentSection";
 import RatingStars from "../../components/Rating/RatingStar";
 import DocumentViewer from "../../components/Document/DocumentViewer";
 import DocumentList from "../../components/Document/DocumentList";
