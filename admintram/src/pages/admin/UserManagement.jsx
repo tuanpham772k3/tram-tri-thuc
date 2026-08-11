@@ -74,25 +74,19 @@ const UserManagement = () => {
 
   const handleStatusChange = (userId, newStatus) => {
     setUsers(
-      users.map((user) =>
-        user.id === userId ? { ...user, status: newStatus } : user
-      )
+      users.map((user) => (user.id === userId ? { ...user, status: newStatus } : user))
     );
   };
 
   const handleRoleChange = (userId, newRole) => {
     setUsers(
-      users.map((user) =>
-        user.id === userId ? { ...user, role: newRole } : user
-      )
+      users.map((user) => (user.id === userId ? { ...user, role: newRole } : user))
     );
   };
 
   const handleSelectUser = (userId) => {
     setSelectedUsers((prev) =>
-      prev.includes(userId)
-        ? prev.filter((id) => id !== userId)
-        : [...prev, userId]
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
     );
   };
 
@@ -100,8 +94,7 @@ const UserManagement = () => {
     const matchesSearch =
       user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || user.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || user.status === statusFilter;
     const matchesRole = roleFilter === "all" || user.role === roleFilter;
     return matchesSearch && matchesStatus && matchesRole;
   });
@@ -215,16 +208,12 @@ const UserManagement = () => {
                 Quản lý người dùng
               </h1>
             </div>
-            <p className="text-gray-600">
-              Quản lý và theo dõi người dùng trong hệ thống
-            </p>
+            <p className="text-gray-600">Quản lý và theo dõi người dùng trong hệ thống</p>
           </div>
 
           <div className="flex items-center space-x-3">
             <button
-              onClick={() =>
-                setViewMode(viewMode === "table" ? "card" : "table")
-              }
+              onClick={() => setViewMode(viewMode === "table" ? "card" : "table")}
               className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors duration-200 flex items-center space-x-2"
             >
               <Settings className="w-4 h-4" />
@@ -258,9 +247,7 @@ const UserManagement = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Hoạt động</p>
-              <p className="text-2xl font-bold text-emerald-600">
-                {stats.active}
-              </p>
+              <p className="text-2xl font-bold text-emerald-600">{stats.active}</p>
             </div>
             <div className="p-3 bg-emerald-100 rounded-xl">
               <Activity className="w-6 h-6 text-emerald-600" />
@@ -283,12 +270,8 @@ const UserManagement = () => {
         <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
-                Người đăng tài liệu
-              </p>
-              <p className="text-2xl font-bold text-purple-600">
-                {stats.admins}
-              </p>
+              <p className="text-sm font-medium text-gray-600">Người đăng tài liệu</p>
+              <p className="text-2xl font-bold text-purple-600">{stats.admins}</p>
             </div>
             <div className="p-3 bg-purple-100 rounded-xl">
               <Shield className="w-6 h-6 text-purple-600" />
@@ -344,9 +327,7 @@ const UserManagement = () => {
 
       {/* User List */}
       {loading ? (
-        <div className="text-center py-10 text-gray-600">
-          Đang tải dữ liệu...
-        </div>
+        <div className="text-center py-10 text-gray-600">Đang tải dữ liệu...</div>
       ) : error ? (
         <div className="text-center py-10 text-red-600">{error}</div>
       ) : viewMode === "card" ? (
@@ -385,7 +366,9 @@ const UserManagement = () => {
                 {filteredUsers.map((user, index) => (
                   <tr
                     key={user.id}
-                    className={`hover:bg-gray-50 transition-colors duration-200 ${index % 2 === 0 ? "bg-white" : "bg-gray-50/30"}`}
+                    className={`hover:bg-gray-50 transition-colors duration-200 ${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+                    }`}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-4">
@@ -397,9 +380,7 @@ const UserManagement = () => {
                           />
                           <div
                             className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
-                              user.status === "active"
-                                ? "bg-emerald-400"
-                                : "bg-red-400"
+                              user.status === "active" ? "bg-emerald-400" : "bg-red-400"
                             }`}
                           ></div>
                         </div>
@@ -407,9 +388,7 @@ const UserManagement = () => {
                           <div className="text-sm font-semibold text-gray-900">
                             {user.username}
                           </div>
-                          <div className="text-sm text-gray-500">
-                            {user.email}
-                          </div>
+                          <div className="text-sm text-gray-500">{user.email}</div>
                         </div>
                       </div>
                     </td>
@@ -426,9 +405,7 @@ const UserManagement = () => {
                     >
                       <div className="space-y-1">
                         <div>Cuối: {user.lastLogin}</div>
-                        <div className="text-xs text-gray-500">
-                          {user.loginCount} lần
-                        </div>
+                        <div className="text-xs text-gray-500">{user.loginCount} lần</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
@@ -478,33 +455,27 @@ const UserManagement = () => {
 
               <nav className="flex items-center space-x-2">
                 <button
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
                   className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Trước
                 </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`px-4 py-2 border rounded-lg text-sm font-medium ${
-                        currentPage === page
-                          ? "bg-blue-500 text-white"
-                          : "text-gray-700 bg-white hover:bg-gray-50"
-                      } transition-colors duration-200`}
-                    >
-                      {page}
-                    </button>
-                  )
-                )}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-4 py-2 border rounded-lg text-sm font-medium ${
+                      currentPage === page
+                        ? "bg-blue-500 text-white"
+                        : "text-gray-700 bg-white hover:bg-gray-50"
+                    } transition-colors duration-200`}
+                  >
+                    {page}
+                  </button>
+                ))}
                 <button
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
                   className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >

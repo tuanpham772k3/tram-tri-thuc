@@ -160,9 +160,7 @@ const CategoryManager = () => {
         <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-white/20 mb-8 hover:shadow-2xl transition-all duration-300">
           <div className="flex items-center mb-6">
             <div className="w-3 h-8 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full mr-4"></div>
-            <h2 className="text-2xl font-bold text-gray-800">
-              Thêm danh mục mới
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-800">Thêm danh mục mới</h2>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -173,31 +171,23 @@ const CategoryManager = () => {
               <input
                 type="text"
                 value={newCategory.name}
-                onChange={(e) =>
-                  setNewCategory({ ...newCategory, name: e.target.value })
-                }
+                onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
                 className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 bg-white/50"
                 placeholder="Nhập tên danh mục"
               />
             </div>
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700">
-                Slug
-              </label>
+              <label className="block text-sm font-semibold text-gray-700">Slug</label>
               <input
                 type="text"
                 value={newCategory.slug}
-                onChange={(e) =>
-                  setNewCategory({ ...newCategory, slug: e.target.value })
-                }
+                onChange={(e) => setNewCategory({ ...newCategory, slug: e.target.value })}
                 className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 bg-white/50"
                 placeholder="Nhập slug (e.g., cong-nghe)"
               />
             </div>
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700">
-                Mô tả
-              </label>
+              <label className="block text-sm font-semibold text-gray-700">Mô tả</label>
               <input
                 type="text"
                 value={newCategory.description}
@@ -213,9 +203,7 @@ const CategoryManager = () => {
             </div>
           </div>
 
-          {error && (
-            <div className="mt-4 text-red-600 text-sm font-medium">{error}</div>
-          )}
+          {error && <div className="mt-4 text-red-600 text-sm font-medium">{error}</div>}
 
           <button
             onClick={handleAdd}
@@ -228,15 +216,11 @@ const CategoryManager = () => {
         {/* Danh sách danh mục */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden">
           <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-6">
-            <h3 className="text-xl font-bold text-gray-800">
-              Danh sách danh mục
-            </h3>
+            <h3 className="text-xl font-bold text-gray-800">Danh sách danh mục</h3>
           </div>
 
           {loading ? (
-            <div className="text-center py-10 text-gray-600">
-              Đang tải dữ liệu...
-            </div>
+            <div className="text-center py-10 text-gray-600">Đang tải dữ liệu...</div>
           ) : error ? (
             <div className="text-center py-10 text-red-600">{error}</div>
           ) : (
@@ -366,38 +350,31 @@ const CategoryManager = () => {
                     <span className="font-bold text-blue-600">
                       {Math.min(currentPage * pageSize, totalItems)}
                     </span>{" "}
-                    trong số{" "}
-                    <span className="font-bold text-blue-600">
-                      {totalItems}
-                    </span>{" "}
+                    trong số <span className="font-bold text-blue-600">{totalItems}</span>{" "}
                     danh mục
                   </div>
 
                   <div className="flex items-center space-x-2">
                     <button
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.max(prev - 1, 1))
-                      }
+                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                       disabled={currentPage === 1}
                       className="inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-600 bg-white border-2 border-gray-200 rounded-lg hover:bg-gray-50 hover:border-blue-300 focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       ← Trước
                     </button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                      (page) => (
-                        <button
-                          key={page}
-                          onClick={() => setCurrentPage(page)}
-                          className={`inline-flex items-center px-4 py-2 text-sm font-bold ${
-                            currentPage === page
-                              ? "text-white bg-gradient-to-r from-blue-600 to-indigo-600"
-                              : "text-gray-600 bg-white border-2 border-gray-200 hover:bg-gray-50 hover:border-blue-300"
-                          } rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 shadow-sm`}
-                        >
-                          {page}
-                        </button>
-                      )
-                    )}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`inline-flex items-center px-4 py-2 text-sm font-bold ${
+                          currentPage === page
+                            ? "text-white bg-gradient-to-r from-blue-600 to-indigo-600"
+                            : "text-gray-600 bg-white border-2 border-gray-200 hover:bg-gray-50 hover:border-blue-300"
+                        } rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 shadow-sm`}
+                      >
+                        {page}
+                      </button>
+                    ))}
                     <button
                       onClick={() =>
                         setCurrentPage((prev) => Math.min(prev + 1, totalPages))

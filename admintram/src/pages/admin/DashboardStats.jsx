@@ -13,12 +13,7 @@ import {
   Filler,
 } from "chart.js";
 import { motion } from "framer-motion";
-import {
-  FiTrendingUp,
-  FiUsers,
-  FiFileText,
-  FiCheckCircle,
-} from "react-icons/fi";
+import { FiTrendingUp, FiUsers, FiFileText, FiCheckCircle } from "react-icons/fi";
 import customAxios from "../../utils/customAxios";
 
 // Register ChartJS components
@@ -257,9 +252,7 @@ const DashboardStats = () => {
                 <FiFileText className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Tổng số tài liệu
-                </p>
+                <p className="text-sm font-medium text-gray-600">Tổng số tài liệu</p>
                 <h3 className="text-2xl font-bold text-gray-900">
                   {stats.totalDocuments}
                 </h3>
@@ -273,12 +266,8 @@ const DashboardStats = () => {
                 <FiUsers className="w-6 h-6 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Tổng số người dùng
-                </p>
-                <h3 className="text-2xl font-bold text-gray-900">
-                  {stats.totalUsers}
-                </h3>
+                <p className="text-sm font-medium text-gray-600">Tổng số người dùng</p>
+                <h3 className="text-2xl font-bold text-gray-900">{stats.totalUsers}</h3>
               </div>
             </div>
           </div>
@@ -289,9 +278,7 @@ const DashboardStats = () => {
                 <FiCheckCircle className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Tài liệu đã duyệt
-                </p>
+                <p className="text-sm font-medium text-gray-600">Tài liệu đã duyệt</p>
                 <h3 className="text-2xl font-bold text-gray-900">
                   {stats.approvedDocuments}
                 </h3>

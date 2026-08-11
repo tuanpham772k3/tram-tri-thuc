@@ -189,9 +189,7 @@ const DocumentApproval = () => {
 
         {/* Document Cards */}
         {loading ? (
-          <div className="text-center py-10 text-gray-600">
-            Đang tải dữ liệu...
-          </div>
+          <div className="text-center py-10 text-gray-600">Đang tải dữ liệu...</div>
         ) : error ? (
           <div className="text-center py-10 text-red-600">{error}</div>
         ) : (
@@ -269,9 +267,7 @@ const DocumentApproval = () => {
                           </>
                         )}
                         <button
-                          onClick={() =>
-                            handleFeatureToggle(doc.id, doc.isFeatured)
-                          }
+                          onClick={() => handleFeatureToggle(doc.id, doc.isFeatured)}
                           className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-200 shadow-lg font-medium ${
                             doc.isFeatured
                               ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
@@ -280,9 +276,7 @@ const DocumentApproval = () => {
                         >
                           <Star
                             className={`w-4 h-4 ${
-                              doc.isFeatured
-                                ? "text-yellow-500"
-                                : "text-gray-400"
+                              doc.isFeatured ? "text-yellow-500" : "text-gray-400"
                             }`}
                           />
                           {doc.isFeatured ? "Bỏ nổi bật" : "Đặt nổi bật"}
@@ -312,10 +306,7 @@ const DocumentApproval = () => {
               <span className="font-semibold text-indigo-600">
                 {Math.min(currentPage * pageSize, totalItems)}
               </span>{" "}
-              trong số{" "}
-              <span className="font-semibold text-indigo-600">
-                {totalItems}
-              </span>{" "}
+              trong số <span className="font-semibold text-indigo-600">{totalItems}</span>{" "}
               tài liệu
             </div>
             <div className="flex items-center gap-2">
@@ -326,25 +317,21 @@ const DocumentApproval = () => {
               >
                 Trước
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`px-4 py-2 ${
-                      currentPage === page
-                        ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                        : "bg-white border-2 border-gray-200 text-gray-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700"
-                    } rounded-xl transition-all duration-200 font-medium shadow-lg`}
-                  >
-                    {page}
-                  </button>
-                )
-              )}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`px-4 py-2 ${
+                    currentPage === page
+                      ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                      : "bg-white border-2 border-gray-200 text-gray-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700"
+                  } rounded-xl transition-all duration-200 font-medium shadow-lg`}
+                >
+                  {page}
+                </button>
+              ))}
               <button
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
                 className="px-4 py-2 bg-white border-2 border-gray-200 text-gray-600 rounded-xl hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >

@@ -1,7 +1,6 @@
 import React from "react";
 import { Input } from "antd";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import PropTypes from "prop-types";
 
 const FormInput = ({
   formik,
@@ -65,19 +64,5 @@ const FormInput = ({
   );
 };
 
-FormInput.propTypes = {
-  formik: PropTypes.object,
-  name: PropTypes.string.isRequired,
-  type: PropTypes.string,
-  placeholder: PropTypes.string,
-  icon: PropTypes.elementType,
-  isPassword: PropTypes.bool,
-  value: PropTypes.any,
-  onChange: PropTypes.func,
-  onBlur: PropTypes.func,
-  disabled: PropTypes.bool,
-  className: PropTypes.string,
-  inputClassName: PropTypes.string,
-};
 
 export default FormInput;

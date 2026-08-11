@@ -1,5 +1,4 @@
 // frontend/src/components/Pagination.js
-import PropTypes from "prop-types";
 
 const Pagination = ({ page, totalPages, onNext, onPrev, onPageChange, isLoading }) => {
     const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1).slice(
@@ -49,18 +48,6 @@ const Pagination = ({ page, totalPages, onNext, onPrev, onPageChange, isLoading 
             </button>
         </div>
     );
-};
-Pagination.propTypes = {
-    page: PropTypes.number.isRequired,
-    totalPages: PropTypes.number.isRequired,
-    onNext: PropTypes.func.isRequired,
-    onPrev: PropTypes.func.isRequired,
-    onPageChange: PropTypes.func.isRequired,
-    isLoading: PropTypes.bool,
-};
-
-Pagination.defaultProps = {
-    isLoading: false,
 };
 
 export default Pagination;

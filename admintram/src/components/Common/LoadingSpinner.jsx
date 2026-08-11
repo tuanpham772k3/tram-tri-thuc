@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 
 const LoadingSpinner = ({ size = "medium" }) => {
     const sizeClasses = {
@@ -17,8 +16,5 @@ const LoadingSpinner = ({ size = "medium" }) => {
     );
 };
 
-LoadingSpinner.propTypes = {
-    size: PropTypes.oneOf(["small", "medium", "large"]),
-};
 
 export default LoadingSpinner;

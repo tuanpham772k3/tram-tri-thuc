@@ -1,22 +1,21 @@
 const nodemailer = require("nodemailer");
-const logger = require("../utils/logger");
 
 const transporter = nodemailer.createTransport({
-    service: "Gmail",
-    auth: {
-        user: process.env.EMAIL_USER, // Ví dụ: your-email@gmail.com
-        pass: process.env.EMAIL_PASS, // App Password từ Gmail
-    },
+  service: "Gmail",
+  auth: {
+    user: process.env.EMAIL_USER, // Ví dụ: your-email@gmail.com
+    pass: process.env.EMAIL_PASS, // App Password từ Gmail
+  },
 });
 
 // Xác minh transporter khi khởi tạo ứng dụng (1 lần)
 (async () => {
-    try {
-        await transporter.verify();
-        logger.info("Email transporter verified and ready to send emails.");
-    } catch (error) {
-        logger.error("Email transporter verification failed:", error);
-    }
+  try {
+    await transporter.verify();
+    console.log("Email transporter verified and ready to send emails.");
+  } catch (error) {
+    console.log("Email transporter verification failed:", error);
+  }
 })();
 
 /**
@@ -25,11 +24,11 @@ const transporter = nodemailer.createTransport({
  * @param {string} verificationCode - Mã xác thực email
  */
 exports.sendVerificationCodeEmail = async (email, verificationCode) => {
-    const mailOptions = {
-        from: `"Thư viện tài liệu" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: "Xác thực email đăng ký",
-        html: `
+  const mailOptions = {
+    from: `"Thư viện tài liệu" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "Xác thực email đăng ký",
+    html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <h1 style="color: #2c3e50; text-align: center;">Xác thực Email</h1>
                     <p>Xin chào,</p>
@@ -49,23 +48,23 @@ exports.sendVerificationCodeEmail = async (email, verificationCode) => {
                     </p>
                 </div>
             `,
-    };
-    try {
-        const info = await transporter.sendMail(mailOptions);
-        logger.info(`Verification email sent to ${email}. MessageId: ${info.messageId}`);
-        return true;
-    } catch (error) {
-        logger.error(`Error sending verification email to ${email}: ${error.message}`);
-        throw new Error("Không thể gửi email xác thực. Vui lòng thử lại sau.");
-    }
+  };
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`Verification email sent to ${email}. MessageId: ${info.messageId}`);
+    return true;
+  } catch (error) {
+    console.log(`Error sending verification email to ${email}: ${error.message}`);
+    throw new Error("Không thể gửi email xác thực. Vui lòng thử lại sau.");
+  }
 };
 
 exports.sendResetPasswordEmail = async (email, resetLink) => {
-    const mailOptions = {
-        from: `"Thư viện tài liệu" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: "Đặt lại mật khẩu",
-        html: `
+  const mailOptions = {
+    from: `"Thư viện tài liệu" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "Đặt lại mật khẩu",
+    html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <h1 style="color: #2c3e50; text-align: center;">Đặt lại mật khẩu</h1>
                 <p>Xin chào,</p>
@@ -82,15 +81,15 @@ exports.sendResetPasswordEmail = async (email, resetLink) => {
                 </p>
             </div>
             `,
-    };
-    try {
-        const info = await transporter.sendMail(mailOptions);
-        logger.info(
-            `Reset password email sent to ${email}. MessageId: ${info.messageId}, Response: ${info.response}`
-        );
-        return true;
-    } catch (error) {
-        logger.error(`Error sending reset password email: ${error.message}`);
-        throw new Error("Không thể gửi email đặt lại mật khẩu. Vui lòng thử lại sau.");
-    }
+  };
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log(
+      `Reset password email sent to ${email}. MessageId: ${info.messageId}, Response: ${info.response}`
+    );
+    return true;
+  } catch (error) {
+    console.log(`Error sending reset password email: ${error.message}`);
+    throw new Error("Không thể gửi email đặt lại mật khẩu. Vui lòng thử lại sau.");
+  }
 };
