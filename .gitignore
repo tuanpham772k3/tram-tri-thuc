@@ -35,3 +35,7 @@ dist-ssr
 
 # Test coverage
 coverage/
+
+# Local uploads
+uploads/
+upload/
