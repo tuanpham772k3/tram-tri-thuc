@@ -1,4 +1,4 @@
-const User = require("../models/user.model");
+const User = require("../models/User.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
@@ -7,17 +7,12 @@ const {
   sendResetPasswordEmail,
 } = require("../services/email.service");
 const { default: mongoose } = require("mongoose");
-
-// Helper tạo token
-const createAccessToken = (user) =>
-  jwt.sign({ id: user._id, role: user.role }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: process.env.ACCESS_TOKEN_EXPIRES || "1h",
-  });
-
-const createRefreshToken = (user) =>
-  jwt.sign({ id: user._id }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: process.env.REFRESH_TOKEN_EXPIRES || "7d",
-  });
+const {
+  generateAccessToken,
+  generateRefreshToken,
+  setRefreshTokenCookie,
+  clearRefreshTokenCookie,
+} = require("../utils/jwt");
 
 // Helper validate email format
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -60,7 +55,7 @@ exports.register = async (req, res) => {
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     const verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 phút
 
-    const newUser = new User({
+    const newUser = await User.create({
       name: name.trim(),
       email,
       password: hashedPassword,
@@ -69,13 +64,10 @@ exports.register = async (req, res) => {
       verificationCodeExpires,
     });
 
-    await newUser.save();
-
     // Gửi email xác thực OTP
     try {
       await sendVerificationCodeEmail(email, verificationCode);
     } catch (emailError) {
-      console.log(`Failed to send verification email to ${email}:`, emailError);
       return res.status(500).json({
         success: false,
         message:
@@ -83,18 +75,15 @@ exports.register = async (req, res) => {
       });
     }
 
-    console.log(`User registered with verification code: ${email}`);
-
     res.status(201).json({
       success: true,
       message: "Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.",
       data: {
-        userId: newUser._id, // Thêm userId để frontend redirect
+        userId: newUser._id,
         email: newUser.email,
       },
     });
   } catch (error) {
-    console.log("Register error:", error);
     res.status(500).json({ success: false, message: "Đăng ký thất bại." });
   }
 };
@@ -140,20 +129,14 @@ exports.login = async (req, res) => {
       });
     }
 
-    const accessToken = createAccessToken(user);
-    const refreshToken = createRefreshToken(user);
+    const accessToken = generateAccessToken({ id: user._id, role: user.role });
+    const refreshToken = generateRefreshToken({ id: user._id });
 
     user.token = refreshToken;
     await user.save();
 
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
-      sameSite: "strict",
-    });
+    setRefreshTokenCookie(res, refreshToken);
 
-    console.log(`User login: ${user.email} | role: ${user.role}`);
     res.status(200).json({
       success: true,
       message: "Đăng nhập thành công!",
@@ -170,7 +153,6 @@ exports.login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log("Login error:", { error: error.message });
     res.status(500).json({ success: false, message: "Đăng nhập thất bại." });
   }
 };
@@ -215,9 +197,7 @@ exports.forgotPassword = async (req, res) => {
 
     try {
       await sendResetPasswordEmail(email, resetLink);
-      console.log(`Password reset email sent to: ${email}`);
     } catch (emailError) {
-      console.log(`Gửi email reset password thất bại: ${emailError.message}`);
       user.resetToken = null;
       user.resetTokenExpires = null;
       await user.save();
@@ -233,7 +213,6 @@ exports.forgotPassword = async (req, res) => {
       data: {},
     });
   } catch (error) {
-    console.log("Forgot password error:", error);
     res.status(500).json({ success: false, message: "Không thể gửi yêu cầu." });
   }
 };
@@ -275,14 +254,12 @@ exports.resetPassword = async (req, res) => {
     user.resetTokenExpires = null;
 
     await user.save();
-    console.log(`Password reset successful for: ${user.email}`);
     res.status(200).json({
       success: true,
       message: "Mật khẩu được đặt lại thành công!",
       data: {},
     });
   } catch (error) {
-    console.log("Reset password error:", error);
     res.status(500).json({
       success: false,
       message: "Không thể đặt lại mật khẩu.",
@@ -320,22 +297,20 @@ exports.refreshToken = async (req, res) => {
 
     const user = await User.findById(decoded.id);
     if (!user || user.token !== refreshToken) {
-      console.log(`Refresh token không hợp lệ cho userId: ${decoded.id}`);
       return res.status(403).json({
         success: false,
         message: "RefreshToken không hợp lệ hoặc đã bị thu hồi.",
       });
     }
 
-    const accessToken = createAccessToken(user);
-    console.log(`Access token refreshed for userId: ${user._id}`);
+    const accessToken = generateAccessToken({ id: user._id, role: user.role });
+
     res.status(200).json({
       success: true,
       message: "Làm mới token thành công.",
       data: { accessToken },
     });
   } catch (error) {
-    console.log("Refresh token error:", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Không thể làm mới token.",
@@ -375,20 +350,14 @@ exports.logout = async (req, res) => {
     user.token = null;
     await user.save();
 
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-    });
+    clearRefreshTokenCookie(res);
 
-    console.log(`User logged out: ${user.email}`);
     res.status(200).json({
       success: true,
       message: "Đăng xuất thành công.",
       data: {},
     });
   } catch (error) {
-    console.log("Logout error:", { error: error.message });
     res.status(500).json({
       success: false,
       message: "Đăng xuất thất bại.",
@@ -448,14 +417,12 @@ exports.verifyEmail = async (req, res) => {
     user.verificationCodeExpires = null;
     await user.save();
 
-    console.log(`Email verified for: ${user.email}`);
     res.status(200).json({
       success: true,
       message: "Xác thực email thành công! Bạn có thể đăng nhập ngay bây giờ.",
       data: {},
     });
   } catch (error) {
-    console.log("Verify email error:", error);
     res.status(500).json({
       success: false,
       message: "Xác thực email thất bại.",
@@ -513,7 +480,6 @@ exports.resendVerificationEmail = async (req, res) => {
       data: {},
     });
   } catch (error) {
-    console.log("Resend verification email error:", error);
     res.status(500).json({
       success: false,
       message: "Không thể gửi lại email xác thực.",

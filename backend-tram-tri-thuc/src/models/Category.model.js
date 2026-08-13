@@ -2,12 +2,24 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const categorySchema = new Schema(
-    {
-        name: { type: String, required: true, trim: true, maxlength: 100 },
-        slug: { type: String, required: true, unique: true, match: /^[a-z0-9-]+$/ },
-        description: { type: String, maxlength: 500 },
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      maxLength: 100,
     },
-    { timestamps: true }
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    description: {
+      type: String,
+      maxLength: 500,
+    },
+  },
+  { timestamps: true }
 );
 
 categorySchema.index({ slug: 1 });

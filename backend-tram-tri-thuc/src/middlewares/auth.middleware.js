@@ -1,10 +1,6 @@
 const User = require("../models/user.model");
 const { verifyAccessToken } = require("../utils/jwt");
 
-if (!process.env.ACCESS_TOKEN_SECRET) {
-  throw new Error("Thiếu ACCESS_TOKEN_SECRET trong biến môi trường");
-}
-
 /**
  * Xác thực người dùng dựa trên JWT token
  */
