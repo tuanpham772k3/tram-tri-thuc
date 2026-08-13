@@ -10,17 +10,15 @@ import adminReducer from "./slices/adminSlice";
 import authReducer from "./slices/authSlice";
 
 export const store = configureStore({
-    reducer: {
-        auth: authReducer,
-        user: userReducer,
-        documents: documentReducer,
-        categories: categoryReducer,
-        comments: commentReducer,
-        notifications: notificationReducer,
-        download: downloadReducer,
-        ratings: ratingReducer,
-        admin: adminReducer,
-    },
-    // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(customMiddleware),
-    // devTools: process.env.NODE_ENV !== "production",
+  reducer: {
+    auth: authReducer,
+    user: userReducer,
+    documents: documentReducer,
+    categories: categoryReducer,
+    comments: commentReducer,
+    notifications: notificationReducer,
+    download: downloadReducer,
+    ratings: ratingReducer,
+    admin: adminReducer,
+  },
 });
