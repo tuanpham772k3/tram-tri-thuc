@@ -1,4 +1,4 @@
-import { Server } from "socket.io";
+const { Server } = require("socket.io");
 
 const initSocket = (server) => {
   const io = new Server(server, {
@@ -23,4 +23,4 @@ const initSocket = (server) => {
   return io;
 };
 
-export default initSocket;
+module.exports = initSocket;
