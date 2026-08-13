@@ -1,24 +1,36 @@
-import jwt from "jsonwebtoken";
-import { config } from "../config/index.js";
+const jwt = require("jsonwebtoken");
 
-export const generateAccessToken = (payload) =>
-  jwt.sign(payload, config.accessTokenSecret, { expiresIn: config.accessTokenExpiry });
+const generateAccessToken = (payload) =>
+  jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: process.env.ACCESS_TOKEN_EXPIRES,
+  });
 
-export const generateRefreshToken = (payload) =>
-  jwt.sign(payload, config.refreshTokenSecret, { expiresIn: config.refreshTokenExpiry });
+const generateRefreshToken = (payload) =>
+  jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: process.env.REFRESH_TOKEN_EXPIRES,
+  });
 
-export const verifyAccessToken = (token) => jwt.verify(token, config.accessTokenSecret);
-export const verifyRefreshToken = (token) => jwt.verify(token, config.refreshTokenSecret);
+const verifyAccessToken = (token) => jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+const verifyRefreshToken = (token) => jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
 
-export const setRefreshTokenCookie = (res, token) => {
+const setRefreshTokenCookie = (res, token) => {
   res.cookie("refreshToken", token, {
     httpOnly: true,
-    secure: config.env === "production",
+    secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };
 
-export const clearRefreshTokenCookie = (res) => {
+const clearRefreshTokenCookie = (res) => {
   res.clearCookie("refreshToken");
+};
+
+module.exports = {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyAccessToken,
+  verifyRefreshToken,
+  setRefreshTokenCookie,
+  clearRefreshTokenCookie,
 };

@@ -1,9 +1,8 @@
-const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
-const { Types } = require("mongoose");
+const { verifyAccessToken } = require("../utils/jwt");
 
-if (!process.env.JWT_SECRET) {
-  throw new Error("Thiếu JWT_SECRET trong biến môi trường");
+if (!process.env.ACCESS_TOKEN_SECRET) {
+  throw new Error("Thiếu ACCESS_TOKEN_SECRET trong biến môi trường");
 }
 
 /**
@@ -19,18 +18,12 @@ const authMiddleware = async (req, res, next) => {
       });
     }
 
-    const token = authHeader.replace("Bearer ", "");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const token = authHeader.split(" ")[1];
 
-    if (!Types.ObjectId.isValid(decoded.id)) {
-      console.log("Invalid user ID in token", { id: decoded.id });
-      return res.status(400).json({
-        success: false,
-        message: "ID người dùng không hợp lệ trong token.",
-      });
-    }
+    const decoded = verifyAccessToken(token);
 
     const user = await User.findById(decoded.id).select("_id email role isActive isVip");
+
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -51,26 +44,10 @@ const authMiddleware = async (req, res, next) => {
       role: user.role,
       isVip: user.isVip,
     };
+
     next();
   } catch (error) {
-    console.log("Authentication error", {
-      error: error.message,
-      url: req.originalUrl,
-      ip: req.ip,
-      userAgent: req.headers["user-agent"],
-    });
-
-    if (error.name === "TokenExpiredError") {
-      return res.status(401).json({
-        success: false,
-        message: "Token đã hết hạn.",
-      });
-    }
-
-    return res.status(401).json({
-      success: false,
-      message: "Token không hợp lệ.",
-    });
+    next(error);
   }
 };
 

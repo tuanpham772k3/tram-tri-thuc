@@ -10,13 +10,13 @@ const { default: mongoose } = require("mongoose");
 
 // Helper tạo token
 const createAccessToken = (user) =>
-  jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_ACCESS_EXPIRES || "1h",
+  jwt.sign({ id: user._id, role: user.role }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: process.env.ACCESS_TOKEN_EXPIRES || "1h",
   });
 
 const createRefreshToken = (user) =>
-  jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_REFRESH_EXPIRES || "7d",
+  jwt.sign({ id: user._id }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: process.env.REFRESH_TOKEN_EXPIRES || "7d",
   });
 
 // Helper validate email format
@@ -304,7 +304,7 @@ exports.refreshToken = async (req, res) => {
 
     let decoded;
     try {
-      decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+      decoded = jwt.verify(refreshToken, process.env.ACCESS_TOKEN_SECRET);
     } catch (error) {
       if (error.name === "TokenExpiredError") {
         return res.status(401).json({
@@ -356,7 +356,7 @@ exports.logout = async (req, res) => {
 
     let decoded;
     try {
-      decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+      decoded = jwt.verify(refreshToken, process.env.ACCESS_TOKEN_SECRET);
     } catch (error) {
       return res.status(401).json({
         success: false,
