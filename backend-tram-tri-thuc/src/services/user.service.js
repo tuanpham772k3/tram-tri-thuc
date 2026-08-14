@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const User = require("../models/user.model");
+const User = require("../models/User.model");
 const Rating = require("../models/rating.model");
 const Document = require("../models/document.model");
 const ViewHistory = require("../models/viewHistory.model");
@@ -25,7 +25,7 @@ class UserService {
       const { page, limit, skip } = getPagination(queryParams);
       const total = await User.countDocuments(filter);
       const users = await User.find(filter)
-        .select("-password -resetToken -token")
+        .select("-password -passwordResetToken -token")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -40,7 +40,7 @@ class UserService {
   static async getUserInfo(userId) {
     try {
       const user = await User.findById(userId)
-        .select("-password -resetToken -token")
+        .select("-password -passwordResetToken -token")
         .lean();
       if (!user) {
         throw new Error("Không tìm thấy người dùng");
@@ -91,7 +91,7 @@ class UserService {
       const user = await User.findByIdAndUpdate(userId, filteredData, {
         new: true,
         runValidators: true,
-      }).select("-password -resetToken -token");
+      }).select("-password -passwordResetToken -token");
       if (!user) {
         throw new Error("Không tìm thấy người dùng");
       }
