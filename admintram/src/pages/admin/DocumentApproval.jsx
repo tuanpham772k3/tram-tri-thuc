@@ -41,7 +41,6 @@ const DocumentApproval = () => {
           status: doc.status || "pending",
           submittedAt: new Date(doc.createdAt).toISOString().split("T")[0],
           description: doc.description || "No description available",
-          isFeatured: doc.isFeatured || false, // Add isFeatured field from API
         }));
         setDocuments(mappedDocuments);
         setTotalItems(response.data.data.pagination.totalItems);
@@ -87,22 +86,6 @@ const DocumentApproval = () => {
       }
     } catch (err) {
       setError(err.message || "Error rejecting document");
-    }
-  };
-
-  const handleFeatureToggle = async (docId, currentFeatured) => {
-    try {
-      const response = await customAxios.put(`/admin/featuredDocument`, {
-        documentId: docId,
-        isFeatured: !currentFeatured,
-      });
-      if (response.data.success) {
-        await fetchDocuments();
-      } else {
-        setError("Failed to update featured status");
-      }
-    } catch (err) {
-      setError(err.message || "Error updating featured status");
     }
   };
 
@@ -266,21 +249,6 @@ const DocumentApproval = () => {
                             </button>
                           </>
                         )}
-                        <button
-                          onClick={() => handleFeatureToggle(doc.id, doc.isFeatured)}
-                          className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-200 shadow-lg font-medium ${
-                            doc.isFeatured
-                              ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                          }`}
-                        >
-                          <Star
-                            className={`w-4 h-4 ${
-                              doc.isFeatured ? "text-yellow-500" : "text-gray-400"
-                            }`}
-                          />
-                          {doc.isFeatured ? "Bỏ nổi bật" : "Đặt nổi bật"}
-                        </button>
                         {/* <button className="flex items-center gap-2 px-6 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transform hover:scale-105 transition-all duration-200 shadow-sm font-medium">
                           <Eye className="w-4 h-4" />
                           Chi tiết

@@ -1,35 +1,28 @@
 const express = require("express");
-const router = express.Router();
 const {
-    createNotification,
-    getNotifications,
-    markNotificationAsRead,
-    markAllNotificationsAsRead,
-    deleteNotification,
-    deleteAllNotifications,
-    markAsUnread,
+  getNotifications,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
+  deleteNotifications,
+  markAsUnread,
 } = require("../controller/notification.controller");
-const { authMiddleware, isAdmin } = require("../middlewares/auth.middleware");
+const { authMiddleware } = require("../middlewares/auth.middleware");
 
-// Tạo thông báo (admin only)
-router.post("/notifications", authMiddleware, isAdmin, createNotification);
+const router = express.Router();
 
-// Lấy danh sách thông báo của người dùng
-router.get("/notifications", authMiddleware, getNotifications);
-
-// Đánh dấu thông báo là đã đọc
-router.patch("/notifications/:id/read", authMiddleware, markNotificationAsRead);
+// Lấy danh sách thông báo
+router.get("/", authMiddleware, getNotifications);
 
 // Đánh dấu thông báo là chưa đọc
-router.patch("/notifications/:id/unread", authMiddleware, markAsUnread);
+router.patch("/:notificationId/unread", authMiddleware, markAsUnread);
+
+// Đánh dấu thông báo là đã đọc
+router.patch("/:notificationId/read", authMiddleware, markNotificationAsRead);
 
 // Đánh dấu tất cả thông báo là đã đọc
-router.patch("/notifications/read-all", authMiddleware, markAllNotificationsAsRead);
+router.patch("/read-all", authMiddleware, markAllNotificationsAsRead);
 
 // Xóa thông báo
-router.delete("/notifications/:id", authMiddleware, deleteNotification);
-
-// Xóa tất cả thông báo của người dùng
-router.delete("/notifications", authMiddleware, deleteAllNotifications);
+router.delete("/", authMiddleware, deleteNotifications);
 
 module.exports = router;

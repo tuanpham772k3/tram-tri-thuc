@@ -3,6 +3,7 @@ const User = mongoose.model("User");
 const Category = require("../models/category.model");
 const Document = require("../models/document.model");
 const slugify = require("slugify");
+
 // thống kê lượt xem
 exports.getViewStatsByMonth = async (req, res) => {
   try {
@@ -275,60 +276,6 @@ exports.rejectDocument = async (req, res) => {
   }
 };
 
-exports.updateDocumentFeatured = async (req, res) => {
-  try {
-    const { documentId, isFeatured } = req.body;
-
-    // Validate documentId
-    if (!mongoose.Types.ObjectId.isValid(documentId)) {
-      return res.status(400).json({
-        success: false,
-        status: 400,
-        message: "ID tài liệu không hợp lệ",
-      });
-    }
-
-    // Validate isFeatured
-    if (typeof isFeatured !== "boolean") {
-      return res.status(400).json({
-        success: false,
-        status: 400,
-        message: "isFeatured phải là giá trị boolean",
-      });
-    }
-
-    // Find and update document's isFeatured field
-    const document = await Document.findByIdAndUpdate(
-      documentId,
-      { isFeatured },
-      { new: true, runValidators: true }
-    ).lean();
-
-    // Check if document exists
-    if (!document) {
-      return res.status(404).json({
-        success: false,
-        status: 404,
-        message: "Không tìm thấy tài liệu",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      status: 200,
-      message: "Cập nhật trạng thái nổi bật thành công",
-      data: document,
-    });
-  } catch (error) {
-    console.error("Lỗi updateDocumentFeatured:", error);
-    return res.status(400).json({
-      success: false,
-      status: 400,
-      message: error.message || "Lỗi khi cập nhật trạng thái nổi bật",
-    });
-  }
-};
-
 // Category
 exports.createCategory = async (req, res) => {
   try {
@@ -485,6 +432,7 @@ exports.updateCategory = async (req, res) => {
     });
   }
 };
+
 exports.deleteCategory = async (req, res) => {
   try {
     const { categoryId } = req.params;

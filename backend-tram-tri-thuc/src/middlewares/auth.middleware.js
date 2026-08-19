@@ -52,7 +52,6 @@ const authMiddleware = async (req, res, next) => {
  */
 const isAdmin = (req, res, next) => {
   if (!req.user || req.user.role !== "admin") {
-    console.log("Access denied for non-admin user", { user: req.user });
     return res.status(403).json({
       success: false,
       message: "Bạn không có quyền truy cập tài nguyên này. Chỉ dành cho admin.",

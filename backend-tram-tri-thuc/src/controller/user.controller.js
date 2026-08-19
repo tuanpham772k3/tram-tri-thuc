@@ -1,143 +1,8 @@
-const { Types } = require("mongoose");
-const UserService = require("../services/user.service");
-const express = require("express"); // npm install express
-const bodyParser = require("body-parser"); // npm install body-parser
-const axios = require("axios").default; // npm install axios
-const CryptoJS = require("crypto-js"); // npm install crypto-js
-const moment = require("moment"); // npm install moment
+const axios = require("axios").default;
+const CryptoJS = require("crypto-js");
+const moment = require("moment");
 const User = require("../models/user.model");
-async function getUsers(req, res) {
-  try {
-    const users = await UserService.getUsers(req.query);
-    return res.status(200).json({
-      success: true,
-      status: 200,
-      message: "Lấy danh sách người dùng thành công",
-      data: users,
-    });
-  } catch (error) {
-    console.log("Lỗi getUsers:", error);
-    return res.status(400).json({
-      success: false,
-      status: 400,
-      message: error.message || "Lỗi khi lấy danh sách người dùng",
-    });
-  }
-}
-
-async function getUserInfo(req, res) {
-  try {
-    const user = await UserService.getUserInfo(req.user._id);
-    return res.status(200).json({
-      success: true,
-      status: 200,
-      message: "Lấy thông tin người dùng thành công",
-      data: user,
-    });
-  } catch (error) {
-    console.log("Lỗi getUserInfo:", error);
-    return res.status(404).json({
-      success: false,
-      status: 404,
-      message: error.message || "Không tìm thấy người dùng",
-    });
-  }
-}
-
-async function updateUserInfo(req, res) {
-  try {
-    const user = await UserService.updateUserInfo(req.user._id, req.body);
-    return res.status(200).json({
-      success: true,
-      status: 200,
-      message: "Cập nhật thông tin thành công",
-      data: user,
-    });
-  } catch (error) {
-    console.log("Lỗi updateUserInfo:", error);
-    return res.status(400).json({
-      success: false,
-      status: 400,
-      message: error.message || "Lỗi khi cập nhật thông tin",
-    });
-  }
-}
-
-async function deleteMyAccount(req, res) {
-  try {
-    await UserService.deleteMyAccount(req.user._id);
-    return res.status(200).json({
-      success: true,
-      status: 200,
-      message: "Xóa tài khoản thành công",
-      data: null,
-    });
-  } catch (error) {
-    console.log("Lỗi deleteMyAccount:", error);
-    return res.status(404).json({
-      success: false,
-      status: 404,
-      message: error.message || "Không tìm thấy người dùng",
-    });
-  }
-}
-
-async function getUserHistory(req, res) {
-  try {
-    const history = await UserService.getUserHistory(req.user._id, req.query);
-    return res.status(200).json({
-      success: true,
-      status: 200,
-      message: "Lấy lịch sử xem tài liệu thành công",
-      data: history,
-    });
-  } catch (error) {
-    console.log("Lỗi getUserHistory:", error);
-    return res.status(400).json({
-      success: false,
-      status: 400,
-      message: error.message || "Lỗi khi lấy lịch sử xem",
-    });
-  }
-}
-
-async function getUserFavorites(req, res) {
-  try {
-    const favorites = await UserService.getUserFavorites(req.user._id, req.query);
-    return res.status(200).json({
-      success: true,
-      status: 200,
-      message: "Lấy danh sách tài liệu yêu thích thành công",
-      data: favorites,
-    });
-  } catch (error) {
-    console.log("Lỗi getUserFavorites:", error);
-    return res.status(400).json({
-      success: false,
-      status: 400,
-      message: error.message || "Lỗi khi lấy danh sách yêu thích",
-    });
-  }
-}
-
-async function getUserDownloads(req, res) {
-  try {
-    const downloads = await UserService.getUserDownloads(req.user._id, req.query);
-    return res.status(200).json({
-      success: true,
-      status: 200,
-      message: "Lấy lịch sử tải tài liệu thành công",
-      data: downloads,
-    });
-  } catch (error) {
-    console.log("Lỗi getUserDownloads:", error);
-    return res.status(400).json({
-      success: false,
-      status: 400,
-      message: error.message || "Lỗi khi lấy lịch sử tải",
-    });
-  }
-}
+const Rating = require("../models/rating.model");
 
 const config = {
   app_id: "2553",
@@ -145,6 +10,92 @@ const config = {
   key2: "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz",
   endpoint: "https://sb-openapi.zalopay.vn/v2/create",
 };
+
+async function getUserInfo(req, res) {
+  try {
+    const user = await User.findById(req.user._id)
+      .select("-password -passwordResetToken -token")
+      .lean();
+
+    if (!user) {
+      throw new Error("Tài khoản không tồn tại");
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Lấy thông tin người dùng thành công",
+      data: user,
+    });
+  } catch (error) {
+    return res.status(404).json({
+      success: false,
+      message: error.message || "Không tìm thấy người dùng",
+    });
+  }
+}
+
+async function updateUserInfo(req, res) {
+  try {
+    const userId = req.user._id;
+    const { name, avatar, phone, address } = req.body;
+
+    const user = await User.findById(userId).select(
+      "-password -passwordResetToken -token"
+    );
+
+    if (!user) {
+      throw new Error("Tài khoản không tồn tại.");
+    }
+
+    user.name = name;
+    user.avatar = avatar;
+    user.phone = phone;
+    user.address = address;
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Cập nhật thông tin thành công",
+      data: user,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message || "Lỗi khi cập nhật thông tin",
+    });
+  }
+}
+
+async function deleteMyAccount(req, res) {
+  try {
+    const userId = req.user._id;
+
+    // Xóa tài liệu
+    await Document.deleteMany({ uploaderId: userId });
+
+    // Xóa bình luận
+    await Comment.deleteMany({ userId });
+
+    // Xóa đánh giá
+    await Rating.deleteMany({ userId });
+
+    // Xóa user
+    await User.deleteOne({ _id: userId });
+
+    return res.status(200).json({
+      success: true,
+      message: "Xóa tài khoản thành công",
+      data: null,
+    });
+  } catch (error) {
+    return res.status(404).json({
+      success: false,
+      message: error.message || "Không tìm thấy người dùng",
+    });
+  }
+}
+
 async function PaymentZaloPay(req, res) {
   const price = req.body.price;
   const numberDate = req.body.numberDate;
@@ -262,13 +213,9 @@ async function CallBack(req, res) {
 }
 
 module.exports = {
-  getUsers,
   getUserInfo,
   updateUserInfo,
   deleteMyAccount,
-  getUserHistory,
-  getUserFavorites,
-  getUserDownloads,
   PaymentZaloPay,
   CallBack,
 };

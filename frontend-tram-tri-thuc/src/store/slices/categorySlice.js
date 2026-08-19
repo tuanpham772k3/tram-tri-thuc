@@ -118,7 +118,6 @@ const categorySlice = createSlice({
         const normalizeDocument = (doc) => ({
             ...doc,
             _id: doc._id?.toString(),
-            favoriteCount: doc.favoriteCount ?? 0,
             viewCount: doc.viewCount ?? 0,
             downloadCount: doc.downloadCount ?? 0,
             category: doc.category || { _id: null, name: "", slug: "" },

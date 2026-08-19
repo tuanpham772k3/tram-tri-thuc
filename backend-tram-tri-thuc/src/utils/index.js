@@ -7,15 +7,17 @@ const adminRoutes = require("../routers/admin.routes");
 const authRoutes = require("../routers/auth.routes");
 const usersRoutes = require("../routers/user.routes");
 const categoryRoutes = require("../routers/category.routes");
-const ratingCommentRoutes = require("../routers/ratingComment.routes");
+const ratingRoutes = require("../routers/rating.routes");
+const commentRoutes = require("../routers/comment.routes");
 const notificationRoutes = require("../routers/notification.routes");
 
-router.use("/admin", adminRoutes);
 router.use("/auth", authRoutes);
+router.use("/admin", adminRoutes);
+router.use("/users", usersRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/documents", documentRoutes);
-router.use("/", notificationRoutes);
-router.use("/", ratingCommentRoutes);
-router.use("/users", usersRoutes);
+router.use("/notifications", notificationRoutes);
+router.use("/ratings", ratingRoutes);
+router.use("/comments", commentRoutes);
 
 module.exports = router;

@@ -31,12 +31,6 @@ module.exports = {
     "Quá nhiều yêu cầu đăng ký, vui lòng thử lại sau 1 giờ."
   ),
 
-  categoryListLimiter: createRateLimiter(
-    60 * 1000, // 1 phút
-    100,
-    "Quá nhiều yêu cầu lấy danh sách danh mục, vui lòng thử lại sau 1 phút."
-  ),
-
   downloadLimiter: createRateLimiter(
     60 * 60 * 1000, // 1 giờ
     20,

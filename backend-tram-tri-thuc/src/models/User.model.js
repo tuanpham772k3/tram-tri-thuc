@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      maxLength: 50,
     },
     email: {
       type: String,
@@ -21,6 +22,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+
+    phone: {
+      type: String,
+    },
+
+    address: {
+      type: String,
+    },
+
     role: {
       type: String,
       enum: ["admin", "uploader", "member"],
@@ -58,15 +68,15 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["not_activated", "active", "expired"],
       default: "not_activated",
-    }, // Trạng thái VIP
+    },
     vipStartDate: {
       type: Date,
       default: null,
-    }, // Thời gian bắt đầu VIP
+    },
     vipEndDate: {
       type: Date,
       default: null,
-    }, // Thời gian hết hạn VIP
+    },
   },
   { timestamps: true }
 );

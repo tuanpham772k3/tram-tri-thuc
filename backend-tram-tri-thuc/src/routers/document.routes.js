@@ -1,56 +1,48 @@
 const express = require("express");
-const router = express.Router();
 const uploadMiddleware = require("../middlewares/upload.middleware");
 const {
-    getDocuments,
-    getDocumentById,
-    getDocumentBySlug,
-    downloadDocument,
-    uploadDocument,
-    getMyDocuments,
-    updateDocument,
-    deleteDocument,
-    getFeaturedDocuments,
-    toggleFavorite,
-    getRelatedDocuments,
-    getVipDocuments,
+  getUploaderDocuments,
+  getVipDocuments,
+  getDocuments,
+  getRelatedDocuments,
+  getDocumentById,
+  downloadDocument,
+  uploadDocument,
+  updateDocument,
+  deleteDocument,
 } = require("../controller/document.controller");
-const { checkVipAccess, authMiddleware, isUploader } = require("../middlewares/auth.middleware");
+const {
+  checkVipAccess,
+  authMiddleware,
+  isUploader,
+} = require("../middlewares/auth.middleware");
 
-// Lấy danh sách tài liệu của người dùng hiện tại
-router.get("/me", authMiddleware, isUploader, getMyDocuments);
+const router = express.Router();
+
+router.get("/uploader", authMiddleware, isUploader, getUploaderDocuments);
 
 //Lấy danh sách tài liệu vip
 router.get("/vip", authMiddleware, checkVipAccess, getVipDocuments);
 
-// Lấy tài liệu nổi bật
-router.get("/featured", getFeaturedDocuments);
-
 // Lấy danh sách tài liệu với các tùy chọn lọc, phân trang, tìm kiếm
-router.get("/", getDocuments);
+router.get("/", authMiddleware, getDocuments);
+
+// Lấy danh sách tài liệu liên quan theo tags
+router.get("/:documentId/related", authMiddleware, getRelatedDocuments);
 
 // Lấy thông tin chi tiết của tài liệu theo ID
-router.get("/:id", authMiddleware, getDocumentById);
-
-// Lấy thông tin chi tiết của tài liệu theo slug
-router.get("/slug/:slug", authMiddleware, getDocumentBySlug);
+router.get("/:documentId", authMiddleware, getDocumentById);
 
 // Tải xuống tài liệu theo ID
-router.get("/:id/download", authMiddleware, downloadDocument);
+router.get("/:documentId/download", authMiddleware, downloadDocument);
 
 // Tải lên tài liệu mới
 router.post("/", authMiddleware, isUploader, uploadMiddleware, uploadDocument);
 
 // Cập nhật thông tin tài liệu theo ID
-router.patch("/:id", authMiddleware, isUploader, updateDocument);
+router.patch("/:documentId", authMiddleware, isUploader, updateDocument);
 
 // Xóa tài liệu theo ID
-router.delete("/:id", authMiddleware, isUploader, deleteDocument);
-
-// Thêm/xoá tài liệu yêu thích
-router.post("/:id/favorite", authMiddleware, toggleFavorite);
-
-// Lấy danh sách tài liệu liên quan theo tags
-router.get("/:id/related", authMiddleware, getRelatedDocuments);
+router.delete("/:documentId", authMiddleware, isUploader, deleteDocument);
 
 module.exports = router;

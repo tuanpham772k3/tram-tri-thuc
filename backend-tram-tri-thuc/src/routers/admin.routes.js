@@ -1,24 +1,26 @@
 const express = require("express");
-const router = express.Router();
 const {
-    getViewStatsByMonth,
-    getUsersWithPagination,
-    getDocumentsWithPagination,
-    approveDocument,
-    rejectDocument,
-    getCategories,
-    createCategory,
-    getCategoryById,
-    updateCategory,
-    deleteCategory,
-    updateDocumentFeatured,
-    getSystemStats,
+  getViewStatsByMonth,
+  getUsersWithPagination,
+  getDocumentsWithPagination,
+  approveDocument,
+  rejectDocument,
+  getCategories,
+  createCategory,
+  getCategoryById,
+  updateCategory,
+  deleteCategory,
+  updateDocumentFeatured,
+  getSystemStats,
 } = require("../controller/admin.controller");
 const { authMiddleware, isAdmin } = require("../middlewares/auth.middleware");
+
+const router = express.Router();
 
 //  thống kê lượt xem hằng tháng
 router.get("/viewstatistics", authMiddleware, isAdmin, getViewStatsByMonth);
 router.get("/totalinfo", authMiddleware, isAdmin, getSystemStats);
+
 // lấy danh sách người dùng
 router.get("/users", authMiddleware, isAdmin, getUsersWithPagination);
 
