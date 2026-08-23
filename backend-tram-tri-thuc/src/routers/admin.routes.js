@@ -4,7 +4,7 @@ const { isAdmin } = require("../middlewares/role.middleware");
 const {
   getViewStatsByMonth,
   getUsersWithPagination,
-  getDocumentsWithPagination,
+  getDocuments,
   approveDocument,
   rejectDocument,
   getCategories,
@@ -26,10 +26,9 @@ router.get("/totalinfo", authenticate, isAdmin, getSystemStats);
 router.get("/users", authenticate, isAdmin, getUsersWithPagination);
 
 // lấy tất cả các tài liệu
-router.get("/document", authenticate, isAdmin, getDocumentsWithPagination);
+router.get("/document", authenticate, isAdmin, getDocuments);
 router.put("/approveDocument", authenticate, isAdmin, approveDocument);
 router.put("/rejectDocument", authenticate, isAdmin, rejectDocument);
-router.put("/featuredDocument", authenticate, isAdmin, updateDocumentFeatured);
 
 // Category
 router.post("/categories", authenticate, isAdmin, createCategory);

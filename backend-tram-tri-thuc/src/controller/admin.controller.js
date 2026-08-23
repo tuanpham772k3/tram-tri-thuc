@@ -143,7 +143,7 @@ exports.getUsersWithPagination = async (req, res) => {
 };
 
 // Document
-exports.getDocumentsWithPagination = async (req, res) => {
+exports.getDocuments = async (req, res) => {
   try {
     // Extract pagination parameters from query
     const page = parseInt(req.query.page) || 1;
@@ -177,7 +177,7 @@ exports.getDocumentsWithPagination = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Lỗi getDocumentsWithPagination:", error);
+    console.error("Lỗi getDocuments:", error);
     return res.status(400).json({
       success: false,
       status: 400,

@@ -1,5 +1,4 @@
 const express = require("express");
-const router = express.Router();
 
 const authRoutes = require("../routers/auth.routes");
 const adminRoutes = require("../routers/admin.routes");
@@ -10,6 +9,8 @@ const categoryRoutes = require("../routers/category.routes");
 const ratingRoutes = require("../routers/rating.routes");
 const commentRoutes = require("../routers/comment.routes");
 const notificationRoutes = require("../routers/notification.routes");
+
+const router = express.Router();
 
 router.use("/auth", authRoutes);
 router.use("/admin", adminRoutes);

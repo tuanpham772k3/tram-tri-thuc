@@ -21,3 +21,5 @@ router.put("/:commentId", authenticate, commentLimiter, updateComment);
 
 // Xóa bình luận
 router.delete("/:commentId", authenticate, deleteComment);
+
+module.exports = router;
