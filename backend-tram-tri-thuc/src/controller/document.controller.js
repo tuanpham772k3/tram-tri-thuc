@@ -1,173 +1,153 @@
 const Document = require("../models/document.model");
 const Category = require("../models/category.model");
 const { Types } = require("mongoose");
-const { getPagination, buildMeta } = require("../utils/helper");
+const {
+  getPagination,
+  buildMeta,
+  asyncHandler,
+  AppError,
+  sendSuccess,
+} = require("../utils/helper");
 
-exports.getDocuments = async (req, res) => {
-  try {
-    const { search, categoryId, sortBy, order, startDate, endDate, page, limit } =
-      req.query;
+// Lấy danh sách tài liệu
+exports.getDocuments = asyncHandler(async (req, res) => {
+  const { search, categoryId, sortBy, order, startDate, endDate, page, limit } =
+    req.query;
 
-    let query = {};
+  let query = {
+    status: "approved",
+  };
 
-    // Lọc theo danh mục
-    if (categoryId) {
-      const categoryDoc = await Category.findById(categoryId).lean();
-      if (!categoryDoc) {
-        return res.status(404).json({
-          success: false,
-          message: "Danh mục không tồn tại.",
-        });
-      }
+  // Tìm kiếm
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } },
+    ];
+  }
 
-      query.categoryId = categoryDoc._id;
+  // Lọc theo danh mục
+  if (categoryId) {
+    if (!Types.ObjectId.isValid(categoryId)) {
+      throw new AppError("ID danh mục không hợp lệ.", 400);
     }
 
-    // Lọc theo khoảng ngày
-    if (startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Định dạng ngày không hợp lệ." });
-      }
-      if (start > end) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Ngày bắt đầu phải trước ngày kết thúc." });
-      }
+    const categoryDoc = await Category.findById(categoryId).lean();
 
-      query.createdAt = {
-        $gte: start,
-        $lte: end,
-      };
+    if (!categoryDoc) {
+      throw new AppError("Danh mục không tồn tại.", 404);
     }
 
-    // Sắp xếp
-    const validSortFields = ["viewCount", "downloadCount", "averageRating", "createdAt"];
-    const validOrders = ["asc", "desc"];
+    query.categoryId = categoryDoc._id;
+  }
 
-    if (sortBy && !validSortFields.includes(sortBy)) {
-      return res.status(400).json({
-        success: false,
-        message: "Trường sắp xếp không hợp lệ.",
-      });
+  // Lọc theo khoảng ngày
+  if (startDate && endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      throw new AppError("Định dạng ngày không hợp lệ.", 400);
     }
 
-    if (order && !validOrders.includes(order)) {
-      return res.status(400).json({
-        success: false,
-        message: "Thứ tự sắp xếp không hợp lệ.",
-      });
+    if (start > end) {
+      throw new AppError("Ngày bắt đầu phải trước ngày kết thúc.", 400);
     }
 
-    const sortOptions = {
-      [sortBy || "createdAt"]: order === "asc" ? 1 : -1,
+    query.createdAt = {
+      $gte: start,
+      $lte: end,
     };
-
-    const pagination = getPagination({ page, limit });
-
-    const documents = await Document.find(query)
-      .select("-mimeType")
-      .populate("uploaderId", "name email avatar")
-      .populate("categoryId", "name slug description")
-      .sort(sortOptions)
-      .skip(pagination.skip)
-      .limit(pagination.limit)
-      .lean();
-
-    const totalDocs = await Document.countDocuments(query);
-
-    const pagingData = buildMeta(pagination.page, pagination.limit, totalDocs);
-
-    return res.status(200).json({
-      success: true,
-      data: documents,
-      meta: pagingData,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Không thể lấy danh sách tài liệu.",
-    });
   }
-};
 
-exports.getRelatedDocuments = async (req, res) => {
-  try {
-    const { documentId } = req.params;
+  // Sắp xếp
+  const validSortFields = ["viewCount", "downloadCount", "averageRating", "createdAt"];
 
-    if (!Types.ObjectId.isValid(documentId)) {
-      return res.status(400).json({
-        success: false,
-        message: "ID tài liệu không hợp lệ.",
-      });
-    }
+  const validOrders = ["asc", "desc"];
 
-    const document = await Document.findById(documentId).lean();
-    if (!document) {
-      return res.status(404).json({
-        success: false,
-        message: "Tài liệu không tồn tại.",
-      });
-    }
-
-    const query = {
-      _id: { $ne: document._id },
-      tags: { $in: document.tags },
-      status: "approved",
-    };
-
-    const relatedDocuments = await Document.find(query)
-      .select("-mimeType")
-      .limit(4)
-      .lean();
-
-    return res.status(200).json({
-      success: true,
-      data: relatedDocuments,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Không thể lấy danh sách tài liệu liên quan.",
-    });
+  if (sortBy && !validSortFields.includes(sortBy)) {
+    throw new AppError("Trường sắp xếp không hợp lệ.", 400);
   }
-};
 
-exports.getDocumentById = async (req, res) => {
-  try {
-    const { documentId } = req.params;
-
-    if (!Types.ObjectId.isValid(documentId)) {
-      return res.status(400).json({
-        success: false,
-        message: "ID tài liệu không hợp lệ.",
-      });
-    }
-
-    const document = await Document.findById(documentId)
-      .select("-mimeType")
-      .populate("categoryId", "name slug")
-      .populate("uploaderId", "name email")
-      .lean();
-
-    if (!document) {
-      return res.status(404).json({
-        success: false,
-        message: "Tài liệu không tồn tại.",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      data: document,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Không thể lấy chi tiết tài liệu.",
-    });
+  if (order && !validOrders.includes(order)) {
+    throw new AppError("Thứ tự sắp xếp không hợp lệ.", 400);
   }
-};
+
+  const sortOptions = {
+    [sortBy || "createdAt"]: order === "asc" ? 1 : -1,
+  };
+
+  // Pagination
+  const pagination = getPagination({ page, limit });
+
+  // Lấy documents
+  const documents = await Document.find(query)
+    .select("-mimeType")
+    .populate("uploaderId", "name email avatar")
+    .populate("categoryId", "name slug description")
+    .sort(sortOptions)
+    .skip(pagination.skip)
+    .limit(pagination.limit)
+    .lean();
+
+  // Tổng số documents
+  const totalDocs = await Document.countDocuments(query);
+
+  // Meta pagination
+  const meta = buildMeta(pagination.page, pagination.limit, totalDocs);
+
+  return sendSuccess(res, documents, "Lấy danh sách tài liệu thành công.", 200, meta);
+});
+
+// Lấy tài liệu liên quan
+exports.getRelatedDocuments = asyncHandler(async (req, res) => {
+  const { documentId } = req.params;
+
+  // Validation
+  if (!Types.ObjectId.isValid(documentId)) {
+    throw new AppError("ID tài liệu không hợp lệ.", 400);
+  }
+
+  // Tìm tài liệu hiện tại
+  const document = await Document.findById(documentId).lean();
+
+  if (!document) {
+    throw new AppError("Tài liệu không tồn tại.", 404);
+  }
+
+  const query = {
+    _id: { $ne: document._id },
+    tags: { $in: document.tags },
+    status: "approved",
+  };
+
+  const relatedDocuments = await Document.find(query).select("-mimeType").limit(4).lean();
+
+  return sendSuccess(
+    res,
+    relatedDocuments,
+    "Lấy danh sách tài liệu liên quan thành công."
+  );
+});
+
+// Lấy chi tiết tài liệu
+exports.getDocumentById = asyncHandler(async (req, res) => {
+  const { documentId } = req.params;
+
+  // Validation
+  if (!Types.ObjectId.isValid(documentId)) {
+    throw new AppError("ID tài liệu không hợp lệ.", 400);
+  }
+
+  const document = await Document.findById(documentId)
+    .select("-mimeType")
+    .populate("categoryId", "name slug")
+    .populate("uploaderId", "name email")
+    .lean();
+
+  if (!document) {
+    throw new AppError("Tài liệu không tồn tại.", 404);
+  }
+
+  return sendSuccess(res, document, "Lấy chi tiết tài liệu thành công.");
+});
