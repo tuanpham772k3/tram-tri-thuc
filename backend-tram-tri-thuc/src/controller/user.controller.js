@@ -17,10 +17,6 @@ async function getUserInfo(req, res) {
       .select("-password -passwordResetToken -token")
       .lean();
 
-    if (!user) {
-      throw new Error("Tài khoản không tồn tại");
-    }
-
     return res.status(200).json({
       success: true,
       message: "Lấy thông tin người dùng thành công",

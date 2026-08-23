@@ -11,7 +11,6 @@ exports.createComment = async (req, res) => {
     const { documentId } = req.params;
     const { content } = req.body;
 
-    // Validation
     if (!Types.ObjectId.isValid(documentId)) {
       return res.status(400).json({
         success: false,
@@ -33,7 +32,6 @@ exports.createComment = async (req, res) => {
       });
     }
 
-    // Kiểm tra tài liệu
     const document = await Document.findById(documentId);
     if (!document || document.status !== "approved") {
       return res.status(404).json({
@@ -74,8 +72,6 @@ exports.createComment = async (req, res) => {
 exports.getCommentsByDocument = async (req, res) => {
   try {
     const { documentId } = req.params;
-    const { sortOrder = "desc" } = req.query;
-
     const { page, limit, skip } = getPagination(req.query);
 
     // Validation
@@ -86,15 +82,8 @@ exports.getCommentsByDocument = async (req, res) => {
       });
     }
 
-    if (sortOrder && !["asc", "desc"].includes(sortOrder)) {
-      return res.status(400).json({
-        success: false,
-        message: "Thứ tự sắp xếp chỉ hỗ trợ asc hoặc desc",
-      });
-    }
-
     const document = await Document.findById(documentId);
-    if (!document || document.status !== "approved") {
+    if (!document) {
       return res.status(404).json({
         success: false,
         message: "Tài liệu không tồn tại.",
@@ -102,15 +91,14 @@ exports.getCommentsByDocument = async (req, res) => {
     }
 
     const comments = await Comment.find({ documentId })
-      .populate("userId", "name")
-      .sort({ createdAt: sortOrder === "asc" ? 1 : -1 })
+      .populate("userId", "name email")
       .skip(skip)
       .limit(limit)
       .lean();
 
-    const total = await Comment.countDocuments({ documentId });
+    const totalComment = await Comment.countDocuments({ documentId });
 
-    const pagingData = buildMeta(page, limit, total);
+    const pagingData = buildMeta(page, limit, totalComment);
 
     return res.status(200).json({
       success: true,
@@ -147,7 +135,10 @@ exports.updateComment = async (req, res) => {
 
     const comment = await Comment.findById(commentId);
     if (!comment) {
-      return res.status(404).json({ success: false, message: "Bình luận không tồn tại" });
+      return res.status(404).json({
+        success: false,
+        message: "Bình luận không tồn tại",
+      });
     }
 
     comment.content = content;

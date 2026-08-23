@@ -1,4 +1,5 @@
 const express = require("express");
+const authenticate = require("../middlewares/auth.middleware");
 const {
   getUserInfo,
   updateUserInfo,
@@ -6,21 +7,20 @@ const {
   CallBack,
   PaymentZaloPay,
 } = require("../controller/user.controller");
-const { authMiddleware } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
 // Lấy thông tin cá nhân
-router.get("/me", authMiddleware, getUserInfo);
+router.get("/me", authenticate, getUserInfo);
 
 // Cập nhật thông tin cá nhân
-router.put("/me", authMiddleware, updateUserInfo);
+router.put("/me", authenticate, updateUserInfo);
 
 // Xoá tài khoản
-router.delete("/me", authMiddleware, deleteMyAccount);
+router.delete("/me", authenticate, deleteMyAccount);
 
 // thanh toán
-router.post("/paymentZaloPay", authMiddleware, PaymentZaloPay);
+router.post("/paymentZaloPay", authenticate, PaymentZaloPay);
 
 router.post("/callback", CallBack);
 

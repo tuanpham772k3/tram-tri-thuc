@@ -1,4 +1,6 @@
 const express = require("express");
+const authenticate = require("../middlewares/auth.middleware");
+const { isAdmin } = require("../middlewares/role.middleware");
 const {
   getViewStatsByMonth,
   getUsersWithPagination,
@@ -13,28 +15,27 @@ const {
   updateDocumentFeatured,
   getSystemStats,
 } = require("../controller/admin.controller");
-const { authMiddleware, isAdmin } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
 //  thống kê lượt xem hằng tháng
-router.get("/viewstatistics", authMiddleware, isAdmin, getViewStatsByMonth);
-router.get("/totalinfo", authMiddleware, isAdmin, getSystemStats);
+router.get("/viewstatistics", authenticate, isAdmin, getViewStatsByMonth);
+router.get("/totalinfo", authenticate, isAdmin, getSystemStats);
 
 // lấy danh sách người dùng
-router.get("/users", authMiddleware, isAdmin, getUsersWithPagination);
+router.get("/users", authenticate, isAdmin, getUsersWithPagination);
 
 // lấy tất cả các tài liệu
-router.get("/document", authMiddleware, isAdmin, getDocumentsWithPagination);
-router.put("/approveDocument", authMiddleware, isAdmin, approveDocument);
-router.put("/rejectDocument", authMiddleware, isAdmin, rejectDocument);
-router.put("/featuredDocument", authMiddleware, isAdmin, updateDocumentFeatured);
+router.get("/document", authenticate, isAdmin, getDocumentsWithPagination);
+router.put("/approveDocument", authenticate, isAdmin, approveDocument);
+router.put("/rejectDocument", authenticate, isAdmin, rejectDocument);
+router.put("/featuredDocument", authenticate, isAdmin, updateDocumentFeatured);
 
 // Category
-router.post("/categories", authMiddleware, isAdmin, createCategory);
-router.get("/categories", authMiddleware, isAdmin, getCategories);
-router.get("/categories/:categoryId", authMiddleware, isAdmin, getCategoryById);
-router.put("/categories/:categoryId", authMiddleware, isAdmin, updateCategory);
-router.delete("/categories/:categoryId", authMiddleware, isAdmin, deleteCategory);
+router.post("/categories", authenticate, isAdmin, createCategory);
+router.get("/categories", authenticate, isAdmin, getCategories);
+router.get("/categories/:categoryId", authenticate, isAdmin, getCategoryById);
+router.put("/categories/:categoryId", authenticate, isAdmin, updateCategory);
+router.delete("/categories/:categoryId", authenticate, isAdmin, deleteCategory);
 
 module.exports = router;

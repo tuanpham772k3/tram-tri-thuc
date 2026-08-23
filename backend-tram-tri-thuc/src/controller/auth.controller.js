@@ -1,7 +1,6 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-
 const emailService = require("../services/email.service");
 const {
   generateAccessToken,
