@@ -1,16 +1,11 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { debounce } from "lodash";
 import { Search, TrendingUp, Eye, Award, User, BookOpen, Filter } from "lucide-react";
 import { FaFilePdf, FaFileWord, FaFilePowerpoint, FaFileArchive } from "react-icons/fa";
 import { Input, Button } from "antd";
-import {
-  fetchDocuments,
-  fetchVipDocuments,
-  fetchDocumentById,
-} from "../../store/slices/documentSlice";
+import { fetchDocuments, fetchDocumentById } from "../../store/slices/documentSlice";
 import {
   fetchRatingsByDocument,
   fetchAverageRating,
@@ -78,31 +73,6 @@ const RatingPage = () => {
     dispatch(fetchCategories({ page: 1, limit: 100 }));
   }, [dispatch]);
 
-  // Lấy danh sách tài liệu
-  useEffect(() => {
-    setIsFiltering(true);
-    const params = {
-      page: 1,
-      limit: 10,
-      search: searchTerm,
-      sort: sortBy,
-    };
-    // Chỉ thêm category vào params nếu không phải chế độ VIP
-    if (accessLevelFilter !== "vip" && filterCategory !== "all") {
-      params.category = filterCategory;
-    }
-    console.log("Fetching documents with params:", params);
-    const fetchAction = accessLevelFilter === "vip" ? fetchVipDocuments : fetchDocuments;
-    dispatch(fetchAction(params)).finally(() => setIsFiltering(false));
-  }, [dispatch, searchTerm, filterCategory, sortBy, accessLevelFilter]);
-
-  // Debug filterCategory
-  useEffect(() => {
-    console.log("Current filterCategory:", filterCategory);
-    const selectedCat = categories.find((cat) => cat.slug === filterCategory);
-    console.log("Selected category:", selectedCat);
-  }, [filterCategory, categories]);
-
   // Đồng bộ selectedDocument với currentDocument
   useEffect(() => {
     if (currentDocument) {
@@ -115,13 +85,6 @@ const RatingPage = () => {
       console.log("SelectedDocument:", updatedDocument);
     }
   }, [currentDocument, averageRating]);
-
-  // Xử lý lỗi
-  useEffect(() => {
-    if (docError) toast.error(docError);
-    if (ratingError) toast.error(ratingError.message);
-    if (catError) toast.error(catError);
-  }, [docError, ratingError, catError]);
 
   // Xử lý chọn tài liệu
   const handleDocumentSelect = (docId) => {

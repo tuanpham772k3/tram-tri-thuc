@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "../../store/slices/categorySlice";
-import { uploadDocument } from "../../store/slices/documentSlice";
 import showToast from "../../utils/toast";
 import { FaCloudUploadAlt, FaImage, FaTrash, FaShieldAlt } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
+import { uploadDocument } from "../../store/slices/uploaderSlice";
 
 export default function UploadForm() {
   const dispatch = useDispatch();

@@ -25,7 +25,7 @@ import UpgradeAccount from "../pages/UpgradeAccount/UpgradeAccount";
 
 // Pages – Uploader
 import UploadPage from "../pages/Uploader/UploadPage";
-import MyDocumentsPage from "../pages/Uploader/MyDocumentsPage";
+import UploaderDocumentsPage from "../pages/Uploader/UploaderDocumentsPage";
 import EditDocumentPage from "../pages/Uploader/EditDocumentPage";
 
 // Route protection wrappers
@@ -98,7 +98,7 @@ const router = createBrowserRouter([
     ),
     children: [
       { path: "upload", element: <UploadPage /> },
-      { path: "my-documents", element: <MyDocumentsPage /> },
+      { path: "my-documents", element: <UploaderDocumentsPage /> },
       { path: "edit-document/:documentId", element: <EditDocumentPage /> },
     ],
   },

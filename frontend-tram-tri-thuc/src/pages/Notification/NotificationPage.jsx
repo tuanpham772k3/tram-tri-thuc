@@ -8,7 +8,6 @@ import {
   markNotificationAsUnread,
   markAllNotificationsAsRead,
   deleteNotification,
-  clearNotificationError,
 } from "../../store/slices/notificationSlice";
 import showToast from "../../utils/toast";
 
@@ -23,14 +22,6 @@ const NotificationPage = ({ className = "" }) => {
   const [selectedIds, setSelectedIds] = useState(new Set());
   // State cho bộ lọc: 'all', 'unread', 'read'
   const [filter, setFilter] = useState("all");
-
-  // Xử lý lỗi từ Redux, hiển thị toast và xóa lỗi
-  useEffect(() => {
-    if (error) {
-      showToast("error", error.message);
-      dispatch(clearNotificationError());
-    }
-  }, [error, dispatch]);
 
   // Hàm lấy danh sách thông báo từ API
   const fetchNotifications = useCallback(() => {

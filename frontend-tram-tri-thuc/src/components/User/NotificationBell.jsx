@@ -3,7 +3,6 @@ import { Bell } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   fetchNotificationsByUser,
-  clearNotificationError,
   addNewNotification,
   markNotificationAsRead,
 } from "../../store/slices/notificationSlice";
@@ -67,14 +66,6 @@ const NotificationBell = ({ onClick, className = "" }) => {
       newSocket.disconnect();
     };
   }, [dispatch, userInfo?._id]);
-
-  // Xử lý lỗi
-  useEffect(() => {
-    if (error) {
-      showToast("error", error.message);
-      dispatch(clearNotificationError());
-    }
-  }, [error, dispatch]);
 
   // Lấy thông báo ban đầu
   const fetchNotifications = useCallback(() => {

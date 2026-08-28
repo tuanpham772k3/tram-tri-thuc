@@ -1,7 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { deleteDocument, fetchMyDocuments } from "../../store/slices/documentSlice";
 import showToast from "../../utils/toast";
 import { motion } from "framer-motion";
 import {
@@ -18,8 +17,9 @@ import { fetchCategories } from "../../store/slices/categorySlice";
 import SearchBar from "../../components/Common/SearchBar";
 import FilterPanel from "../../components/Common/FilterPanel";
 import Pagination from "../../components/Common/Pagination";
+import { deleteDocument, fetchUploaderDocuments } from "../../store/slices/uploaderSlice";
 
-export default function MyDocumentsPage() {
+export default function UploaderDocumentsPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const {
@@ -70,7 +70,7 @@ export default function MyDocumentsPage() {
     const cleanParams = Object.fromEntries(
       Object.entries(params).filter(([_, v]) => v != null && v !== "")
     );
-    dispatch(fetchMyDocuments(cleanParams))
+    dispatch(fetchUploaderDocuments(cleanParams))
       .unwrap()
       .catch((err) => {
         showToast("error", err.message || "Lỗi khi tải tài liệu.");

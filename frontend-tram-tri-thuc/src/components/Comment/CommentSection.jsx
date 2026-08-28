@@ -5,9 +5,6 @@ import {
   createComment,
   updateComment,
   deleteComment,
-  reportComment,
-  retryCommentAction,
-  clearCommentError,
 } from "../../store/slices/commentSlice";
 import showToast from "../../utils/toast";
 import { useNavigate } from "react-router-dom";
@@ -30,9 +27,6 @@ export default function CommentSection({ documentId }) {
     if (documentId) {
       dispatch(fetchCommentsByDocument({ documentId, params: { page: currentPage } }));
     }
-    return () => {
-      dispatch(clearCommentError());
-    };
   }, [dispatch, documentId, currentPage]);
 
   // Xử lý lỗi
@@ -45,27 +39,7 @@ export default function CommentSection({ documentId }) {
   // Gửi bình luận mới
   const handleAddComment = async (e) => {
     e.preventDefault();
-    if (!newComment.trim()) {
-      showToast("error", "Bình luận không được để trống.");
-      return;
-    }
-    if (newComment.length > 500) {
-      showToast("error", "Bình luận không được vượt quá 500 ký tự.");
-      return;
-    }
-    if (!userInfo) {
-      showToast("error", "Vui lòng đăng nhập để bình luận.");
-      return;
-    }
-    if (!localStorage.getItem("token")) {
-      showToast("error", "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
-      dispatch({ type: "user/logout" });
-      navigate("/auth/login");
-      return;
-    }
-
     try {
-      console.log("Sending comment:", newComment);
       await dispatch(createComment({ documentId, content: newComment })).unwrap();
       setNewComment("");
     } catch (err) {
@@ -96,26 +70,6 @@ export default function CommentSection({ documentId }) {
     } catch (err) {
       // Lỗi đã được xử lý trong thunk và showToast
     }
-  };
-
-  // Báo cáo bình luận
-  const handleReportComment = async (commentId) => {
-    if (!window.confirm("Bạn có muốn báo cáo bình luận này vì vi phạm?")) return;
-    try {
-      await dispatch(reportComment(commentId)).unwrap();
-    } catch (err) {
-      // Lỗi đã được xử lý trong thunk và showToast
-    }
-  };
-
-  // Retry khi gặp lỗi
-  const handleRetry = () => {
-    dispatch(
-      retryCommentAction({
-        action: fetchCommentsByDocument,
-        payload: { documentId, params: { page: currentPage } },
-      })
-    );
   };
 
   // Render bình luận và replies

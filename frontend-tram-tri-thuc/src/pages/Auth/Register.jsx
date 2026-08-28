@@ -14,7 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import FormInput from "../../components/Auth/FormInput";
-import { register, resetAuthState } from "../../store/slices/authSlice";
+import { register } from "../../store/slices/authSlice";
 import backgroundImage from "../../assets/image3.jpg";
 const Register = () => {
   const dispatch = useDispatch();

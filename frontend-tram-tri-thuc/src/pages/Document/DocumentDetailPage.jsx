@@ -19,10 +19,7 @@ import CommentSection from "../../components/Comment/CommentSection";
 import RatingStars from "../../components/Rating/RatingStar";
 import DocumentViewer from "../../components/Document/DocumentViewer";
 import DocumentList from "../../components/Document/DocumentList";
-import {
-  fetchDocumentBySlug,
-  fetchRelatedDocuments,
-} from "../../store/slices/documentSlice";
+import { fetchRelatedDocuments } from "../../store/slices/documentSlice";
 
 export default function DocumentDetailPage() {
   const { slug } = useParams();
@@ -35,10 +32,6 @@ export default function DocumentDetailPage() {
   const [relatedPage, setRelatedPage] = useState(1);
   const [sort, setSort] = useState("relevance:desc");
   const [isViewerOpen, setIsViewerOpen] = useState(false);
-
-  useEffect(() => {
-    dispatch(fetchDocumentBySlug(slug));
-  }, [dispatch, slug]);
 
   useEffect(() => {
     if (currentDocument?._id) {

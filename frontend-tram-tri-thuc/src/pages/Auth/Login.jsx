@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Checkbox } from "antd";
+import { Button, Checkbox } from "antd";
 import {
   FaEnvelope,
   FaLock,
@@ -13,13 +13,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import FormInput from "../../components/Auth/FormInput";
-import { clearAuthState, login } from "../../store/slices/authSlice";
+import { login } from "../../store/slices/authSlice";
 import backgroundImage from "../../assets/image2.jpg";
 const Login = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { loading, error, isAuthenticated } = useSelector((state) => state.auth);
-  const { userInfo } = useSelector((state) => state.user);
+  const { loading, error } = useSelector((state) => state.auth);
   const [activeFeature, setActiveFeature] = useState(0);
 
   const formik = useFormik({
@@ -38,18 +36,6 @@ const Login = () => {
       await dispatch(login({ email, password, remember }));
     },
   });
-
-  useEffect(() => {
-    if (isAuthenticated && userInfo) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate, userInfo]);
-
-  useEffect(() => {
-    return () => {
-      dispatch(clearAuthState());
-    };
-  }, [dispatch]);
 
   // Auto-cycle through features
   useEffect(() => {
