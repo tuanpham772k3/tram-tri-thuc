@@ -4,9 +4,7 @@ import documentReducer from "./slices/documentSlice";
 import categoryReducer from "./slices/categorySlice";
 import commentReducer from "./slices/commentSlice";
 import notificationReducer from "./slices/notificationSlice";
-import downloadReducer from "./slices/downloadSlice";
 import ratingReducer from "./slices/ratingSlice";
-import adminReducer from "./slices/adminSlice";
 import authReducer from "./slices/authSlice";
 
 export const store = configureStore({
@@ -17,8 +15,6 @@ export const store = configureStore({
     categories: categoryReducer,
     comments: commentReducer,
     notifications: notificationReducer,
-    download: downloadReducer,
     ratings: ratingReducer,
-    admin: adminReducer,
   },
 });

@@ -101,7 +101,7 @@ customAxios.interceptors.response.use(
 
     // Xử lý lỗi 401 từ /auth/login một cách riêng biệt
     if (error.response?.status === 401 && error.config.url === "/auth/login") {
-      return Promise.reject(error); // Trả về lỗi gốc để xử lý trong loginThunk
+      return Promise.reject(error); // Trả về lỗi gốc để xử lý trong login
     }
 
     return Promise.reject(error);

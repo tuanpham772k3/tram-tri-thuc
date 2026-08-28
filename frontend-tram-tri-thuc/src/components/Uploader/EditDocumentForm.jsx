@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { clearError, updateDocument } from "../../store/slices/documentSlice";
+import {  updateDocument } from "../../store/slices/documentSlice";
 import showToast from "../../utils/toast";
 import { FaSave, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +24,6 @@ const EditDocumentForm = ({ document, onSuccess }) => {
                 tags: Array.isArray(document.tags) ? document.tags : [],
             });
         }
-        return () => dispatch(clearError());
     }, [document, dispatch]);
 
     // Xử lý thay đổi input

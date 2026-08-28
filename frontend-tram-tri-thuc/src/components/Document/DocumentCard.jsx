@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Download, Eye, User, Tag } from "lucide-react";
-import { downloadDocument } from "../../store/slices/documentSlice";
 import defaultThumbnail from "../../assets/image2.jpg";
 
 // Thêm constant cho API URL
@@ -9,10 +8,6 @@ const API_URL = "http://localhost:5000"; // hoặc URL của server của bạn
 
 export default function DocumentCard({ document, type }) {
   const dispatch = useDispatch();
-
-  const handleDownload = () => {
-    dispatch(downloadDocument(document._id));
-  };
 
   const tags = Array.isArray(document.tags) ? document.tags : [];
 
@@ -125,7 +120,6 @@ export default function DocumentCard({ document, type }) {
         </div>
         <motion.button
           className="flex items-center gap-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-md"
-          onClick={handleDownload}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >

@@ -2,44 +2,16 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import customAxios from "../../utils/customAxios";
 import showToast from "../../utils/toast";
 
-// Lấy danh sách tài liệu với (search,bộ lọc,phân trang)
+// Lấy danh sách tài liệu
 export const fetchDocuments = createAsyncThunk(
   "documents/fetchDocuments",
   async (params, { rejectWithValue }) => {
     try {
       const response = await customAxios.get("/documents", { params });
-      return response.data.data; // { totalItems, totalPages, currentPage, items }
+      return response.data.data;
     } catch (error) {
       const message = error.response?.data?.message || "Không thể lấy danh sách tài liệu";
       return rejectWithValue(message);
-    }
-  }
-);
-
-export const fetchVipDocuments = createAsyncThunk(
-  "documents/fetchVipDocuments",
-  async (params, { rejectWithValue }) => {
-    try {
-      const response = await customAxios.get("/documents/vip", { params });
-      return response.data.data; // { totalItems, totalPages, currentPage, items }
-    } catch (error) {
-      let message;
-      switch (error.response?.status) {
-        case 401:
-          message = "Vui lòng đăng nhập để xem tài liệu VIP.";
-          break;
-        case 403:
-          message = "Bạn không có quyền truy cập tài liệu VIP.";
-          break;
-        case 400:
-          message = "Tham số không hợp lệ.";
-          break;
-        default:
-          message =
-            error.response?.data?.message || "Không thể lấy danh sách tài liệu VIP.";
-      }
-      showToast("error", message);
-      return rejectWithValue({ message, status: error.response?.status });
     }
   }
 );
@@ -55,243 +27,6 @@ export const fetchDocumentById = createAsyncThunk(
       return rejectWithValue(
         error.response?.data?.message || "Không thể lấy chi tiết tài liệu"
       );
-    }
-  }
-);
-
-// Lấy chi tiết tài liệu theo slug
-export const fetchDocumentBySlug = createAsyncThunk(
-  "documents/fetchDocumentBySlug",
-  async (slug, { rejectWithValue }) => {
-    try {
-      console.log("fetchDocumentBySlug called with slug:", slug);
-      const response = await customAxios.get(`/documents/slug/${slug}`);
-      return response.data.data; // document
-    } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Không thể lấy chi tiết tài liệu"
-      );
-    }
-  }
-);
-
-// Tải file tài liệu
-export const downloadDocument = createAsyncThunk(
-  "documents/downloadDocument",
-  async (id, { rejectWithValue, getState }) => {
-    try {
-      let fileName;
-      let documentData = null;
-
-      // Lấy dữ liệu từ state
-      const state = getState();
-      documentData =
-        state.documents.currentDocument ||
-        state.documents.documents.find((doc) => doc._id === id) ||
-        state.documents.myDocuments.find((doc) => doc._id === id) ||
-        state.documents.featuredDocuments.find((doc) => doc._id === id);
-
-      // Nếu không có fileName, gọi API để lấy chi tiết tài liệu
-      if (!documentData?.fileName) {
-        console.warn(`fileName missing for document ID: ${id}, fetching details`);
-        const response = await customAxios.get(`/documents/${id}`);
-        documentData = response.data.data;
-        fileName = documentData.fileName || `document-${id}`;
-      } else {
-        fileName = documentData.fileName;
-      }
-
-      // Tải file
-      const response = await customAxios.get(`/documents/${id}/download`, {
-        responseType: "blob",
-        timeout: 30000,
-      });
-
-      if (!(response.data instanceof Blob)) {
-        throw new Error("Định dạng phản hồi không hợp lệ");
-      }
-
-      // Lấy filename từ header Content-Disposition (fallback)
-      const contentDisposition = response.headers["content-disposition"];
-      if (contentDisposition) {
-        const fileNameMatch = contentDisposition.match(
-          /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
-        );
-        if (fileNameMatch && fileNameMatch[1]) {
-          fileName = decodeURIComponent(fileNameMatch[1].replace(/['"]/g, ""));
-        }
-      }
-
-      // Tạo link tải xuống
-      const url = window.URL.createObjectURL(response.data);
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", fileName);
-      link.style.display = "none";
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      return { id, fileName, document: documentData };
-    } catch (error) {
-      console.error("Lỗi tải xuống:", error);
-      let message;
-      if (error.code === "ECONNABORTED") {
-        message = "Timeout: Quá trình tải xuống mất quá nhiều thời gian.";
-      } else {
-        switch (error.response?.status) {
-          case 404:
-            message = "Tài liệu không tồn tại.";
-            break;
-          case 403:
-            message = "Bạn không có quyền tải tài liệu này.";
-            break;
-          case 401:
-            message = "Vui lòng đăng nhập để tải tài liệu.";
-            break;
-          case 500:
-            message = "Lỗi server. Vui lòng thử lại sau.";
-            break;
-          default:
-            message =
-              error.response?.data?.message || error.message || "Không thể tải tài liệu.";
-        }
-      }
-      showToast("error", message);
-      return rejectWithValue({ message, status: error.response?.status });
-    }
-  }
-);
-
-// Upload tài liệu mới
-export const uploadDocument = createAsyncThunk(
-  "documents/uploadDocument",
-  async (formData, { rejectWithValue }) => {
-    try {
-      const response = await customAxios.post("/documents", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      showToast("success", response.data.message);
-      return response.data.data; // document
-    } catch (error) {
-      let message;
-      switch (error.response?.status) {
-        case 400:
-          message = "Dữ liệu không hợp lệ hoặc thiếu file tài liệu.";
-          break;
-        case 401:
-          message = "Vui lòng đăng nhập để upload tài liệu.";
-          break;
-        case 403:
-          message = "Bạn không có quyền upload tài liệu.";
-          break;
-        default:
-          message = error.response?.data?.message || "Không thể upload tài liệu.";
-      }
-      showToast("error", message);
-      return rejectWithValue({ message, status: error.response?.status });
-    }
-  }
-);
-
-// Lấy danh sách tài liệu của người dùng
-export const fetchMyDocuments = createAsyncThunk(
-  "documents/fetchMyDocuments",
-  async (params, { rejectWithValue }) => {
-    try {
-      const response = await customAxios.get("/documents/me", { params });
-      return response.data.data; // { totalItems, totalPages, currentPage, items }
-    } catch (error) {
-      const status = error.response?.status;
-      let message =
-        error.response?.data?.message || "Không thể lấy danh sách tài liệu cá nhân";
-      if (status === 401) {
-        message = "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.";
-      } else if (status === 403) {
-        message = "Bạn không có quyền truy cập danh sách tài liệu.";
-      }
-      return rejectWithValue({ message, status });
-    }
-  }
-);
-
-// Cập nhật tài liệu
-export const updateDocument = createAsyncThunk(
-  "documents/updateDocument",
-  async ({ id, data }, { rejectWithValue }) => {
-    try {
-      const response = await customAxios.patch(`/documents/${id}`, data);
-      showToast("success", response.data.message);
-      return response.data.data; // document
-    } catch (error) {
-      let message;
-      switch (error.response?.status) {
-        case 400:
-          message = "Dữ liệu không hợp lệ.";
-          break;
-        case 401:
-          message = "Vui lòng đăng nhập để cập nhật tài liệu.";
-          break;
-        case 403:
-          message = "Bạn không có quyền cập nhật tài liệu này.";
-          break;
-        case 404:
-          message = "Tài liệu không tồn tại.";
-          break;
-        default:
-          message = error.response?.data?.message || "Không thể cập nhật tài liệu.";
-      }
-      showToast("error", message);
-      return rejectWithValue({ message, status: error.response?.status });
-    }
-  }
-);
-
-// Xóa tài liệu
-export const deleteDocument = createAsyncThunk(
-  "documents/deleteDocument",
-  async (id, { rejectWithValue }) => {
-    try {
-      const response = await customAxios.delete(`/documents/${id}`);
-      showToast("success", response.data.message);
-      return id; // Trả về id để xóa trong state
-    } catch (error) {
-      let message;
-      switch (error.response?.status) {
-        case 400:
-          message = "ID tài liệu không hợp lệ.";
-          break;
-        case 401:
-          message = "Vui lòng đăng nhập để xóa tài liệu.";
-          break;
-        case 403:
-          message = "Bạn không có quyền xóa tài liệu này.";
-          break;
-        case 404:
-          message = "Tài liệu không tồn tại.";
-          break;
-        default:
-          message = error.response?.data?.message || "Không thể xóa tài liệu.";
-      }
-      showToast("error", message);
-      return rejectWithValue({ message, status: error.response?.status });
-    }
-  }
-);
-
-// Lấy danh sách tài liệu nổi bật
-export const fetchFeaturedDocuments = createAsyncThunk(
-  "documents/fetchFeaturedDocuments",
-  async (params, { rejectWithValue }) => {
-    try {
-      const response = await customAxios.get("/documents/featured", { params });
-      return response.data.data; // { totalItems, totalPages, currentPage, items }
-    } catch (error) {
-      const message =
-        error.response?.data?.message || "Không thể lấy danh sách tài liệu nổi bật";
-      return rejectWithValue(message);
     }
   }
 );
@@ -313,236 +48,44 @@ export const fetchRelatedDocuments = createAsyncThunk(
 );
 
 // ========== Slice ==========
-
 const documentSlice = createSlice({
   name: "documents",
   initialState: {
     documents: [],
-    featuredDocuments: [],
-    currentDocument: null,
-    myDocuments: [],
-    relatedDocuments: [],
-    vipDocuments: [],
+    pagination: {},
     loading: false,
-    error: null,
-    pagination: {
-      totalItems: 0,
-      totalPages: 0,
-      currentPage: 1,
-      limit: 12,
-    },
-    featuredPagination: {
-      totalItems: 0,
-      totalPages: 0,
-      currentPage: 1,
-      limit: 12,
-    },
-    myDocumentsPagination: {
-      totalItems: 0,
-      totalPages: 0,
-      currentPage: 1,
-      limit: 12,
-    },
-    relatedPagination: {
-      totalItems: 0,
-      totalPages: 0,
-      currentPage: 1,
-      limit: 12,
-    },
-    vipPagination: {
-      totalItems: 0,
-      totalPages: 0,
-      currentPage: 1,
-      limit: 12,
-    },
+
+    currentDocument: null,
+    relatedDocuments: [],
   },
-  reducers: {
-    clearError: (state) => {
-      state.error = null;
-    },
-  },
+
+  reducers: {},
+
   extraReducers: (builder) => {
-    const handlePending = (state) => {
-      state.loading = true;
-      state.error = null;
-    };
-
-    const handleRejected = (state, action) => {
-      state.loading = false;
-      state.error = action.payload || "Đã xảy ra lỗi không xác định";
-    };
-
-    const normalizeDocument = (doc) => ({
-      ...doc,
-      _id: doc._id?.toString(),
-      thumbnailUrl: doc.thumbnailUrl || null,
-      viewCount: doc.viewCount ?? 0,
-      downloadCount: doc.downloadCount ?? 0,
-      category: doc.category || { _id: null, name: "", slug: "" },
-      uploader: doc.uploader || { _id: null, name: "" },
-      createdAt: doc.createdAt ? new Date(doc.createdAt).toISOString() : null,
-    });
-
     builder
       // fetchDocuments
-      .addCase(fetchDocuments.pending, handlePending)
+      .addCase(fetchDocuments.pending, (state, action) => {
+        state.loading = true;
+      })
       .addCase(fetchDocuments.fulfilled, (state, action) => {
         state.loading = false;
-        state.documents = action.payload.items?.map(normalizeDocument) || [];
-        state.pagination = {
-          totalItems: action.payload.totalItems || 0,
-          totalPages: action.payload.totalPages || 0,
-          currentPage: action.payload.currentPage || 1,
-          limit: action.payload.limit || state.pagination.limit,
-        };
+        state.documents = action.payload.documents;
+        state.pagination = action.payload.pagination;
       })
-      .addCase(fetchDocuments.rejected, handleRejected)
-
-      // fetchVipDocuments
-      .addCase(fetchVipDocuments.pending, handlePending)
-      .addCase(fetchVipDocuments.fulfilled, (state, action) => {
+      .addCase(fetchDocuments.rejected, (state, action) => {
         state.loading = false;
-        state.vipDocuments = action.payload.items?.map(normalizeDocument) || [];
-        state.vipPagination = {
-          totalItems: action.payload.totalItems || 0,
-          totalPages: action.payload.totalPages || 0,
-          currentPage: action.payload.currentPage || 1,
-          limit: action.payload.limit || state.vipPagination.limit,
-        };
       })
-      .addCase(fetchVipDocuments.rejected, handleRejected)
-
-      // fetchFeaturedDocuments
-      .addCase(fetchFeaturedDocuments.pending, handlePending)
-      .addCase(fetchFeaturedDocuments.fulfilled, (state, action) => {
-        state.loading = false;
-        state.featuredDocuments = action.payload.items?.map(normalizeDocument) || [];
-        state.featuredPagination = {
-          totalItems: action.payload.totalItems || 0,
-          totalPages: action.payload.totalPages || 0,
-          currentPage: action.payload.currentPage || 1,
-          limit: action.payload.limit || state.featuredPagination.limit,
-        };
-      })
-      .addCase(fetchFeaturedDocuments.rejected, handleRejected)
 
       // fetchDocumentById
-      .addCase(fetchDocumentById.pending, handlePending)
       .addCase(fetchDocumentById.fulfilled, (state, action) => {
-        state.loading = false;
-        state.currentDocument = normalizeDocument(action.payload);
+        state.currentDocument = action.payload;
       })
-      .addCase(fetchDocumentById.rejected, handleRejected)
-
-      // fetchDocumentBySlug
-      .addCase(fetchDocumentBySlug.pending, handlePending)
-      .addCase(fetchDocumentBySlug.fulfilled, (state, action) => {
-        state.loading = false;
-        state.currentDocument = normalizeDocument(action.payload);
-      })
-      .addCase(fetchDocumentBySlug.rejected, handleRejected)
-
-      // downloadDocument
-      .addCase(downloadDocument.pending, handlePending)
-      .addCase(downloadDocument.fulfilled, (state, action) => {
-        state.loading = false;
-        if (action.payload.document) {
-          const updatedDoc = normalizeDocument(action.payload.document);
-          state.documents = state.documents.map((doc) =>
-            doc._id === updatedDoc._id ? updatedDoc : doc
-          );
-          state.vipDocuments = state.vipDocuments.map((doc) =>
-            doc._id === updatedDoc._id ? updatedDoc : doc
-          );
-          state.myDocuments = state.myDocuments.map((doc) =>
-            doc._id === updatedDoc._id ? updatedDoc : doc
-          );
-          state.featuredDocuments = state.featuredDocuments.map((doc) =>
-            doc._id === updatedDoc._id ? updatedDoc : doc
-          );
-          if (state.currentDocument?._id === updatedDoc._id) {
-            state.currentDocument = updatedDoc;
-          }
-        }
-      })
-      .addCase(downloadDocument.rejected, handleRejected)
-
-      // uploadDocument
-      .addCase(uploadDocument.pending, handlePending)
-      .addCase(uploadDocument.fulfilled, (state, action) => {
-        state.loading = false;
-        state.myDocuments.push(normalizeDocument(action.payload));
-        state.myDocumentsPagination.totalItems += 1;
-      })
-      .addCase(uploadDocument.rejected, handleRejected)
-
-      // fetchMyDocuments
-      .addCase(fetchMyDocuments.pending, handlePending)
-      .addCase(fetchMyDocuments.fulfilled, (state, action) => {
-        state.loading = false;
-        state.myDocuments = action.payload.items?.map(normalizeDocument) || [];
-        state.myDocumentsPagination = {
-          totalItems: action.payload.totalItems || 0,
-          totalPages: action.payload.totalPages || 0,
-          currentPage: action.payload.currentPage || 1,
-          limit: action.payload.limit || state.myDocumentsPagination.limit,
-        };
-      })
-      .addCase(fetchMyDocuments.rejected, handleRejected)
-
-      // updateDocument
-      .addCase(updateDocument.pending, handlePending)
-      .addCase(updateDocument.fulfilled, (state, action) => {
-        state.loading = false;
-        const updatedDoc = normalizeDocument(action.payload);
-        state.myDocuments = state.myDocuments.map((doc) =>
-          doc._id === updatedDoc._id ? updatedDoc : doc
-        );
-        state.vipDocuments = state.vipDocuments.map((doc) =>
-          doc._id === updatedDoc._id ? updatedDoc : doc
-        );
-        state.documents = state.documents.map((doc) =>
-          doc._id === updatedDoc._id ? updatedDoc : doc
-        );
-        state.featuredDocuments = state.featuredDocuments.map((doc) =>
-          doc._id === updatedDoc._id ? updatedDoc : doc
-        );
-        if (state.currentDocument?._id === updatedDoc._id) {
-          state.currentDocument = updatedDoc;
-        }
-      })
-      .addCase(updateDocument.rejected, handleRejected)
-
-      // deleteDocument
-      .addCase(deleteDocument.pending, handlePending)
-      .addCase(deleteDocument.fulfilled, (state, action) => {
-        state.loading = false;
-        state.myDocuments = state.myDocuments.filter((doc) => doc._id !== action.payload);
-        state.documents = state.documents.filter((doc) => doc._id !== action.payload);
-        state.featuredDocuments = state.featuredDocuments.filter(
-          (doc) => doc._id !== action.payload
-        );
-        if (state.currentDocument?._id === action.payload) {
-          state.currentDocument = null;
-        }
-      })
-      .addCase(deleteDocument.rejected, handleRejected)
 
       // fetchRelatedDocuments
-      .addCase(fetchRelatedDocuments.pending, handlePending)
       .addCase(fetchRelatedDocuments.fulfilled, (state, action) => {
-        state.loading = false;
-        state.relatedDocuments = action.payload.items?.map(normalizeDocument) || [];
-        state.relatedPagination = {
-          totalItems: action.payload.totalItems || 0,
-          totalPages: action.payload.totalPages || 0,
-          currentPage: action.payload.currentPage || 1,
-          limit: action.payload.limit || state.relatedPagination.limit,
-        };
-      })
-      .addCase(fetchRelatedDocuments.rejected, handleRejected);
+        state.relatedDocuments = action.payload;
+      });
   },
 });
 
-export const { clearError } = documentSlice.actions;
 export default documentSlice.reducer;
