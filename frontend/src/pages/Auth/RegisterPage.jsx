@@ -16,7 +16,7 @@ import * as Yup from "yup";
 import FormInput from "../../components/Auth/FormInput";
 import { register } from "../../store/slices/authSlice";
 import backgroundImage from "../../assets/image3.jpg";
-const Register = () => {
+const RegisterPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error, success } = useSelector((state) => state.auth);
@@ -62,19 +62,6 @@ const Register = () => {
       }
     },
   });
-
-  useEffect(() => {
-    if (success) {
-      formik.resetForm();
-      dispatch(resetAuthState());
-    }
-  }, [success, dispatch, formik]);
-
-  useEffect(() => {
-    return () => {
-      dispatch(resetAuthState());
-    };
-  }, [dispatch]);
 
   // Auto-cycle through features
   useEffect(() => {
@@ -345,4 +332,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default RegisterPage;

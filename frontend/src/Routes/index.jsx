@@ -8,14 +8,14 @@ import UserProfilePage from "../components/Layout/UserProfilePage";
 import HomePage from "../pages/Home/HomePage";
 
 // Pages – Auth
-import Login from "../pages/Auth/Login";
-import Register from "../pages/Auth/Register";
-import VerifyEmail from "../pages/Auth/VerifyEmail";
-import ResetPassword from "../pages/Auth/ResetPassword";
-import ForgotPassword from "../pages/Auth/ForgotPassword";
+import LoginPage from "../pages/Auth/LoginPage";
+import RegisterPage from "../pages/Auth/RegisterPage";
+import VerifyEmailPage from "../pages/Auth/VerifyEmailPage";
+import ResetPasswordPage from "../pages/Auth/ResetPasswordPage";
+import ForgotPasswordPage from "../pages/Auth/ForgotPasswordPage";
 
 // Pages – User
-import ProfileInfo from "../pages/User/ProfileInfo";
+import ProfilePage from "../pages/User/ProfilePage";
 import NotificationPage from "../pages/Notification/NotificationPage";
 import DocumentDetailPage from "../pages/Document/DocumentDetailPage";
 import SearchPage from "../pages/Search/SearchPage";
@@ -38,23 +38,23 @@ const router = createBrowserRouter([
   // =========================
   {
     path: "/login",
-    element: <Login />,
+    element: <LoginPage />,
   },
   {
     path: "/register",
-    element: <Register />,
+    element: <RegisterPage />,
   },
   {
     path: "/verify/:userId",
-    element: <VerifyEmail />,
+    element: <VerifyEmailPage />,
   },
   {
     path: "/reset-password",
-    element: <ResetPassword />,
+    element: <ResetPasswordPage />,
   },
   {
     path: "/forgot-password",
-    element: <ForgotPassword />,
+    element: <ForgotPasswordPage />,
   },
 
   // =========================
@@ -75,7 +75,7 @@ const router = createBrowserRouter([
       {
         path: "profile",
         element: <UserProfilePage />,
-        children: [{ element: <ProfileInfo />, index: true }],
+        children: [{ element: <ProfilePage />, index: true }],
       },
       { path: "notifications", element: <NotificationPage /> },
       { path: "upgradeAccount", element: <UpgradeAccount /> },

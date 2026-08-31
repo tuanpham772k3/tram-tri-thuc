@@ -1,23 +1,18 @@
-import React, { useState } from "react";
-import { Button, Card, Input } from "antd";
+import { Button, Card } from "antd";
 import { FaLock, FaShieldAlt, FaCheckCircle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import * as Yup from "yup";
 import FormInput from "../../components/Auth/FormInput";
 import { resetPassword } from "../../store/slices/authSlice";
-import showToast from "../../utils/toast";
 import { useFormik } from "formik";
 
-const ResetPassword = () => {
+const ResetPasswordPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error, message } = useSelector((state) => state.auth);
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
-
-  // Log để debug
-  console.log("ResetPassword rendered", { token, loading, error });
 
   const formik = useFormik({
     initialValues: {
@@ -228,4 +223,4 @@ const ResetPassword = () => {
   );
 };
 
-export default ResetPassword;
+export default ResetPasswordPage;

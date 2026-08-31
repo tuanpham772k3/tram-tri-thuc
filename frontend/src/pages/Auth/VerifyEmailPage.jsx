@@ -61,7 +61,7 @@ const Button = ({ children, onClick, disabled, primary, loading }) => (
   </button>
 );
 
-const VerifyEmail = () => {
+const VerifyEmailPage = () => {
   const { userId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -263,4 +263,4 @@ const VerifyEmail = () => {
   );
 };
 
-export default VerifyEmail;
+export default VerifyEmailPage;

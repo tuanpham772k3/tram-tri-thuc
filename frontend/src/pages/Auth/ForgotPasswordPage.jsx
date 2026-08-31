@@ -7,7 +7,7 @@ import showToast from "../../utils/toast";
 import FormInput from "../../components/Auth/FormInput";
 import { forgotPassword } from "../../store/slices/authSlice";
 
-const ForgotPassword = () => {
+const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
   const dispatch = useDispatch();
   const { loading, error, message } = useSelector((state) => state.auth);
@@ -124,4 +124,4 @@ const ForgotPassword = () => {
   );
 };
 
-export default ForgotPassword;
+export default ForgotPasswordPage;
