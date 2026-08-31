@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const ratingSchema = new Schema(
+const reviewsSchema = new Schema(
   {
-    documentId: {
+    bookId: {
       type: Schema.Types.ObjectId,
       ref: "Document",
       required: true,
@@ -21,7 +21,6 @@ const ratingSchema = new Schema(
     },
     review: {
       type: String,
-      trim: true,
       maxLength: 500,
     },
   },
@@ -30,15 +29,15 @@ const ratingSchema = new Schema(
   }
 );
 
-ratingSchema.index(
+reviewsSchema.index(
   {
     userId: 1,
-    documentId: 1,
+    bookId: 1,
     score: 1,
   },
   { unique: true }
 );
 
-const Rating = mongoose.models.Rating || mongoose.model("Rating", ratingSchema);
+const Reviews = mongoose.model("Reviews", reviewsSchema);
 
-module.exports = Rating;
+module.exports = Reviews;

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
-const userSchema = new mongoose.Schema(
+const usersSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -10,35 +11,37 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
+      trim: true,
+      lowercase: true,
       unique: true,
+      validate: {
+        validator: validator.isEmail,
+        message: "Email không đúng định dạng",
+      },
     },
     password: {
       type: String,
-      required: function () {
-        return !this.googleId; // Chỉ bắt buộc nếu không dùng Google OAuth
-      },
+      required: true,
+      trim: true,
+      minLength: 6,
+      maxLength: 50,
     },
+
     avatar: {
       type: String,
       default: null,
     },
 
-    phone: {
-      type: String,
-    },
-
-    address: {
-      type: String,
-    },
-
     role: {
       type: String,
-      enum: ["admin", "uploader", "member"],
-      default: "member",
+      enum: ["customer", "seller", "admin"],
+      default: "customer",
     },
-    isActive: {
-      type: Boolean,
-      default: false,
+
+    status: {
+      type: String,
+      enum: ["active", "banned"],
+      default: "active",
     },
 
     refreshToken: {
@@ -81,10 +84,9 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-userSchema.index({ passwordResetTokenExpires: 1 }, { expireAfterSeconds: 0 });
-userSchema.index({ verificationCodeExpires: 1 }, { expireAfterSeconds: 0 });
-// Thêm index cho vipEndDate để hỗ trợ kiểm tra hết hạn VIP
-userSchema.index({ vipEndDate: 1 }, { expireAfterSeconds: 0 });
+usersSchema.index({ passwordResetTokenExpires: 1 }, { expireAfterSeconds: 0 });
+usersSchema.index({ verificationCodeExpires: 1 }, { expireAfterSeconds: 0 });
+usersSchema.index({ vipEndDate: 1 }, { expireAfterSeconds: 0 });
 
-const User = mongoose.models.User || mongoose.model("User", userSchema);
-module.exports = User;
+const Users = mongoose.model("Users", usersSchema);
+module.exports = Users;

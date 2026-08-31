@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const categorySchema = new Schema(
+const categoriesSchema = new Schema(
   {
     name: {
       type: String,
@@ -9,21 +9,29 @@ const categorySchema = new Schema(
       trim: true,
       maxLength: 100,
     },
+
     slug: {
       type: String,
       required: true,
       unique: true,
     },
+
     description: {
       type: String,
       maxLength: 500,
+    },
+
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
     },
   },
   { timestamps: true }
 );
 
-categorySchema.index({ slug: 1 });
+categoriesSchema.index({ slug: 1 });
 
-const Category = mongoose.model("Category", categorySchema);
+const Categories = mongoose.model("Categories", categoriesSchema);
 
-module.exports = Category;
+module.exports = Categories;
