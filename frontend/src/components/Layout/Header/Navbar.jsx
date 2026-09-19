@@ -9,6 +9,7 @@ import {
   LogOut,
   User,
   Settings,
+  Heart,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,6 +18,13 @@ import showToast from "../../../utils/toast";
 import LoadingSpinner from "../../Common/LoadingSpinner";
 import { logout } from "../../../store/slices/authSlice";
 import { fetchUserInfo, resetUserState } from "../../../store/slices/userSlice";
+
+const navLinks = [
+  { to: "/", label: "Home" },
+  { to: "/explore", label: "Explore" },
+  { to: "/categories", label: "Categories" },
+  { to: "/libraries", label: "My Library" },
+];
 
 export default function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -63,7 +71,7 @@ export default function Navbar() {
       await dispatch(logout()).unwrap();
       setTimeout(() => navigate("/"), 100);
     } catch (error) {
-      showToast("error", "Đăng xuất thất bại. Vui lòng thử lại.");
+      showToast(error);
     }
   };
 
@@ -78,12 +86,6 @@ export default function Navbar() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  const navLinks = [
-    { to: "/", icon: Home, label: "Trang chủ" },
-    { to: "/search", icon: Search, label: "Tìm kiếm" },
-    { to: "/uploader/upload", icon: Upload, label: "Tải lên" },
-  ];
-
   return (
     <motion.nav className="bg-white/90 backdrop-blur-md shadow-lg sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -93,27 +95,36 @@ export default function Navbar() {
             to="/"
             className="flex items-center space-x-2 text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
           >
-            <span className="text-3xl">📚</span>
-            <span className="hidden sm:block">DocuLib</span>
+            <span className="hidden sm:block">BooksMarketplace</span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link
-                key={link.to}
+                key={link.label}
                 to={link.to}
                 className="nav-link flex items-center space-x-1 text-gray-600 hover:text-blue-600 transition-colors px-3 py-2 rounded-md text-sm font-medium"
               >
-                <link.icon className="w-4 h-4" />
                 <span>{link.label}</span>
               </Link>
             ))}
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center space-x-4">
-            {/* Notifications */}
+          <div className="flex items-center gap-2">
+            <Link
+              to="/"
+              className="text-gray-600 hover:text-blue-600 transition-colors p-2"
+            >
+              <Search className="w-5 h-5" />
+            </Link>
+            <Link
+              to="/"
+              className="text-gray-600 hover:text-blue-600 transition-colors p-2"
+            >
+              <Heart className="w-5 h-5" />
+            </Link>
             <Link
               to="/user/notifications"
               className="relative text-gray-600 hover:text-blue-600 transition-colors p-2"
@@ -254,35 +265,6 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Styles */}
-      <style jsx>{`
-        .nav-link {
-          position: relative;
-        }
-
-        .nav-link::after {
-          content: "";
-          position: absolute;
-          bottom: -2px;
-          left: 50%;
-          width: 0;
-          height: 2px;
-          background-color: #2563eb;
-          transition: all 0.3s ease;
-          transform: translateX(-50%);
-        }
-
-        .nav-link:hover::after {
-          width: 100%;
-        }
-
-        @media (max-width: 768px) {
-          .nav-link::after {
-            display: none;
-          }
-        }
-      `}</style>
     </motion.nav>
   );
 }
