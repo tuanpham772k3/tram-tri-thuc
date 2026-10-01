@@ -1,4 +1,5 @@
 import { Outlet, NavLink } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const tabs = [
   { to: "/user/profile", label: "Thông tin", end: true },

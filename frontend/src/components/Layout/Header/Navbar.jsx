@@ -3,8 +3,6 @@ import {
   Bell,
   UserCircle,
   Search,
-  Upload,
-  Home,
   Menu,
   LogOut,
   User,

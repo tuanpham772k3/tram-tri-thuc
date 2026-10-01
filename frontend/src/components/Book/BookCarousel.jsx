@@ -20,7 +20,7 @@ export default function BookCarousel({ title, books, actionLabel }) {
           {title}
         </h2>
 
-        <button className="text-xs sm:text-sm text-text-muted hover:text-white flex items-center gap-1 transition-colors group">
+        <button className="text-xs sm:text-sm text-text-muted hover:text-text-main flex items-center gap-1 transition-colors group">
           <span>{actionLabel || "See all"}</span>
           <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
         </button>
@@ -29,10 +29,10 @@ export default function BookCarousel({ title, books, actionLabel }) {
       <div className="relative">
         {/* Scroll Navigation Arrows */}
         <div className="hidden lg:flex items-center justify-between absolute -top-2 -bottom-2 -left-6 -right-6 pointer-events-none z-20">
-          <button className="pointer-events-auto p-2 rounded-full bg-bg-main border border-border-main hover:text-white hover:bg-bg-muted shadow-xl transition-all">
+          <button className="pointer-events-auto p-2 rounded-full bg-bg-main border border-border-main hover:bg-bg-muted shadow-xl transition-all">
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <button className="pointer-events-auto p-2 rounded-full bg-bg-main border border-border-main hover:text-white hover:bg-bg-muted shadow-xl transition-all">
+          <button className="pointer-events-auto p-2 rounded-full bg-bg-main border border-border-main hover:bg-bg-muted shadow-xl transition-all">
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>

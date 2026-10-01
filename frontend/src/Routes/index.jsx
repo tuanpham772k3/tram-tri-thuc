@@ -31,6 +31,8 @@ import EditDocumentPage from "../pages/Uploader/EditDocumentPage";
 // Route protection wrappers
 import UploaderRoute from "./UploaderRoute";
 import ProtectedRoute from "./ProtectedRoute";
+import MyLibraryPage from "../pages/MyLibrary/MyLibraryPage";
+import ExplorePage from "../pages/Explore/ExplorePage";
 
 const router = createBrowserRouter([
   // =========================
@@ -72,6 +74,9 @@ const router = createBrowserRouter([
         element: <HomePage />,
         index: true,
       },
+      { path: "libraries", element: <MyLibraryPage /> },
+      { path: "explore", element: <ExplorePage /> },
+      { path: "documents/:documentId", element: <DocumentDetailPage /> },
       {
         path: "profile",
         element: <UserProfilePage />,
@@ -82,7 +87,6 @@ const router = createBrowserRouter([
       { path: "payment", element: <Checkout /> },
       { path: "rating", element: <RatingPage /> },
       { path: "search", element: <SearchPage /> },
-      { path: "documents/:documentId", element: <DocumentDetailPage /> },
     ],
   },
 
@@ -102,6 +106,10 @@ const router = createBrowserRouter([
       { path: "edit-document/:documentId", element: <EditDocumentPage /> },
     ],
   },
+
+  // =========================
+  // 404 – Not Found
+  // =========================
   {
     path: "*",
     element: <h1>404 – Không tìm thấy trang</h1>,
