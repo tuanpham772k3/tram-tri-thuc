@@ -1,31 +1,48 @@
 import { Link, useNavigate } from "react-router-dom";
-import {
-  Bell,
-  UserCircle,
-  Search,
-  Menu,
-  LogOut,
-  User,
-  Settings,
-  Heart,
-} from "lucide-react";
+import { Bell, UserCircle, Search, Menu, Heart, LogOut, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
 import showToast from "../../../utils/toast";
 import LoadingSpinner from "../../Common/LoadingSpinner";
 import { logout } from "../../../store/slices/authSlice";
-import { fetchUserInfo, resetUserState } from "../../../store/slices/userSlice";
+import { fetchUserInfo } from "../../../store/slices/userSlice";
+import { Dropdown, Space } from "antd";
 
 const navLinks = [
   { to: "/", label: "Home" },
   { to: "/explore", label: "Explore" },
-  { to: "/categories", label: "Categories" },
+  { to: "/wishlist", label: "Wishlist" },
   { to: "/libraries", label: "My Library" },
 ];
 
+const items = [
+  {
+    key: "1",
+    label: "My Account",
+    disabled: true,
+  },
+  {
+    type: "divider",
+  },
+
+  {
+    key: "2",
+    label: "Profile",
+  },
+  {
+    key: "3",
+    label: "Seller Dashboard",
+  },
+  {
+    key: "4",
+    label: "Logout",
+    icon: <LogOut size={16} />,
+    danger: true,
+  },
+];
+
 export default function Navbar() {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -36,8 +53,6 @@ export default function Navbar() {
     error: userError,
   } = useSelector((state) => state.user);
 
-  const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
-  const closeDropdown = () => setIsDropdownOpen(false);
   const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
 
   // Lấy thông tin người dùng khi đã đăng nhập
@@ -47,42 +62,15 @@ export default function Navbar() {
     }
   }, [dispatch, isAuthenticated]);
 
-  // Xử lý lỗi khi lấy thông tin người dùng
-  useEffect(() => {
-    if (userError) {
-      showToast("error", userError);
-    }
-  }, [userError]);
-
-  // Đóng dropdown khi không đăng nhập
-  useEffect(() => {
-    if (!isAuthenticated) {
-      closeDropdown();
-      dispatch(resetUserState()); // Reset user state khi đăng xuất
-    }
-  }, [isAuthenticated, dispatch]);
-
   // Xử lý đăng xuất
   const handleLogout = async () => {
     try {
-      closeDropdown();
       await dispatch(logout()).unwrap();
       setTimeout(() => navigate("/"), 100);
     } catch (error) {
       showToast(error);
     }
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest(".dropdown-avatar")) {
-        closeDropdown();
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
 
   return (
     <motion.nav className="bg-white/90 backdrop-blur-md shadow-lg sticky top-0 z-40">
@@ -132,94 +120,30 @@ export default function Navbar() {
             </Link>
 
             {/* User Menu */}
-            {isAuthenticated ? (
-              <div className="relative dropdown-avatar">
-                {authLoading || userLoading ? (
-                  <LoadingSpinner size="small" />
-                ) : (
-                  <button
-                    onClick={toggleDropdown}
-                    className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
-                  >
-                    <img
-                      src={userInfo?.avatar || "/src/assets/default-avatar.png"}
-                      onError={(e) =>
-                        (e.currentTarget.src = "/src/assets/default-avatar.png")
-                      }
-                      alt="User Avatar"
-                      className="w-8 h-8 rounded-full ring-2 ring-blue-100 hover:ring-blue-300 transition-all"
-                    />
-                  </button>
-                )}
+            {true ? (
+              authLoading || userLoading ? (
+                <LoadingSpinner size="small" />
+              ) : (
+                <Dropdown menu={{ items }} trigger={["click"]} placement="bottomRight">
+                  <div className="flex items-center space-x-1 cursor-pointer">
+                    <button className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors cursor-pointer">
+                      <img
+                        src={userInfo?.avatar || "/src/assets/default-avatar.png"}
+                        onError={(e) =>
+                          (e.currentTarget.src = "/src/assets/default-avatar.png")
+                        }
+                        alt="User Avatar"
+                        className="w-8 h-8 rounded-full ring-2 ring-blue-100 hover:ring-blue-300 transition-all"
+                      />
+                    </button>
 
-                <AnimatePresence>
-                  {isDropdownOpen && isAuthenticated && userInfo && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden"
-                    >
-                      {/* User Info Section */}
-                      <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50">
-                        <div className="flex items-center space-x-4">
-                          <img
-                            src={userInfo?.avatar || "/src/assets/default-avatar.png"}
-                            onError={(e) =>
-                              (e.currentTarget.src = "/src/assets/default-avatar.png")
-                            }
-                            alt="User Avatar"
-                            className="w-12 h-12 rounded-full ring-4 ring-white shadow-md"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-base font-semibold text-gray-900 truncate">
-                              {userInfo.name || "Người dùng"}
-                            </p>
-                            <p className="text-sm text-gray-500 truncate">
-                              {userInfo.email || "Không có email"}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Menu Items */}
-                      <div className="p-2 bg-white">
-                        <Link
-                          to="/user/profile"
-                          onClick={closeDropdown}
-                          className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors group"
-                        >
-                          <User className="w-5 h-5 group-hover:stroke-blue-600" />
-                          <span className="text-sm font-medium">Hồ sơ cá nhân</span>
-                        </Link>
-
-                        <Link
-                          to="/user/settings"
-                          onClick={closeDropdown}
-                          className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors group"
-                        >
-                          <Settings className="w-5 h-5 group-hover:stroke-blue-600" />
-                          <span className="text-sm font-medium">Cài đặt tài khoản</span>
-                        </Link>
-
-                        <div className="h-[1px] bg-gray-100 my-2 mx-4"></div>
-
-                        <button
-                          onClick={handleLogout}
-                          className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors group"
-                          disabled={authLoading || userLoading}
-                        >
-                          <LogOut className="w-5 h-5 group-hover:stroke-red-700" />
-                          <span className="text-sm font-medium">Đăng xuất</span>
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+                    <ChevronDown size={20} />
+                  </div>
+                </Dropdown>
+              )
             ) : (
               <Link
-                to="/auth/login"
+                to="/login"
                 className="flex items-center space-x-2 text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 <UserCircle className="w-4 h-4" />

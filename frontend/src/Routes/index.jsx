@@ -33,7 +33,6 @@ import UploaderRoute from "./UploaderRoute";
 import ProtectedRoute from "./ProtectedRoute";
 import MyLibraryPage from "../pages/MyLibrary/MyLibraryPage";
 import ExplorePage from "../pages/Explore/ExplorePage";
-import CategoriesPage from "../pages/Categories/CategoriesPage";
 
 const router = createBrowserRouter([
   // =========================
@@ -66,9 +65,9 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <ProtectedRoute>
-        <MainLayout />
-      </ProtectedRoute>
+      // <ProtectedRoute>
+      <MainLayout />
+      // </ProtectedRoute>
     ),
     children: [
       {
@@ -77,7 +76,6 @@ const router = createBrowserRouter([
       },
       { path: "libraries", element: <MyLibraryPage /> },
       { path: "explore", element: <ExplorePage /> },
-      { path: "categories", element: <CategoriesPage /> },
       { path: "documents/:documentId", element: <DocumentDetailPage /> },
       {
         path: "profile",
