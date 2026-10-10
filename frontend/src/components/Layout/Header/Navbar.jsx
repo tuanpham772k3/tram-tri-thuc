@@ -1,5 +1,17 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Bell, UserCircle, Search, Menu, Heart, LogOut, ChevronDown } from "lucide-react";
+import {
+  Bell,
+  UserCircle,
+  Search,
+  Menu,
+  Heart,
+  LogOut,
+  ChevronDown,
+  ShoppingCart,
+  UserRound,
+  Library,
+  Gem,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,11 +20,11 @@ import LoadingSpinner from "../../Common/LoadingSpinner";
 import { logout } from "../../../store/slices/authSlice";
 import { fetchUserInfo } from "../../../store/slices/userSlice";
 import { Dropdown, Space } from "antd";
+import SearchBar from "../../UI/SearchBar";
 
 const navLinks = [
   { to: "/", label: "Home" },
   { to: "/explore", label: "Explore" },
-  { to: "/wishlist", label: "Wishlist" },
   { to: "/libraries", label: "My Library" },
 ];
 
@@ -28,14 +40,26 @@ const items = [
 
   {
     key: "2",
-    label: "Profile",
+    label: "My Profile",
+    icon: <UserRound size={16} />,
   },
   {
     key: "3",
-    label: "Seller Dashboard",
+    label: "My Library",
+    icon: <Library size={16} />,
   },
   {
     key: "4",
+    label: "My Orders",
+    icon: <ShoppingCart size={16} />,
+  },
+  {
+    key: "5",
+    label: "Become a seller",
+    icon: <Gem size={16} />,
+  },
+  {
+    key: "6",
     label: "Logout",
     icon: <LogOut size={16} />,
     danger: true,
@@ -99,18 +123,26 @@ export default function Navbar() {
 
           {/* Right Section */}
           <div className="flex items-center gap-2">
+            {/* Search */}
+            <SearchBar />
+
+            {/* Cart */}
             <Link
               to="/"
               className="text-gray-600 hover:text-blue-600 transition-colors p-2"
             >
-              <Search className="w-5 h-5" />
+              <ShoppingCart className="w-5 h-5" />
             </Link>
+
+            {/* Wishlist */}
             <Link
               to="/"
               className="text-gray-600 hover:text-blue-600 transition-colors p-2"
             >
               <Heart className="w-5 h-5" />
             </Link>
+
+            {/* Notifications */}
             <Link
               to="/user/notifications"
               className="relative text-gray-600 hover:text-blue-600 transition-colors p-2"

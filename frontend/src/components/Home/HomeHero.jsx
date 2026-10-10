@@ -1,6 +1,7 @@
+import { Button } from "antd";
 import { motion } from "framer-motion";
-import { Star, Plus, Check, ShoppingBag } from "lucide-react";
-import { useState } from "react";
+import { Star, MoveRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -24,7 +25,7 @@ const contentVariants = {
 };
 
 export default function HomeHero() {
-  const [inList, setInList] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <section className="relative min-h-[500px] w-full overflow-hidden px-6 py-12 md:px-12">
@@ -117,35 +118,17 @@ export default function HomeHero() {
             variants={itemVariants}
             className="flex flex-wrap items-center gap-4 pt-2"
           >
-            {/* Buy */}
-            <motion.button
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              className="flex items-center justify-center gap-2 rounded-full bg-[#1d6bf3] px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 transition-colors hover:bg-[#185adb] sm:text-base"
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="inline-block"
             >
-              <ShoppingBag className="h-4 w-4" />
-              <span>BUY NOW</span>
-            </motion.button>
-
-            {/* My List */}
-            <motion.button
-              onClick={() => setInList((prev) => !prev)}
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              className="flex items-center justify-center gap-2 rounded-full border border-border-main px-6 py-3 text-sm font-semibold backdrop-blur-md transition-colors hover:border-border-focus hover:bg-white/10 sm:text-base"
-            >
-              {inList ? (
-                <>
-                  <Check className="h-4 w-4 text-emerald-400" />
-                  <span>IN MY LIST</span>
-                </>
-              ) : (
-                <>
-                  <Plus className="h-4 w-4" />
-                  <span>MY LIST</span>
-                </>
-              )}
-            </motion.button>
+              {/* Buy */}
+              <Button onClick={() => navigate("/explore")} type="primary" size="large">
+                <span>Explore now</span>
+                <MoveRight />
+              </Button>
+            </motion.div>
           </motion.div>
         </motion.div>
       </div>
