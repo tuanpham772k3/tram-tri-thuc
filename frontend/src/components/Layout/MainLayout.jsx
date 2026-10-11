@@ -7,7 +7,7 @@ export default function MainLayout() {
     <div className="min-h-screen flex flex-col bg-slate-100">
       <Navbar />
 
-      <main className="z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <main className="z-20 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <Outlet />
       </main>
 

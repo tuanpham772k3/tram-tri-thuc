@@ -1,24 +1,18 @@
-import { ArrowRight } from "lucide-react";
 import BookGridList from "./BookGridList";
+import { Link } from "react-router-dom";
 
-export default function BookGrid({ title, books, actionLabel, showAddToCart = false }) {
+export default function BookGrid({ title, books, path, showAddToCart = false }) {
   return (
-    <div className="relative group/carousel">
-      {/* Section Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm sm:text-base font-bold uppercase tracking-wider">
-          {title}
-        </h2>
-
-        <button className="text-xs sm:text-sm flex items-center gap-1 transition-colors group">
-          <span>{actionLabel || "See all"}</span>
-          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-        </button>
+    <div className="mt-4">
+      <div className="flex items-center justify-between mb-2">
+        <Link to={path}>
+          <h2 className="text-xl font-bold border-b-2 border-violet-700 uppercase">
+            {title}
+          </h2>
+        </Link>
       </div>
 
-      <div className="overflow-x-auto">
-        <BookGridList books={books} showAddToCart={showAddToCart} />
-      </div>
+      <BookGridList books={books} showAddToCart={showAddToCart} />
     </div>
   );
 }

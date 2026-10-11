@@ -3,7 +3,7 @@ import { Button } from "antd";
 
 export default function BookCard({ book, showAddToCart = false }) {
   return (
-    <div className="group relative overflow-hidden rounded-lg hover:shadow-xl mt-2 p-3">
+    <div className="group relative overflow-hidden rounded-lg hover:shadow-xl p-3 max-w-50 cursor-pointer">
       {/* Book Cover */}
       <div className="aspect-[2/3] rounded-lg overflow-hidden bg-gray-800 relative">
         <img
