@@ -136,7 +136,7 @@ export default function Navbar() {
 
             {/* Wishlist */}
             <Link
-              to="/"
+              to="/wishlist"
               className="text-gray-600 hover:text-blue-600 transition-colors p-2"
             >
               <Heart className="w-5 h-5" />

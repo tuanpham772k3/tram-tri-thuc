@@ -72,119 +72,111 @@ const MyLibraryPage = () => {
   }[activeTab];
 
   return (
-    <div className="min-h-screen">
+    <div className="w-full min-h-screen">
       {/* Header */}
       <div className="pt-8 text-center">
-        <h1 className="text-base sm:text-lg font-bold text-text-main uppercase tracking-wider">
+        <h1 className="text-base sm:text-lg font-bold uppercase tracking-wider">
           My Library
         </h1>
 
-        <p className="mt-2 text-sm text-text-muted">Your personal collection</p>
+        <p className="mt-2 text-sm">Your personal collection</p>
       </div>
 
-      <section className="w-full px-4 md:px-12 py-8">
-        <div className="flex flex-col gap-8">
-          {/* Tabs */}
-          <div className="flex justify-center">
-            <div className="flex items-center gap-6 border-b border-border">
-              <button
-                type="button"
-                onClick={() => handleTabChange("all")}
-                className={`pb-3 text-sm font-medium transition-colors ${
-                  activeTab === "all"
-                    ? "text-primary border-b-2 border-primary"
-                    : "text-text-muted hover:text-text-main"
-                }`}
-              >
-                All Books
-              </button>
+      <div className="flex flex-col gap-8">
+        {/* Tabs */}
+        <div className="flex justify-center">
+          <div className="flex items-center gap-6 border-b">
+            <button
+              type="button"
+              onClick={() => handleTabChange("all")}
+              className={`pb-3 text-sm font-medium transition-colors ${
+                activeTab === "all" ? "text-primary border-b-2 border-primary" : ""
+              }`}
+            >
+              All Books
+            </button>
 
-              <button
-                type="button"
-                onClick={() => handleTabChange("reading")}
-                className={`pb-3 text-sm font-medium transition-colors ${
-                  activeTab === "reading"
-                    ? "text-primary border-b-2 border-primary"
-                    : "text-text-muted hover:text-text-main"
-                }`}
-              >
-                Reading
-              </button>
+            <button
+              type="button"
+              onClick={() => handleTabChange("reading")}
+              className={`pb-3 text-sm font-medium transition-colors ${
+                activeTab === "reading" ? "text-primary border-b-2 border-primary" : ""
+              }`}
+            >
+              Reading
+            </button>
 
-              <button
-                type="button"
-                onClick={() => handleTabChange("completed")}
-                className={`pb-3 text-sm font-medium transition-colors ${
-                  activeTab === "completed"
-                    ? "text-primary border-b-2 border-primary"
-                    : "text-text-muted hover:text-text-main"
-                }`}
-              >
-                Completed
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => handleTabChange("completed")}
+              className={`pb-3 text-sm font-medium transition-colors ${
+                activeTab === "completed" ? "text-primary border-b-2 border-primary" : ""
+              }`}
+            >
+              Completed
+            </button>
           </div>
-
-          {/* Search & Sort Bar (Nằm trên một thanh ngang ngay dưới tab) */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
-            {/* Input Tìm kiếm */}
-            <div className="relative w-full sm:w-80">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-text-muted">
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </span>
-              <input
-                type="text"
-                placeholder="Search title or author..."
-                className="w-full pl-9 pr-4 py-2 text-sm bg-background border border-border rounded-lg text-text-main placeholder-text-muted focus:outline-none focus:border-primary transition-colors"
-              />
-            </div>
-
-            {/* Select Sắp xếp */}
-            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-              <label htmlFor="sort" className="text-sm text-text-muted whitespace-nowrap">
-                Sort by:
-              </label>
-              <select
-                id="sort"
-                className="px-3 py-2 text-sm bg-background border border-border rounded-lg text-text-main focus:outline-none focus:border-primary transition-colors cursor-pointer"
-              >
-                <option value="title-asc">Title (A - Z)</option>
-                <option value="title-desc">Title (Z - A)</option>
-                <option value="rating-desc">Highest Rated</option>
-                <option value="progress-desc">Progress</option>
-              </select>
-            </div>
-          </div>
-
-          {/* All Books */}
-          {activeTab === "all" && (
-            <div className="flex flex-col gap-10">
-              {/* My Books */}
-              <BookGrid title="My Books" books={myBooks} />
-            </div>
-          )}
-
-          {/* Reading */}
-          {activeTab === "reading" && <BookGrid title="Reading" books={readingBooks} />}
-
-          {/* Completed */}
-          {activeTab === "completed" && (
-            <BookGrid title="Completed" books={completedBooks} />
-          )}
         </div>
-      </section>
+
+        {/* Search & Sort Bar (Nằm trên một thanh ngang ngay dưới tab) */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
+          {/* Input Tìm kiếm */}
+          <div className="relative w-full sm:w-80">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </span>
+            <input
+              type="text"
+              placeholder="Search title or author..."
+              className="w-full pl-9 pr-4 py-2 text-sm bg-background border rounded-lg placeholder-text-muted focus:outline-none focus:border-primary transition-colors"
+            />
+          </div>
+
+          {/* Select Sắp xếp */}
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <label htmlFor="sort" className="text-sm whitespace-nowrap">
+              Sort by:
+            </label>
+            <select
+              id="sort"
+              className="px-3 py-2 text-sm bg-background border rounded-lg focus:outline-none focus:border-primary transition-colors cursor-pointer"
+            >
+              <option value="title-asc">Title (A - Z)</option>
+              <option value="title-desc">Title (Z - A)</option>
+              <option value="rating-desc">Highest Rated</option>
+              <option value="progress-desc">Progress</option>
+            </select>
+          </div>
+        </div>
+
+        {/* All Books */}
+        {activeTab === "all" && (
+          <div className="flex flex-col gap-10">
+            {/* My Books */}
+            <BookGrid title="My Books" books={myBooks} />
+          </div>
+        )}
+
+        {/* Reading */}
+        {activeTab === "reading" && <BookGrid title="Reading" books={readingBooks} />}
+
+        {/* Completed */}
+        {activeTab === "completed" && (
+          <BookGrid title="Completed" books={completedBooks} />
+        )}
+      </div>
     </div>
   );
 };

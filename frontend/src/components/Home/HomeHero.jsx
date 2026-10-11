@@ -59,7 +59,7 @@ export default function HomeHero() {
             <div className="absolute -inset-2 rounded-lg bg-gradient-to-r from-emerald-500/30 to-teal-500/30 blur-xl transition-opacity duration-300 group-hover:opacity-100" />
 
             {/* Book cover */}
-            <div className="relative aspect-[2/3] w-[220px] overflow-hidden rounded-md border border-border-main bg-bg-main shadow-2xl shadow-black/80 sm:w-[260px] md:w-[280px]">
+            <div className="relative aspect-[2/3] w-[220px] overflow-hidden rounded-md border bg-slate-50 shadow-2xl shadow-black/80 sm:w-[260px] md:w-[280px]">
               <img
                 src="https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1660682804i/57668000.jpg"
                 alt="The Psychology of Money by Morgan Housel"
@@ -98,14 +98,14 @@ export default function HomeHero() {
               ))}
             </div>
 
-            <span className="font-bold text-text-muted">4.8</span>
-            <span className="text-text-disabled">· Morgan Housel</span>
+            <span className="font-bold">4.8</span>
+            <span>· Morgan Housel</span>
           </motion.div>
 
           {/* Description */}
           <motion.p
             variants={itemVariants}
-            className="line-clamp-4 max-w-xl text-sm leading-relaxed text-text-muted sm:text-base md:line-clamp-none"
+            className="line-clamp-4 max-w-xl text-sm leading-relaxed sm:text-base md:line-clamp-none"
           >
             Timeless lessons on wealth, greed, and happiness. Doing well with money isn’t
             necessarily about what you know. It’s about how you behave. And behavior is

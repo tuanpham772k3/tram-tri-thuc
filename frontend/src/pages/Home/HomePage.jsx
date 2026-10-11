@@ -3,7 +3,7 @@ import HomeOverview from "../../components/Home/HomeOverview";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
+    <div className="w-full min-h-screen">
       <HomeHero />
 
       <HomeOverview />

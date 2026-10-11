@@ -89,11 +89,11 @@ const ExplorePage = () => {
   const FilterContent = () => (
     <form className="flex flex-col gap-4 text-sm">
       {/* Categories */}
-      <div className="border border-border-main p-4 rounded-2xl">
+      <div className="border p-4 rounded-2xl">
         <button
           type="button"
           onClick={() => toggleSection("categories")}
-          className="w-full flex items-center justify-between font-semibold text-text-main mb-3 cursor-pointer"
+          className="w-full flex items-center justify-between font-semibold mb-3 cursor-pointer"
         >
           <span>Categories</span>
           {openSections.categories ? (
@@ -103,11 +103,11 @@ const ExplorePage = () => {
           )}
         </button>
         {openSections.categories && (
-          <div className="flex items-center gap-2 text-text-muted pl-1">
+          <div className="flex items-center gap-2 pl-1">
             <input
               type="checkbox"
               id="on-store"
-              className="rounded border-border accent-primary cursor-pointer"
+              className="rounded accent-primary cursor-pointer"
             />
             <label htmlFor="on-store" className="cursor-pointer text-xs">
               On Store
@@ -117,10 +117,10 @@ const ExplorePage = () => {
       </div>
 
       {/* Price */}
-      <div className="border border-border-main p-4 rounded-2xl">
+      <div className="border p-4 rounded-2xl">
         <div className="flex justify-between items-center mb-3">
-          <h3 className="font-semibold text-text-main">Price</h3>
-          <span className="text-xs text-text-muted">${price}</span>
+          <h3 className="font-semibold">Price</h3>
+          <span className="text-xs">${price}</span>
         </div>
         <input
           type="range"
@@ -133,8 +133,8 @@ const ExplorePage = () => {
       </div>
 
       {/* Rating */}
-      <div className="border border-border-main p-4 rounded-2xl">
-        <h3 className="font-semibold text-text-main mb-2">Rating</h3>
+      <div className="border p-4 rounded-2xl">
+        <h3 className="font-semibold mb-2">Rating</h3>
         <div className="flex items-center gap-1 cursor-pointer">
           {[1, 2, 3, 4, 5].map((star) => (
             <button
@@ -157,11 +157,11 @@ const ExplorePage = () => {
       </div>
 
       {/* Author */}
-      <div className="border border-border-main p-4 rounded-2xl">
+      <div className="border p-4 rounded-2xl">
         <button
           type="button"
           onClick={() => toggleSection("author")}
-          className="w-full flex items-center justify-between font-semibold text-text-main mb-3 cursor-pointer"
+          className="w-full flex items-center justify-between font-semibold mb-3 cursor-pointer"
         >
           <span>Author</span>
           {openSections.author ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
@@ -170,7 +170,7 @@ const ExplorePage = () => {
         {openSections.author && (
           <>
             <div className="relative mb-3">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 text-text-muted">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-2.5">
                 <Search size={14} />
               </span>
               <input
@@ -178,7 +178,7 @@ const ExplorePage = () => {
                 placeholder="Search"
                 value={authorSearch}
                 onChange={(e) => setAuthorSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-xs bg-background border border-border rounded-md text-text-main focus:outline-none focus:border-primary"
+                className="w-full pl-8 pr-3 py-1.5 text-xs bg-background border rounded-md focus:outline-none focus:border-primary"
               />
             </div>
 
@@ -190,11 +190,11 @@ const ExplorePage = () => {
                 .map((author, index) => (
                   <label
                     key={index}
-                    className="flex items-center gap-2 text-text-muted text-xs cursor-pointer"
+                    className="flex items-center gap-2 text-xs cursor-pointer"
                   >
                     <input
                       type="checkbox"
-                      className="rounded border-border accent-primary cursor-pointer"
+                      className="rounded  accent-primary cursor-pointer"
                     />
                     <span>{author}</span>
                   </label>
@@ -205,10 +205,10 @@ const ExplorePage = () => {
       </div>
 
       {/* Date Published */}
-      <div className="border border-border-main p-4 rounded-2xl">
+      <div className="border p-4 rounded-2xl">
         <div
           onClick={() => toggleSection("datePublished")}
-          className="flex items-center justify-between font-semibold text-text-main cursor-pointer"
+          className="flex items-center justify-between font-semibold cursor-pointer"
         >
           <span>Date Published</span>
           {openSections.datePublished ? (
@@ -220,10 +220,10 @@ const ExplorePage = () => {
       </div>
 
       {/* Genre */}
-      <div className="border border-border-main p-4 rounded-2xl">
+      <div className="border p-4 rounded-2xl">
         <div
           onClick={() => toggleSection("genre")}
-          className="flex items-center justify-between font-semibold text-text-main cursor-pointer"
+          className="flex items-center justify-between font-semibold cursor-pointer"
         >
           <span>Genre</span>
           {openSections.genre ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
@@ -232,116 +232,112 @@ const ExplorePage = () => {
 
       {/* Submit */}
       <div className="flex flex-col gap-3">
-        <button className="border border-border-main p-3 rounded-xl font-semibold bg-violet-700 text-white cursor-pointer hover:bg-violet-800 transition-colors">
+        <button className="border p-3 rounded-xl font-semibold bg-violet-700 text-white cursor-pointer hover:bg-violet-800 transition-colors">
           Refine Search
         </button>
-        <button className="border border-border-main p-3 rounded-xl font-semibold text-text-disabled">
-          Reset filter
-        </button>
+        <button className="border p-3 rounded-xl font-semibold">Reset filter</button>
       </div>
     </form>
   );
 
   return (
-    <div className="min-h-screen">
+    <div className="w-full min-h-screen">
       {/* Header */}
       <div className="pt-8 text-center">
-        <h1 className="text-base sm:text-lg font-bold text-text-main uppercase tracking-wider">
+        <h1 className="text-base sm:text-lg font-bold uppercase tracking-wider">
           Explore
         </h1>
-        <p className="mt-2 text-sm text-text-muted">Discover new books</p>
+        <p className="mt-2 text-sm">Discover new books</p>
       </div>
 
-      <section className="w-full px-4 md:px-12 py-8">
-        <div className="flex flex-col gap-6">
-          {/* Search & Sort & Filter Button Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
-            {/* Input Tìm kiếm */}
-            <div className="relative w-full sm:w-80">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-text-muted">
-                <Search size={16} />
-              </span>
-              <input
-                type="text"
-                placeholder="Search ..."
-                className="w-full pl-9 pr-4 py-2 text-sm bg-background border border-border rounded-lg text-text-main placeholder-text-muted focus:outline-none focus:border-primary transition-colors"
-              />
-            </div>
-
-            {/* Sort & Filter Toggle Button */}
-            <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
-              {/* Nút lọc hiển thị riêng trên Mobile/Tablet */}
-              <button
-                type="button"
-                onClick={() => setIsMobileFilterOpen(true)}
-                className="md:hidden flex items-center gap-2 px-4 py-2 text-sm border border-border rounded-lg bg-background text-text-main hover:bg-gray-50 transition-colors"
-              >
-                <Filter size={16} />
-                <span>Filters</span>
-              </button>
-
-              {/* Select Sắp xếp */}
-              <div className="flex items-center gap-2">
-                <label
-                  htmlFor="sort"
-                  className="text-sm text-text-muted whitespace-nowrap hidden sm:inline"
-                >
-                  Sort by:
-                </label>
-                <select
-                  id="sort"
-                  className="px-3 py-2 text-sm bg-background border border-border rounded-lg text-text-main focus:outline-none focus:border-primary transition-colors cursor-pointer"
-                >
-                  <option value="title-asc">Title (A - Z)</option>
-                  <option value="title-desc">Title (Z - A)</option>
-                  <option value="rating-desc">Highest Rated</option>
-                  <option value="progress-desc">Progress</option>
-                </select>
-              </div>
-            </div>
+      <div className="flex flex-col gap-6">
+        {/* Search & Sort & Filter Button Bar */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
+          {/* Input Tìm kiếm */}
+          <div className="relative w-full sm:w-80">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <Search size={16} />
+            </span>
+            <input
+              type="text"
+              placeholder="Search ..."
+              className="w-full pl-9 pr-4 py-2 text-sm bg-background border rounded-lg placeholder-text-muted focus:outline-none focus:border-primary transition-colors"
+            />
           </div>
 
-          <div className="flex gap-8 items-start">
-            {/* Sidebar cho Desktop (Màn hình md trở lên) */}
-            <aside className="hidden md:block w-64 shrink-0">
-              <h1 className="font-bold text-lg text-text-main mb-4">Filter Option</h1>
-              <FilterContent />
-            </aside>
+          {/* Sort & Filter Toggle Button */}
+          <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+            {/* Nút lọc hiển thị riêng trên Mobile/Tablet */}
+            <button
+              type="button"
+              onClick={() => setIsMobileFilterOpen(true)}
+              className="md:hidden flex items-center gap-2 px-4 py-2 text-sm border rounded-lg bg-background hover:bg-gray-50 transition-colors"
+            >
+              <Filter size={16} />
+              <span>Filters</span>
+            </button>
 
-            {/* Sidebar Drawer cho Mobile (Màn hình dưới md) */}
-            {isMobileFilterOpen && (
-              <div className="fixed inset-0 z-50 md:hidden flex">
-                {/* Overlay làm mờ nền */}
-                <div
-                  className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
-                  onClick={() => setIsMobileFilterOpen(false)}
-                />
-
-                {/* Drawer Container */}
-                <div className="relative ml-auto w-full max-w-xs bg-background h-full shadow-xl flex flex-col z-10 overflow-y-auto p-6">
-                  <div className="flex items-center justify-between pb-4 mb-4 border-b border-border">
-                    <h2 className="font-bold text-lg text-text-main">Filters</h2>
-                    <button
-                      type="button"
-                      onClick={() => setIsMobileFilterOpen(false)}
-                      className="p-1 rounded-md text-text-muted hover:text-text-main"
-                    >
-                      <X size={20} />
-                    </button>
-                  </div>
-
-                  <FilterContent />
-                </div>
-              </div>
-            )}
-
-            {/* Book Grid */}
-            <div className="min-w-0 flex-1">
-              <BookGrid title="Books" books={myBooks} />
+            {/* Select Sắp xếp */}
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="sort"
+                className="text-sm whitespace-nowrap hidden sm:inline"
+              >
+                Sort by:
+              </label>
+              <select
+                id="sort"
+                className="px-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:border-primary transition-colors cursor-pointer"
+              >
+                <option value="title-asc">Title (A - Z)</option>
+                <option value="title-desc">Title (Z - A)</option>
+                <option value="rating-desc">Highest Rated</option>
+                <option value="progress-desc">Progress</option>
+              </select>
             </div>
           </div>
         </div>
-      </section>
+
+        <div className="flex gap-8 items-start">
+          {/* Sidebar cho Desktop (Màn hình md trở lên) */}
+          <aside className="hidden md:block w-64 shrink-0">
+            <h1 className="font-bold text-lg mb-4">Filter Option</h1>
+            <FilterContent />
+          </aside>
+
+          {/* Sidebar Drawer cho Mobile (Màn hình dưới md) */}
+          {isMobileFilterOpen && (
+            <div className="fixed inset-0 z-50 md:hidden flex">
+              {/* Overlay làm mờ nền */}
+              <div
+                className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+                onClick={() => setIsMobileFilterOpen(false)}
+              />
+
+              {/* Drawer Container */}
+              <div className="relative ml-auto w-full max-w-xs bg-background h-full shadow-xl flex flex-col z-10 overflow-y-auto p-6">
+                <div className="flex items-center justify-between pb-4 mb-4 border-b border-border">
+                  <h2 className="font-bold text-lg">Filters</h2>
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileFilterOpen(false)}
+                    className="p-1 rounded-md"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <FilterContent />
+              </div>
+            </div>
+          )}
+
+          {/* Book Grid */}
+          <div className="min-w-0 flex-1">
+            <BookGrid title="Books" books={myBooks} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

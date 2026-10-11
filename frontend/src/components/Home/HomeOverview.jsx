@@ -1,4 +1,4 @@
-import BookCarousel from "../Book/BookCarousel";
+import BookGrid from "../Book/BookGrid";
 
 const continueReadingBooks = [
   {
@@ -135,27 +135,17 @@ const newReleaseBooks = [
 
 export default function HomeOverview() {
   return (
-    <section className="w-full px-4 md:px-12 py-8 min-h-screen">
-      <div className="flex flex-col gap-6">
-        <BookCarousel
-          title="Continuous Reading"
-          books={continueReadingBooks}
-          actionLabel="See all"
-        />
+    <div className="flex flex-col gap-6">
+      <BookGrid
+        title="Continuous Reading"
+        books={continueReadingBooks}
+        actionLabel="See all"
+      />
 
-        <BookCarousel title="Trending Now" books={trendingBooks} actionLabel="See all" />
+      <BookGrid title="Trending Now" books={trendingBooks} actionLabel="See all" />
 
-        <BookCarousel
-          title="Best Sellers"
-          books={bestSellerBooks}
-          actionLabel="See all"
-        />
-        <BookCarousel
-          title="New Releases"
-          books={newReleaseBooks}
-          actionLabel="See all"
-        />
-      </div>
-    </section>
+      <BookGrid title="Best Sellers" books={bestSellerBooks} actionLabel="See all" />
+      <BookGrid title="New Releases" books={newReleaseBooks} actionLabel="See all" />
+    </div>
   );
 }
