@@ -3,6 +3,7 @@ import { Button } from "antd";
 import { motion } from "framer-motion";
 import { Star, MoveRight } from "lucide-react";
 import BookGrid from "../../components/Book/BookGrid";
+import { FaEye, FaStar } from "react-icons/fa";
 
 const continueReadingBooks = [
   {
@@ -36,6 +37,16 @@ const continueReadingBooks = [
   },
   {
     id: "cr4",
+    title: "Essentialism",
+    author: "Greg McKeown",
+    rating: 4.6,
+    price: "$13.99",
+    cover:
+      "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=500&q=80",
+    progress: "15%",
+  },
+  {
+    id: "cr5",
     title: "Essentialism",
     author: "Greg McKeown",
     rating: 4.6,
@@ -158,6 +169,49 @@ const contentVariants = {
   },
 };
 
+const listItems = [
+  {
+    id: 1,
+    title: "Làm chủ tuổi 20",
+    subTitle: "Doctor X: Mafia in White",
+    rating: 8,
+    status: "Tập 2",
+    buy: "73,084",
+    image:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQuZWawKUELp_6tBhlqIdDwVHP0v4W4bA9HLgAa8t7ExQ&s", // Thay bằng link ảnh thực tế của bạn
+  },
+  {
+    id: 2,
+    title: "Tư duy nhanh và chậm",
+    subTitle: "Shadow Punisher (Season 1)",
+    rating: 8.1,
+    status: "Tập 19",
+    buy: "156,234",
+    image:
+      "https://giadinh.phenikaa.com/wp-content/uploads/2025/09/tu-duy-nhanh-va-cham.jpg",
+  },
+  {
+    id: 3,
+    title: "Nhà giả kim",
+    subTitle: "Against The Current",
+    rating: 7.2,
+    status: "Hoàn Tất (47/47)",
+    buy: "1,078,464",
+    image:
+      "https://static-company.waka.vn/img.media/tin%20t%E1%BB%A9c/102023/nha%20gia%20kim.PNG",
+  },
+  {
+    id: 4,
+    title: "Kiến tạo thiên tài",
+    subTitle: "Take Charge Of My Heart",
+    rating: 7.8,
+    status: "Hoàn Tất (10/10)",
+    buy: "23,049",
+    image:
+      "https://vcdn1-giaitri.vnecdn.net/2025/03/22/nxbtre-full-12262024-112657-17-8353-6822-1742615121.jpg?w=1020&h=0&q=100&dpr=2&fit=crop&s=wSyArgkAt5afMiTP4kjhaA",
+  },
+];
+
 export default function HomePage() {
   const navigate = useNavigate();
 
@@ -272,7 +326,7 @@ export default function HomePage() {
       </div>
 
       {/* Home Overview */}
-      <div className="flex gap-6 mt-4 mb-4">
+      <div className="flex gap-6 mt-8 mb-4">
         {/* Book Grid */}
         <div className="min-w-0 flex-1">
           <BookGrid
@@ -288,9 +342,89 @@ export default function HomePage() {
         </div>
 
         {/* Book Recommendations */}
-        <aside className="w-[300px] shrink-0 flex flex-col gap-4">
-          <div className="bg-amber-200 uppercase">Sách hot trong tuần</div>
-          <div className="bg-amber-100 uppercase">Đánh giá cao</div>
+        <aside className="w-[300px] shrink-0">
+          {/* Hot Books */}
+          <div className="p-4 rounded-md bg-slate-200">
+            <div className=" flex items-center border-b-2 border-dashed border-slate-300 pb-1">
+              <h2 className="text-violet-700 font-bold text-lg uppercase">
+                Sách hot trong tuần
+              </h2>
+            </div>
+            {/* List */}
+            <div className="space-y-2 mt-4">
+              {/* Item 1 */}
+              <div className="p-3 flex items-center gap-4 rounded-md bg-slate-300">
+                <div className="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-semibold">
+                  1
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="truncate text-sm font-semibold">Atomic Habits</h3>
+                  <p className="truncate text-xs text-gray-700">James Clear</p>
+                </div>
+              </div>
+              {/* Item 2 */}
+              <div className="p-3 flex items-center gap-4 rounded-md bg-slate-300">
+                <div className="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-semibold">
+                  2
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="truncate text-sm font-semibold">
+                    The Subtle Art of Not Giving a F*ck
+                  </h3>
+                  <p className="truncate text-xs text-gray-700">Mark Manson</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* High Rating Books */}
+          <div className="bg-slate-200 mt-6 rounded-md p-4">
+            {/* Title */}
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-1.5 h-6 bg-violet-500 rounded-full"></div>
+              <h2 className="font-bold text-lg uppercase tracking-wide">Đánh giá cao</h2>
+            </div>
+            {/* List */}
+            <div className="flex flex-col space-y-4">
+              {listItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-start space-x-3 cursor-pointer group"
+                >
+                  {/* Ảnh bìa */}
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-16 h-22 object-cover rounded-md shrink-0"
+                  />
+
+                  {/* Thông tin chi tiết */}
+                  <div className="flex flex-col justify-between flex-1 text-sm">
+                    <div>
+                      <h3 className="font-semibold group-hover:text-violet-400 transition-colors line-clamp-1">
+                        {item.title}
+                      </h3>
+                      <p className="text-gray-400 text-xs mt-0.5 line-clamp-1">
+                        {item.subTitle}
+                      </p>
+                    </div>
+
+                    {/* Đánh giá */}
+                    <div className="flex items-center space-x-2 text-xs mt-2">
+                      <span className="flex items-center text-yellow-400 font-medium">
+                        <FaStar className="mr-1 text-xs" /> {item.rating}
+                      </span>
+                    </div>
+
+                    {/* Lượt mua */}
+                    <div className="flex items-center text-xs mt-1">
+                      <span>{item.buy} lượt mua</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </aside>
       </div>
     </div>
