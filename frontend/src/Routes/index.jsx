@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 
 // Layouts
 import MainLayout from "../components/Layout/MainLayout";
-import UserProfilePage from "../components/Layout/UserProfilePage";
+import UserProfilePage from "../components/User/UserProfilePage";
 
 // Pages – Public
 import HomePage from "../pages/Home/HomePage";
