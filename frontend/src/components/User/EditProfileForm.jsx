@@ -13,7 +13,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import showToast from "../../utils/toast";
-import defaultAvatar from "../../assets/default-avatar.png";
+import defaultAvatar from "../../assets/avatar_default.jpg";
 
 const EditProfileForm = () => {
   const dispatch = useDispatch();
