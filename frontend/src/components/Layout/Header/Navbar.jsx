@@ -23,9 +23,9 @@ import { Dropdown, Space } from "antd";
 import SearchBar from "../../UI/SearchBar";
 
 const navLinks = [
-  { to: "/", label: "Home" },
-  { to: "/explore", label: "Explore" },
-  { to: "/libraries", label: "My Library" },
+  { to: "/", label: "Trang chủ" },
+  { to: "/explore", label: "Khám phá" },
+  { to: "/libraries", label: "Sách của tôi" },
 ];
 
 const items = [
@@ -97,39 +97,42 @@ export default function Navbar() {
   };
 
   return (
-    <motion.nav className="bg-slate-100 shadow-lg sticky top-0 z-40">
+    <motion.nav className="bg-violet-700 shadow-lg sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link
             to="/"
-            className="flex items-center space-x-2 text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
+            className="flex items-center space-x-2 text-2xl font-bold text-white"
           >
-            <span className="hidden sm:block">BooksMarketplace</span>
+            <span className="hidden sm:block">BookStore</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-4">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
                 to={link.to}
-                className="nav-link flex items-center space-x-1 text-gray-600 hover:text-blue-600 transition-colors px-3 py-2 rounded-md text-sm font-medium"
+                className="nav-link flex items-center space-x-1 text-white hover:text-violet-200
+                transition-colors px-3 py-2 rounded-md text-base font-medium"
               >
                 <span>{link.label}</span>
               </Link>
             ))}
           </div>
 
+          {/* Search bar */}
+          <div>
+            <SearchBar />
+          </div>
+
           {/* Right Section */}
           <div className="flex items-center gap-2">
-            {/* Search */}
-            <SearchBar />
-
             {/* Cart */}
             <Link
               to="/"
-              className="text-gray-600 hover:text-blue-600 transition-colors p-2"
+              className="text-white hover:text-violet-200 transition-colors p-2"
             >
               <ShoppingCart className="w-5 h-5" />
             </Link>
@@ -137,7 +140,7 @@ export default function Navbar() {
             {/* Wishlist */}
             <Link
               to="/wishlist"
-              className="text-gray-600 hover:text-blue-600 transition-colors p-2"
+              className="text-white hover:text-violet-200 transition-colors p-2"
             >
               <Heart className="w-5 h-5" />
             </Link>
@@ -145,7 +148,7 @@ export default function Navbar() {
             {/* Notifications */}
             <Link
               to="/user/notifications"
-              className="relative text-gray-600 hover:text-blue-600 transition-colors p-2"
+              className="relative text-white hover:text-violet-200 transition-colors p-2"
             >
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
@@ -158,27 +161,27 @@ export default function Navbar() {
               ) : (
                 <Dropdown menu={{ items }} trigger={["click"]} placement="bottomRight">
                   <div className="flex items-center space-x-1 cursor-pointer">
-                    <button className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors cursor-pointer">
+                    <button
+                      className="flex items-center space-x-2 cursor-pointer rounded-full overflow-hidden
+                      ring-2 ring-violet-500 hover:ring-white transition-colors"
+                    >
                       <img
-                        src={userInfo?.avatar || "/src/assets/default-avatar.png"}
-                        onError={(e) =>
-                          (e.currentTarget.src = "/src/assets/default-avatar.png")
-                        }
+                        src={userInfo?.avatar || "/src/assets/avatar_default.jpg"}
                         alt="User Avatar"
-                        className="w-8 h-8 rounded-full ring-2 ring-blue-100 hover:ring-blue-300 transition-all"
+                        className="w-8 h-8 object-cover"
                       />
                     </button>
 
-                    <ChevronDown size={20} />
+                    <ChevronDown size={20} className="text-white"/>
                   </div>
                 </Dropdown>
               )
             ) : (
               <Link
                 to="/login"
-                className="flex items-center space-x-2 text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                className="flex items-center space-x-2 text-white bg-violet-500 hover:bg-violet-600 px-4 py-2 rounded-xl text-base font-medium transition-colors"
               >
-                <UserCircle className="w-4 h-4" />
+                <UserCircle className="w-5 h-5" />
                 <span>Đăng nhập</span>
               </Link>
             )}
