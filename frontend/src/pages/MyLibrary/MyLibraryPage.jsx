@@ -1,17 +1,8 @@
-import { useMemo, useState } from "react";
 import BookGrid from "../../components/Book/BookGrid";
 import FilterToolbar from "../../components/UI/FilterToolBar";
 import {
   SlidersHorizontal,
-  Truck,
-  ShoppingCart,
-  CircleDollarSign,
-  ChevronDown,
-  X,
   Search,
-  Star,
-  LoaderCircle,
-  List,
   Book,
   BookCheck,
   BookOpen,

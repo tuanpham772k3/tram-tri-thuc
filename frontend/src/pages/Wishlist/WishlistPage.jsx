@@ -1,4 +1,6 @@
+import { ArrowDownWideNarrow, ArrowUpWideNarrow, Search } from "lucide-react";
 import BookGrid from "../../components/Book/BookGrid";
+import SortBar from "../../components/UI/SortBar";
 
 const myBooks = [
   {
@@ -43,62 +45,44 @@ const myBooks = [
   },
 ];
 
+const sorts = [
+  { label: "Thêm gần đây", value: "recently_save" },
+  { label: "Giá cao - thấp", value: "progress_desc", icon: ArrowDownWideNarrow },
+  { label: "Giá thấp - cao", value: "progress_asc", icon: ArrowUpWideNarrow },
+];
+
 const WishlistPage = () => {
   return (
     <div className="w-full min-h-screen">
       {/* Header */}
       <div className="pt-8 text-center">
         <h1 className="text-base sm:text-lg font-bold uppercase tracking-wider">
-          Wishlist
+          Sách yêu thích
         </h1>
 
-        <p className="mt-2 text-sm">Your personal collection</p>
+        <p className="mt-2 text-sm">Bộ sưu tập cá nhân của bạn</p>
       </div>
 
       <div className="flex flex-col gap-8">
-        {/* Search & Sort Bar (Nằm trên một thanh ngang ngay dưới tab) */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2">
-          {/* Input Tìm kiếm */}
-          <div className="relative w-full sm:w-80">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </span>
-            <input
-              type="text"
-              placeholder="Search title or author..."
-              className="w-full pl-9 pr-4 py-2 text-sm bg-background border rounded-lg placeholder-text-muted focus:outline-none focus:border-primary transition-colors"
-            />
-          </div>
-
-          {/* Select Sắp xếp */}
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-            <label htmlFor="sort" className="text-sm whitespace-nowrap">
-              Sort by:
-            </label>
-            <select
-              id="sort"
-              className="px-3 py-2 text-sm bg-background border rounded-lg focus:outline-none focus:border-primary transition-colors cursor-pointer"
-            >
-              <option value="title-asc">Title (A - Z)</option>
-              <option value="title-desc">Title (Z - A)</option>
-              <option value="rating-desc">Highest Rated</option>
-            </select>
-          </div>
+        {/* Search */}
+        <div className="relative w-full sm:w-80 ">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <Search className="w-5 h-5" />
+          </span>
+          <input
+            type="text"
+            placeholder="Search title or author..."
+            className="w-full pl-9 pr-4 py-2 text-sm bg-background border rounded-lg placeholder-text-muted focus:outline-none focus:border-primary transition-colors"
+          />
         </div>
 
-        <BookGrid title="My Wishlist" books={myBooks} showAddToCart={true} />
+        {/* Sort Bar */}
+        <SortBar sorts={sorts} />
+
+        <div>
+          <span className="text-gray-400">12 cuốn sách đã lưu</span>
+          <BookGrid books={myBooks} showAddToCart={true} showRemove={true} />
+        </div>
       </div>
     </div>
   );

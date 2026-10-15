@@ -1,7 +1,8 @@
-import { Star } from "lucide-react";
+import { ShoppingBag, ShoppingCart, Star, Trash } from "lucide-react";
 import { Button } from "antd";
+import { FaRegTrashAlt } from "react-icons/fa";
 
-export default function BookCard({ book, showAddToCart = false }) {
+export default function BookCard({ book, showAddToCart = false, showRemove = false }) {
   return (
     <div className="group relative bg-white rounded-xl shadow-xl p-3 max-w-50 cursor-pointer">
       {/* Book Cover */}
@@ -45,9 +46,13 @@ export default function BookCard({ book, showAddToCart = false }) {
 
       {/* Add to Cart Button */}
       {showAddToCart && (
-        <div className="mt-3">
-          <Button type="primary" className="w-full">
-            Add to cart
+        <div className="mt-3 flex items-center gap-2">
+          <Button className="flex-1 !bg-violet-500 !text-white !border-none hover:!bg-violet-700 transition-colors">
+            <ShoppingCart size={18} />
+            <span>Add to Cart</span>
+          </Button>
+          <Button className="!p-2 hover:!border-red-500 hover:!text-red-500">
+            <FaRegTrashAlt size={18} />
           </Button>
         </div>
       )}
