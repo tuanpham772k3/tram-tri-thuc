@@ -342,7 +342,7 @@ export default function HomePage() {
         </div>
 
         {/* Book Recommendations */}
-        <aside className="w-[300px] shrink-0">
+        <aside className="hidden md:block w-64 lg:w-75 shrink-0">
           {/* Hot Books */}
           <div className="p-4 rounded-md bg-slate-200">
             <div className=" flex items-center border-b-2 border-dashed border-slate-300 pb-1">
