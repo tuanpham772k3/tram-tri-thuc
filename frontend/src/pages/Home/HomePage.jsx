@@ -297,11 +297,11 @@ export default function HomePage() {
               variants={itemVariants}
               className="line-clamp-4 max-w-xl text-sm leading-relaxed sm:text-base md:line-clamp-none"
             >
-              Timeless lessons on wealth, greed, and happiness. Doing well with money
-              isn’t necessarily about what you know. It’s about how you behave. And
-              behavior is hard to teach, even to really smart people. Money—investing,
-              personal finance, and business decisions—is typically taught as a math-based
-              field.
+              Những bài học vượt thời gian về sự giàu có, lòng tham và hạnh phúc. Làm tốt
+              việc kiếm tiền không nhất thiết phụ thuộc vào những gì bạn biết. Đó là về
+              cách bạn cư xử. Và cách cư xử rất khó dạy, ngay cả với những người thực sự
+              thông minh. Tiền bạc - đầu tư, tài chính cá nhân và các quyết định kinh
+              doanh - thường được dạy như một lĩnh vực dựa trên toán học.
             </motion.p>
 
             {/* Actions */}
@@ -315,8 +315,12 @@ export default function HomePage() {
                 className="inline-block"
               >
                 {/* Buy */}
-                <Button onClick={() => navigate("/explore")} type="primary" size="large">
-                  <span>Explore now</span>
+                <Button
+                  onClick={() => navigate("/explore")}
+                  className="!bg-violet-500 !text-white !font-semibold !border-none"
+                  size="large"
+                >
+                  <span>Khám phá ngay</span>
                   <MoveRight />
                 </Button>
               </motion.div>
