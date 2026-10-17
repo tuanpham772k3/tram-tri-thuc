@@ -34,6 +34,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import MyLibraryPage from "../pages/MyLibrary/MyLibraryPage";
 import ExplorePage from "../pages/Explore/ExplorePage";
 import WishlistPage from "../pages/Wishlist/WishlistPage";
+import CartPage from "../pages/Cart/CartPage";
 
 const router = createBrowserRouter([
   // =========================
@@ -78,6 +79,7 @@ const router = createBrowserRouter([
       { path: "libraries", element: <MyLibraryPage /> },
       { path: "explore", element: <ExplorePage /> },
       { path: "wishlist", element: <WishlistPage /> },
+      { path: "cart", element: <CartPage /> },
       { path: "documents/:documentId", element: <DocumentDetailPage /> },
       {
         path: "profile",

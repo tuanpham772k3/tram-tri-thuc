@@ -131,7 +131,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2">
             {/* Cart */}
             <Link
-              to="/"
+              to="/cart"
               className="text-white hover:text-violet-200 transition-colors p-2"
             >
               <ShoppingCart className="w-5 h-5" />
@@ -172,7 +172,7 @@ export default function Navbar() {
                       />
                     </button>
 
-                    <ChevronDown size={20} className="text-white"/>
+                    <ChevronDown size={20} className="text-white" />
                   </div>
                 </Dropdown>
               )
