@@ -1,3 +1,4 @@
+import { Checkbox } from "antd";
 import { Minus, Plus, ShieldCheck, Trash2 } from "lucide-react";
 import { useState } from "react";
 
@@ -33,6 +34,8 @@ const cartItems = [
 
 const CartPage = () => {
   const [items, setItems] = useState(cartItems);
+  const [productIds, setProductIds] = useState([]);
+  console.log("🚀 ~ CartPage ~ productIds:", productIds);
 
   const updateQuantity = (id, amount) => {
     setItems((prev) =>
@@ -44,6 +47,16 @@ const CartPage = () => {
             }
           : item
       )
+    );
+  };
+
+  const handleSelectIdAllProducts = (checked) => {
+    setProductIds(checked ? items.map((item) => item.id) : []);
+  };
+
+  const handleSelectIdProduct = (id) => {
+    setProductIds((prev) =>
+      prev.includes(id) ? prev.filter((productId) => productId !== id) : [...prev, id]
     );
   };
 
@@ -61,7 +74,14 @@ const CartPage = () => {
 
         {/* Tiêu đề bảng */}
         <div className="grid grid-cols-12 text-sm font-semibold text-gray-500 pb-4 border-b border-gray-100 mb-6">
-          <div className="col-span-5">Sản phẩm</div>
+          <div className="col-span-1">
+            <Checkbox
+              checked={items.length > 0 && items.length === productIds.length}
+              onChange={(e) => handleSelectIdAllProducts(e.target.checked)}
+              indeterminate={productIds.length > 0 && productIds.length < items.length}
+            />
+          </div>
+          <div className="col-span-4">Sản phẩm</div>
           <div className="col-span-2 text-center">Đơn giá</div>
           <div className="col-span-2 text-center">Số lượng</div>
           <div className="col-span-2 text-center">Số tiền</div>
@@ -79,8 +99,14 @@ const CartPage = () => {
               const itemTotal = (item.price * item.quantity).toFixed(0);
               return (
                 <li key={item.id} className="py-6 grid grid-cols-12 items-center gap-4">
+                  {/* Checkbox */}
+                  <Checkbox
+                    checked={productIds.includes(item.id)}
+                    onChange={() => handleSelectIdProduct(item.id)}
+                  />
+
                   {/* Thông tin sản phẩm & Hình ảnh */}
-                  <div className="col-span-5 md:flex items-center gap-4">
+                  <div className="col-span-4 md:flex items-center gap-4">
                     <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-100">
                       <img
                         src={item.image}
