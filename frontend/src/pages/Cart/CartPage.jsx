@@ -1,6 +1,7 @@
 import { Checkbox } from "antd";
 import { Minus, Plus, ShieldCheck, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const cartItems = [
   {
@@ -33,9 +34,9 @@ const cartItems = [
 ];
 
 const CartPage = () => {
+  const navigate = useNavigate();
   const [items, setItems] = useState(cartItems);
   const [productIds, setProductIds] = useState([]);
-  console.log("🚀 ~ CartPage ~ productIds:", productIds);
 
   const updateQuantity = (id, amount) => {
     setItems((prev) =>
@@ -63,7 +64,7 @@ const CartPage = () => {
   return (
     <div className="w-full min-h-screen grid grid-cols-1 lg:grid-cols-3 gap-8 items-start my-8">
       {/* Phần 1: bảng sản phẩm bên trái (chiếm 2 cột) */}
-      <div className="lg:col-span-2 bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100">
+      <section className="lg:col-span-2 bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100">
         {/* Tiêu đề Trang */}
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold">Giỏ hàng</h1>
@@ -89,13 +90,11 @@ const CartPage = () => {
         </div>
 
         {/* Danh sách sản phẩm */}
-        <ul className="divide-y divide-gray-100">
-          {items.length === 0 ? (
-            <div className="py-12 text-center text-gray-400">
-              Giỏ hàng của bạn đang trống
-            </div>
-          ) : (
-            items.map((item) => {
+        {items.length === 0 ? (
+          <p className="py-12 text-center text-gray-400">Giỏ hàng của bạn đang trống</p>
+        ) : (
+          <ul className="divide-y divide-gray-100">
+            {items.map((item) => {
               const itemTotal = (item.price * item.quantity).toFixed(0);
               return (
                 <li key={item.id} className="py-6 grid grid-cols-12 items-center gap-4">
@@ -165,13 +164,13 @@ const CartPage = () => {
                   </div>
                 </li>
               );
-            })
-          )}
-        </ul>
-      </div>
+            })}
+          </ul>
+        )}
+      </section>
 
       {/* Phần 2: Order Summary bên phải (Chiếm 1 cột) */}
-      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 flex flex-col justify-between">
+      <aside className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 flex flex-col justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Tóm tắt đơn hàng</h2>
 
@@ -204,10 +203,6 @@ const CartPage = () => {
               <span>Giảm giá (10%)</span>
               <span className="font-semibold text-gray-900">-1.000 USD</span>
             </div>
-            <div className="flex justify-between text-gray-600">
-              <span>Phí giao hàng</span>
-              <span className="font-semibold text-gray-900">50.00 USD</span>
-            </div>
           </div>
 
           <hr className="border-gray-300 mb-6" />
@@ -235,12 +230,13 @@ const CartPage = () => {
 
         {/* Nút Checkout Now */}
         <button
+          onClick={() => navigate("/checkout")}
           className="w-full bg-violet-500 text-white py-4 rounded-full font-bold text-base
           hover:bg-violet-700 transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
         >
-          Checkout Now
+          Mua hàng
         </button>
-      </div>
+      </aside>
     </div>
   );
 };

@@ -20,8 +20,8 @@ import NotificationPage from "../pages/Notification/NotificationPage";
 import DocumentDetailPage from "../pages/Document/DocumentDetailPage";
 import SearchPage from "../pages/Search/SearchPage";
 import RatingPage from "../pages/Rating/RatingPage";
-import Checkout from "../pages/Checkout/Checkout";
 import UpgradeAccount from "../pages/UpgradeAccount/UpgradeAccount";
+import CheckoutPage from "../pages/Checkout/CheckoutPage";
 
 // Pages – Uploader
 import UploadPage from "../pages/Uploader/UploadPage";
@@ -88,7 +88,7 @@ const router = createBrowserRouter([
       },
       { path: "notifications", element: <NotificationPage /> },
       { path: "upgradeAccount", element: <UpgradeAccount /> },
-      { path: "payment", element: <Checkout /> },
+      { path: "checkout", element: <CheckoutPage /> },
       { path: "rating", element: <RatingPage /> },
       { path: "search", element: <SearchPage /> },
     ],
