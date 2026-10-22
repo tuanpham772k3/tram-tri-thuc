@@ -34,11 +34,19 @@ const cartItems = [
 
 const CheckoutPage = () => {
   const [items, setItems] = useState(cartItems);
-  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("card");
+
+  const handleCheckout = (e) => {
+    e.preventDefault();
+
+    console.log("Phương thức thanh toán:", paymentMethod);
+
+    // Tiếp tục xử lý đơn hàng
+  };
 
   return (
     <div className="w-full min-h-screen grid grid-cols-1 lg:grid-cols-3 gap-8 items-start my-8">
-      {/* Phần 1: bảng sản phẩm bên trái (chiếm 2 cột) */}
+      {/* Phần 1: Danh sách sản phẩm bên trái (chiếm 2 cột) */}
       <section className="lg:col-span-2 bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100">
         {/* Tiêu đề Trang */}
         <div className="flex items-center justify-between mb-8">
@@ -115,23 +123,50 @@ const CheckoutPage = () => {
         )}
       </section>
 
-      {/* Phần 2: Order Summary bên phải (Chiếm 1 cột) */}
+      {/* Phần 2: Thanh toán bên phải (Chiếm 1 cột) */}
       <aside className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 flex flex-col justify-between">
-        {/* Thông tin thanh toán */}
-        <form onSubmit={() => {}}>
-          <h2 className="text-lg font-semibold mb-8">Chọn phương thức thanh toán</h2>
+        <form onSubmit={handleCheckout}>
+          <h2 className="mb-6 text-lg font-semibold">Chọn phương thức thanh toán</h2>
 
           {/* Phương thức thanh toán */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             {/* Thẻ */}
-            <label className="flex items-center gap-4 rounded-md px-4 py-3 cursor-pointer border border-gray-300 hover:bg-gray-200">
-              <input type="radio" name="paymentMethod" value="card" defaultChecked />
+            <label
+              className={`flex items-center gap-4 rounded-md px-4 py-3 cursor-pointer border transition-colors ${
+                paymentMethod === "card"
+                  ? "border-violet-500 bg-violet-50"
+                  : "border-gray-300 hover:bg-gray-100"
+              }`}
+            >
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="card"
+                onChange={() => {
+                  setPaymentMethod("card");
+                }}
+                checked={paymentMethod === "card"}
+              />
               <CreditCard className="w-8 h-8" />
               <span className="text-base font-medium">Thanh toán bằng thẻ tín dụng</span>
             </label>
             {/* ZaloPay */}
-            <label className="flex items-center gap-4 rounded-md px-4 py-3 cursor-pointer border border-gray-300 hover:bg-gray-200">
-              <input type="radio" name="paymentMethod" value="zalopay" />
+            <label
+              className={`flex items-center gap-4 rounded-md px-4 py-3 cursor-pointer border transition-colors ${
+                paymentMethod === "zalopay"
+                  ? "border-violet-500 bg-violet-50"
+                  : "border-gray-300 hover:bg-gray-100"
+              }`}
+            >
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="zalopay"
+                onChange={() => {
+                  setPaymentMethod("zalopay");
+                }}
+                checked={paymentMethod === "zalopay"}
+              />
               <div className="w-8 h-8 shrink-0 rounded-md overflow-hidden">
                 <img
                   src="https://cdn.tgdd.vn/2020/04/GameApp/image-180x180.png"
@@ -142,8 +177,22 @@ const CheckoutPage = () => {
               <span className="text-base font-medium">ZaloPay</span>
             </label>
             {/* MoMo */}
-            <label className="flex items-center gap-4 rounded-md px-4 py-3 cursor-pointer border border-gray-300 hover:bg-gray-200">
-              <input type="radio" name="paymentMethod" value="momo" />
+            <label
+              className={`flex items-center gap-4 rounded-md px-4 py-3 cursor-pointer border transition-colors ${
+                paymentMethod === "momo"
+                  ? "border-violet-500 bg-violet-50"
+                  : "border-gray-300 hover:bg-gray-100"
+              }`}
+            >
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="momo"
+                onChange={() => {
+                  setPaymentMethod("momo");
+                }}
+                checked={paymentMethod === "momo"}
+              />
               <div className="w-8 h-8 shrink-0 rounded-md overflow-hidden">
                 <img
                   src="https://cdn.tgdd.vn/2020/03/GameApp/Untitled-2-200x200.jpg"
@@ -155,13 +204,13 @@ const CheckoutPage = () => {
             </label>
           </div>
 
-          {/* Chi tiết thẻ */}
-          <div className="mt-6">
-            <h3 className="text-base font-semibold mb-4">Chi tiết thẻ</h3>
-            <div className="space-y-4">
+          {/* Chi tiết phương thức thanh toán */}
+          {paymentMethod === "card" && (
+            <div className="mt-6 space-y-4 rounded-xl bg-gray-50 p-4">
+              <h3 className="text-base font-semibold">Chi tiết thẻ</h3>
               {/* Số thẻ */}
-              <div className="flex flex-col gap-0.5">
-                <label htmlFor="card-number" className="text-sm font-semibold">
+              <div>
+                <label htmlFor="card-number" className="mb-1 block text-sm font-semibold">
                   Số thẻ
                 </label>
                 <input
@@ -169,13 +218,17 @@ const CheckoutPage = () => {
                   name="cardNumber"
                   type="text"
                   placeholder="1234 5678 9012 3456"
-                  className="py-2 px-3 border-2 border-gray-300 rounded-lg outline-0 focus:border-violet-600"
+                  autoComplete="cc-number"
+                  className="w-full min-w-0 rounded-lg py-2 px-3 border-2 border-gray-300 outline-none focus:border-violet-600"
                 />
               </div>
               {/* Ngày hết hạn & CVC */}
-              <div className="flex gap-2">
-                <div className="w-full min-w-0 flex flex-col gap-0.5">
-                  <label htmlFor="expiry-day" className="text-sm font-semibold">
+              <div className="flex gap-3">
+                <div className="flex-1 min-w-0">
+                  <label
+                    htmlFor="expiry-day"
+                    className="mb-1 block text-sm font-semibold"
+                  >
                     Ngày hết hạn
                   </label>
                   <input
@@ -183,11 +236,12 @@ const CheckoutPage = () => {
                     name="expiryDay"
                     type="text"
                     placeholder="MM/YY"
-                    className="py-2 px-3 border-2 border-gray-300 rounded-lg outline-0 focus:border-violet-600"
+                    autoComplete="cc-exp"
+                    className="w-full min-w-0 rounded-lg py-2 px-3 border-2 border-gray-300 outline-none focus:border-violet-600"
                   />
                 </div>
-                <div className="w-full min-w-0 flex flex-col gap-0.5">
-                  <label htmlFor="cvc" className="text-sm font-semibold">
+                <div className="flex-1 min-w-0">
+                  <label htmlFor="cvc" className="mb-1 block text-sm font-semibold">
                     CVC
                   </label>
                   <input
@@ -195,13 +249,14 @@ const CheckoutPage = () => {
                     name="cvc"
                     type="text"
                     placeholder="123"
-                    className="py-2 px-3 border-2 border-gray-300 rounded-lg outline-0 focus:border-violet-600"
+                    autoComplete="cc-csc"
+                    className="w-full min-w-0 rounded-lg py-2 px-3 border-2 border-gray-300 outline-none focus:border-violet-600"
                   />
                 </div>
               </div>
               {/* Tên thẻ */}
-              <div className="flex flex-col gap-0.5">
-                <label htmlFor="card-name" className="text-sm font-semibold">
+              <div>
+                <label htmlFor="card-name" className="mb-1 block text-sm font-semibold">
                   Tên thẻ
                 </label>
                 <input
@@ -209,73 +264,119 @@ const CheckoutPage = () => {
                   name="cardName"
                   type="text"
                   placeholder="Toni Pham"
-                  className="py-2 px-3 border-2 border-gray-300 rounded-lg outline-0 focus:border-violet-600"
+                  autoComplete="cc-name"
+                  className="w-full min-w-0 rounded-lg py-2 px-3 border-2 border-gray-300 outline-none focus:border-violet-600"
                 />
               </div>
             </div>
+          )}
+
+          {paymentMethod === "zalopay" && (
+            <div className="mt-6 rounded-xl bg-gray-50 p-4">
+              <h3 className="mb-3 font-semibold">Thanh toán qua ví ZaloPay</h3>
+              <div className="flex gap-4">
+                <div className="w-28 shrink-0 overflow-hidden">
+                  <img
+                    src="https://images.openai.com/static-rsc-4/l4hAAqlAzyvjBCshNrI-k65BKEgqvOvVViHET50olPCsi4kZK6zhUwsKegt1zAoNNLTXosQZ_Zoja9wzni48C2tVoCbJCFIuZeJiUwKkuHpGG5GByCem-QTQXVa8Ori8BmAeMh6AHM4DOyHwN5izvuoR6ZrEgKo8q6TmFNj_5Vc5tHULHRBZ9jlSKb9iyZCt?purpose=fullsize"
+                    alt="image zalopay"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <p className="text-sm leading-6 text-gray-600">
+                  1. Mở ứng dụng ZaloPay trên điện thoại.
+                  <br />
+                  2. Quét mã QR hoặc mở liên kết do hệ thống cung cấp.
+                  <br />
+                  3. Kiểm tra số tiền và xác nhận giao dịch.
+                  <br />
+                  4. Chờ hệ thống xác nhận thanh toán.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {paymentMethod === "momo" && (
+            <div className="mt-6 rounded-xl bg-gray-50 p-4">
+              <h3 className="mb-4 font-semibold">Thanh toán qua ví MoMo</h3>
+              <div className="flex gap-4">
+                <div className="w-28 shrink-0 rounded-2xl shadow-2xs overflow-hidden">
+                  <img
+                    src="https://images.openai.com/static-rsc-4/RoHpxwsWGtaqB8rGKiqQ-UGmEW6VFPJuk3FnwdQ4yfbycv1lsFnDD-TL76OnsC2pDQrWoqjaGBRh03CugYmRVS-YlLuMaJXQfmVqgc6QrN7xP_Bc9Pw9qbot188FgdLO_yV7JtX1DBSgeSQTPHFz4WXoNz5pREjxRotN7-0L8RdgGgCz1pWsJ5cCuL8HDBCa?purpose=fullsize"
+                    alt="image momo"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <p className="text-sm leading-6 text-gray-600">
+                  1. Mở ứng dụng MoMo trên điện thoại.
+                  <br />
+                  2. Quét mã QR hoặc mở liên kết thanh toán.
+                  <br />
+                  3. Kiểm tra thông tin đơn hàng.
+                  <br />
+                  4. Xác nhận giao dịch và chờ hệ thống cập nhật.
+                </p>
+              </div>
+            </div>
+          )}
+
+          <hr className="my-6 border-gray-300 mt-8" />
+
+          {/* Mã giảm giá */}
+          <div className="mb-6 flex gap-2">
+            <input
+              type="text"
+              placeholder="Mã giảm giá"
+              aria-label="Mã giảm giá"
+              className="min-w-0 flex-1 rounded-full border border-gray-300 outline-none px-4 py-2.5 text-sm focus:border-violet-600"
+            />
+            <button
+              type="button"
+              onClick={() => alert("Nhập Mã giảm giá")}
+              className="px-6 py-2.5 rounded-full text-sm font-medium border border-gray-300 hover:text-violet-600
+              hover:bg-violet-200 hover:border-violet-600 transition-colors cursor-pointer"
+            >
+              Áp dụng
+            </button>
           </div>
 
-          <hr className="border-gray-300 mt-8" />
+          {/* Tổng kết thanh toán */}
+          <div className="mb-6 space-y-3 text-sm">
+            <div className="flex justify-between gap-4 text-gray-600">
+              <span>Tổng tiền hàng</span>
+              <span className="font-semibold text-gray-900">200.000</span>
+            </div>
+            <div className="flex justify-between text-gray-600">
+              <span>Giảm giá (10%)</span>
+              <span className="font-semibold text-gray-900">-20.000</span>
+            </div>
+          </div>
 
-          {/* Tổng thanh toán */}
-          <div className="mt-6">
-            {/* Ô nhập mã giảm giá & Nút Apply */}
-            <div className="flex gap-2 mb-6">
-              <input
-                type="text"
-                placeholder="Phiếu giảm giá"
-                className="flex-1 bg-white border border-gray-300 rounded-full px-4 py-2.5 text-sm
-                focus:outline-none focus:border-violet-600 transition-colors text-gray-800 placeholder-gray-400"
-              />
-              <button
-                type="button"
-                className="px-6 py-2.5 rounded-full text-sm font-medium border border-gray-300 text-gray-700
-                hover:text-violet-600 hover:bg-violet-200 hover:border-violet-600 transition-colors cursor-pointer"
+          <hr className="mb-6 border-gray-300" />
+
+          <div className="mb-6 flex justify-between items-center gap-4">
+            <span className="font-bold">Tổng thanh toán</span>
+            <span className="text-xl font-bold">180.000</span>
+          </div>
+
+          {/* Thông tin bảo hành */}
+          <div className="mb-6 flex items-start gap-2 rounded-xl border border-gray-100 bg-gray-50 p-3">
+            <ShieldCheck className="mt-0.5 text-gray-500 shrink-0" size={18} />
+            <p className="text-xs text-gray-500 leading-relaxed">
+              Thanh toán an toàn và bảo mật. Thông tin thanh toán của bạn được bảo vệ.{" "}
+              <a
+                href="#details"
+                className="text-black font-semibold underline hover:text-gray-700"
               >
-                Áp dụng
-              </button>
-            </div>
-
-            {/* Chi tiết giá tiền */}
-            <div className="space-y-3.5 mb-6 text-sm">
-              <div className="flex justify-between text-gray-600">
-                <span>Tổng tiền hàng</span>
-                <span className="font-semibold text-gray-900">2.000 USD</span>
-              </div>
-              <div className="flex justify-between text-gray-600">
-                <span>Giảm giá (10%)</span>
-                <span className="font-semibold text-gray-900">-1.000 USD</span>
-              </div>
-            </div>
-
-            <hr className="border-gray-300 mb-6" />
-
-            {/* Tổng cộng Total */}
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-base font-bold text-gray-900">Tổng thanh toán</span>
-              <span className="text-2xl font-black text-gray-900">$1850 USD</span>
-            </div>
-
-            {/* Thông tin bảo hành */}
-            <div className="flex items-start gap-2.5 bg-gray-50 p-3.5 rounded-2xl mb-8 border border-gray-100">
-              <ShieldCheck className="text-gray-500 shrink-0 mt-0.5" size={18} />
-              <p className="text-xs text-gray-500 leading-relaxed">
-                90 Day divmited Warranty against manufacturer's defects{" "}
-                <a
-                  href="#details"
-                  className="text-black font-semibold underdivne hover:text-gray-700"
-                >
-                  Chi tiết
-                </a>
-              </p>
-            </div>
+                Chi tiết
+              </a>
+            </p>
           </div>
 
           {/* Nút Thanh toán ngay */}
           <button
             type="submit"
-            className="w-full bg-violet-500 text-white py-4 rounded-full font-bold text-base
-          hover:bg-violet-700 transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-violet-500 py-4 font-bold
+            text-white shadow-md transition-colors hover:bg-violet-700 cursor-pointer"
           >
             Thanh toán ngay
           </button>
