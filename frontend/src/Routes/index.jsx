@@ -23,18 +23,14 @@ import RatingPage from "../pages/Rating/RatingPage";
 import UpgradeAccount from "../pages/UpgradeAccount/UpgradeAccount";
 import CheckoutPage from "../pages/Checkout/CheckoutPage";
 
-// Pages – Uploader
-import UploadPage from "../pages/Uploader/UploadPage";
-import UploaderDocumentsPage from "../pages/Uploader/UploaderDocumentsPage";
-import EditDocumentPage from "../pages/Uploader/EditDocumentPage";
-
 // Route protection wrappers
-import UploaderRoute from "./UploaderRoute";
 import ProtectedRoute from "./ProtectedRoute";
 import MyLibraryPage from "../pages/MyLibrary/MyLibraryPage";
 import ExplorePage from "../pages/Explore/ExplorePage";
 import WishlistPage from "../pages/Wishlist/WishlistPage";
 import CartPage from "../pages/Cart/CartPage";
+import SellerLayout from "../components/Layout/SellerLayout";
+import SellerUploadPage from "../pages/Seller/SellerUploadPage";
 
 const router = createBrowserRouter([
   // =========================
@@ -62,7 +58,7 @@ const router = createBrowserRouter([
   },
 
   // =========================
-  // USER
+  // Customer
   // =========================
   {
     path: "/",
@@ -80,35 +76,23 @@ const router = createBrowserRouter([
       { path: "explore", element: <ExplorePage /> },
       { path: "wishlist", element: <WishlistPage /> },
       { path: "cart", element: <CartPage /> },
+      { path: "checkout", element: <CheckoutPage /> },
+
       { path: "documents/:documentId", element: <DocumentDetailPage /> },
-      {
-        path: "profile",
-        element: <UserProfilePage />,
-        children: [{ element: <ProfilePage />, index: true }],
-      },
       { path: "notifications", element: <NotificationPage /> },
       { path: "upgradeAccount", element: <UpgradeAccount /> },
-      { path: "checkout", element: <CheckoutPage /> },
       { path: "rating", element: <RatingPage /> },
       { path: "search", element: <SearchPage /> },
     ],
   },
 
   // =========================
-  // UPLOADER
+  // Seller
   // =========================
   {
-    path: "/uploader",
-    element: (
-      <UploaderRoute>
-        <MainLayout />
-      </UploaderRoute>
-    ),
-    children: [
-      { path: "upload", element: <UploadPage /> },
-      { path: "my-documents", element: <UploaderDocumentsPage /> },
-      { path: "edit-document/:documentId", element: <EditDocumentPage /> },
-    ],
+    path: "seller",
+    element: <SellerLayout />,
+    children: [{ path: "upload", element: <SellerUploadPage /> }],
   },
 
   // =========================
