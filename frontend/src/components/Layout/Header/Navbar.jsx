@@ -2,7 +2,6 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   Bell,
   UserCircle,
-  Search,
   Menu,
   Heart,
   LogOut,
@@ -28,54 +27,52 @@ const navLinks = [
   { to: "/libraries", label: "Sách của tôi" },
 ];
 
-const items = [
-  {
-    key: "1",
-    label: "My Account",
-    disabled: true,
-  },
-  {
-    type: "divider",
-  },
-
-  {
-    key: "2",
-    label: "My Profile",
-    icon: <UserRound size={16} />,
-  },
-  {
-    key: "3",
-    label: "My Library",
-    icon: <Library size={16} />,
-  },
-  {
-    key: "4",
-    label: "My Orders",
-    icon: <ShoppingCart size={16} />,
-  },
-  {
-    key: "5",
-    label: "Become a seller",
-    icon: <Gem size={16} />,
-  },
-  {
-    key: "6",
-    label: "Logout",
-    icon: <LogOut size={16} />,
-    danger: true,
-  },
-];
-
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isAuthenticated, loading: authLoading } = useSelector((state) => state.auth);
-  const {
-    userInfo,
-    loading: userLoading,
-    error: userError,
-  } = useSelector((state) => state.user);
+  const { userInfo, loading: userLoading } = useSelector((state) => state.user);
+
+  const items = [
+    {
+      key: "1",
+      label: "My Account",
+      disabled: true,
+      onClick: () => navigate("/"),
+    },
+    {
+      type: "divider",
+    },
+
+    {
+      key: "2",
+      label: "My Profile",
+      icon: <UserRound size={16} />,
+    },
+    {
+      key: "3",
+      label: "My Library",
+      icon: <Library size={16} />,
+    },
+    {
+      key: "4",
+      label: "My Orders",
+      icon: <ShoppingCart size={16} />,
+    },
+    {
+      key: "5",
+      label: "Become a seller",
+      icon: <Gem size={16} />,
+      onClick: () => navigate("/seller"),
+    },
+    {
+      key: "6",
+      label: "Logout",
+      icon: <LogOut size={16} />,
+      danger: true,
+    },
+  ];
 
   const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
 
