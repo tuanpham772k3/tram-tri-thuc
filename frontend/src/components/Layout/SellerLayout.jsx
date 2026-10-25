@@ -3,10 +3,10 @@ import SellerSidebar from "./Sidebar/SellerSidebar";
 
 const SellerLayout = () => {
   return (
-    <div className="min-h-screen flex bg-slate-100">
+    <div className="min-h-screen flex bg-slate-50">
       <SellerSidebar />
 
-      <main className="z-20 w-full">
+      <main className="ml-14 md:ml-64 flex-1 flex flex-col min-w-0 overflow-y-auto">
         <Outlet />
       </main>
     </div>

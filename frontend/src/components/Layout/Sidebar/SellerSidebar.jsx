@@ -21,7 +21,7 @@ export default function SellerSidebar() {
   };
 
   return (
-    <aside className="h-screen fixed top-0 left-0 z-40 w-14 md:w-72 flex flex-col overflow-y-auto bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white shadow-2xl border-r border-slate-700">
+    <aside className="h-screen z-40 w-14 md:w-64 flex flex-col fixed top-0 left-0 overflow-y-auto bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white shadow-2xl border-r border-slate-700">
       {/* Header */}
       <div className="p-2 md:p-6 border-b border-slate-700/50">
         <div className="flex items-center gap-3">
