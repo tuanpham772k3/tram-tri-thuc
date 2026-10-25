@@ -142,11 +142,11 @@ const SellerUploadPage = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="py-16 px-4 md:px-6 grid grid-cols-1 lg:grid-cols-3 gap-4"
+        className="my-8 mx-4 md:mx-6 grid grid-cols-1 lg:grid-cols-3 gap-4"
       >
         {/* Phần 1: Nhập thông tin sách (chiếm 2 cột) */}
         <section className="col-span-2 bg-white rounded-2xl shadow-lg p-8">
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">Upload Tài Liệu</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-6">Đăng bán sách</h1>
 
           {/* Progress Steps */}
           <div className="mb-8 flex items-center justify-center space-x-4">

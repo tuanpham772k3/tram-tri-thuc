@@ -1,15 +1,5 @@
 import { useState } from "react";
-import {
-  Users,
-  FileCheck,
-  Layers,
-  BarChart,
-  Settings,
-  Book,
-  Upload,
-  LogOut,
-  Home,
-} from "lucide-react";
+import { Layers, BarChart, Settings, Book, Upload, Home } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 export default function SellerSidebar() {
