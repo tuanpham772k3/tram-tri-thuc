@@ -1,9 +1,6 @@
-import BookGrid from "../../components/Book/BookGrid";
 import {
   Search,
   SlidersHorizontal,
-  Truck,
-  ShoppingCart,
   CircleDollarSign,
   Star,
   LibraryBig,
@@ -13,6 +10,7 @@ import {
   ArrowDownWideNarrow,
   ArrowUpWideNarrow,
 } from "lucide-react";
+import BookGrid from "../../components/Book/BookGrid";
 import SortBar from "../../components/UI/SortBar";
 import FilterToolBar from "../../components/UI/FilterToolBar";
 
@@ -111,7 +109,7 @@ const ExplorePage = () => {
 
         {/* Book Grid */}
         <div className="mt-6">
-          <BookGrid books={myBooks} />
+          <BookGrid books={myBooks} rating={true} price={true} />
         </div>
       </div>
     </div>

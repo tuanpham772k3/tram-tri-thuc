@@ -96,7 +96,7 @@ export default function Navbar() {
 
   return (
     <motion.nav className="bg-violet-700 shadow-lg sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link
@@ -209,7 +209,7 @@ export default function Navbar() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-md text-base font-medium transition-colors"
                 >
-                  <link.icon className="w-5 h-5" />
+                  {link.icon && <link.icon className="w-5 h-5" />}
                   <span>{link.label}</span>
                 </Link>
               ))}

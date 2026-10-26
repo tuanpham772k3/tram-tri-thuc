@@ -5,8 +5,9 @@ export default function BookGrid({
   title,
   books,
   path,
+  rating = false,
+  price = false,
   showAddToCart = false,
-  showRemove = false,
 }) {
   return (
     <div className="mb-4">
@@ -18,7 +19,12 @@ export default function BookGrid({
         </Link>
       </div>
 
-      <BookGridList books={books} showAddToCart={showAddToCart} showRemove={showRemove} />
+      <BookGridList
+        books={books}
+        rating={rating}
+        price={price}
+        showAddToCart={showAddToCart}
+      />
     </div>
   );
 }

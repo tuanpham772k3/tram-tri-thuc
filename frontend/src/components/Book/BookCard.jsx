@@ -1,10 +1,15 @@
-import { ShoppingBag, ShoppingCart, Star, Trash } from "lucide-react";
 import { Button } from "antd";
+import { ShoppingCart, Star } from "lucide-react";
 import { FaRegTrashAlt } from "react-icons/fa";
 
-export default function BookCard({ book, showAddToCart = false, showRemove = false }) {
+export default function BookCard({
+  book,
+  showAddToCart = false,
+  rating = false,
+  price = false,
+}) {
   return (
-    <div className="group relative bg-white rounded-xl shadow-xl p-3 max-w-50 cursor-pointer">
+    <div className="group relative max-w-50 cursor-pointer">
       {/* Book Cover */}
       <div className="aspect-[3/4] rounded-xl overflow-hidden bg-gray-300 relative">
         <img
@@ -25,7 +30,7 @@ export default function BookCard({ book, showAddToCart = false, showRemove = fal
       </div>
 
       {/* Content */}
-      <div className="mt-2 space-y-1.5">
+      <div className="p-2 space-y-1">
         {/* Title */}
         <h3 className="text-xs sm:text-sm font-semibold line-clamp-1">{book.title}</h3>
 
@@ -33,15 +38,17 @@ export default function BookCard({ book, showAddToCart = false, showRemove = fal
         <p className="text-[11px] sm:text-xs line-clamp-1 mt-0.5">{book.author}</p>
 
         {/* Rating */}
-        <div className="flex items-center space-x-1">
-          <div className="flex text-amber-400">
-            <Star className="w-3 h-3 fill-amber-400 stroke-amber-400" />
+        {rating && (
+          <div className="flex items-center space-x-1">
+            <div className="flex text-amber-400">
+              <Star className="w-3 h-3 fill-amber-400 stroke-amber-400" />
+            </div>
+            <span className="text-[11px] font-medium">{book.rating}</span>
           </div>
-          <span className="text-[11px] font-medium">{book.rating}</span>
-        </div>
+        )}
 
         {/* Price */}
-        <div className="text-xs font-bold">{book.price}</div>
+        {price && <div className="text-xs font-bold">{book.price}</div>}
       </div>
 
       {/* Add to Cart Button */}
