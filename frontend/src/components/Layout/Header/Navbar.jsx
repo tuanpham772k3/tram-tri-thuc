@@ -24,6 +24,7 @@ import SearchBar from "../../UI/SearchBar";
 const navLinks = [
   { to: "/", label: "Trang chủ" },
   { to: "/explore", label: "Khám phá" },
+  { to: "/category", label: "Danh mục", icon: ChevronDown },
   { to: "/libraries", label: "Sách của tôi" },
 ];
 
@@ -111,10 +112,11 @@ export default function Navbar() {
               <Link
                 key={link.label}
                 to={link.to}
-                className="nav-link flex items-center space-x-1 text-white hover:text-violet-200
+                className="nav-link flex items-center gap-1 text-white hover:text-violet-200
                 transition-colors px-3 py-2 rounded-md text-base font-medium"
               >
                 <span>{link.label}</span>
+                {link.icon && <link.icon className="w-5 h-5" />}
               </Link>
             ))}
           </div>
@@ -157,20 +159,16 @@ export default function Navbar() {
                 <LoadingSpinner size="small" />
               ) : (
                 <Dropdown menu={{ items }} trigger={["click"]} placement="bottomRight">
-                  <div className="flex items-center space-x-1 cursor-pointer">
-                    <button
-                      className="flex items-center space-x-2 cursor-pointer rounded-full overflow-hidden
+                  <button
+                    className="flex items-center space-x-2 cursor-pointer rounded-full overflow-hidden
                       ring-2 ring-violet-500 hover:ring-white transition-colors"
-                    >
-                      <img
-                        src={userInfo?.avatar || "/src/assets/avatar_default.jpg"}
-                        alt="User Avatar"
-                        className="w-8 h-8 object-cover"
-                      />
-                    </button>
-
-                    <ChevronDown size={20} className="text-white" />
-                  </div>
+                  >
+                    <img
+                      src={userInfo?.avatar || "/src/assets/avatar_default.jpg"}
+                      alt="User Avatar"
+                      className="w-8 h-8 object-cover"
+                    />
+                  </button>
                 </Dropdown>
               )
             ) : (
