@@ -32,6 +32,7 @@ import CartPage from "../pages/Cart/CartPage";
 import SellerLayout from "../components/Layout/SellerLayout";
 import SellerUploadPage from "../pages/Seller/SellerUploadPage";
 import SellerDashboardPage from "../pages/Seller/SellerDashboardPage";
+import SellerOrderPage from "../pages/Seller/SellerOrderPage";
 
 const router = createBrowserRouter([
   // =========================
@@ -96,6 +97,7 @@ const router = createBrowserRouter([
     children: [
       { path: "upload", element: <SellerUploadPage /> },
       { path: "dashboard", element: <SellerDashboardPage /> },
+      { path: "sales", element: <SellerOrderPage /> },
     ],
   },
 
