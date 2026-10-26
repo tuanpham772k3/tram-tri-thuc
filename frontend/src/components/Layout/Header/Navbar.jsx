@@ -64,7 +64,7 @@ export default function Navbar() {
       key: "5",
       label: "Become a seller",
       icon: <Gem size={16} />,
-      onClick: () => navigate("/seller"),
+      onClick: () => navigate("/seller/dashboard"),
     },
     {
       key: "6",

@@ -95,8 +95,8 @@ const router = createBrowserRouter([
     path: "seller",
     element: <SellerLayout />,
     children: [
+      { index: true, path: "dashboard", element: <SellerDashboardPage /> },
       { path: "upload", element: <SellerUploadPage /> },
-      { path: "dashboard", element: <SellerDashboardPage /> },
       { path: "sales", element: <SellerOrderPage /> },
     ],
   },
