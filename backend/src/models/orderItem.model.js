@@ -1,12 +1,11 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const librariesSchema = new Schema(
+const orderItemSchema = new Schema(
   {
-    userId: {
+    orderId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
-      unique: true,
+      ref: "Order",
       require: true,
     },
 
@@ -16,32 +15,33 @@ const librariesSchema = new Schema(
       require: true,
     },
 
-    orderId: {
+    sellerId: {
       type: Schema.Types.ObjectId,
-      ref: "Order",
+      ref: "User",
       require: true,
     },
 
-    purchasedAt: {
-      type: Date,
-      default: null,
-    },
-
-    lastReadAt: {
-      type: Date,
-      default: null,
-    },
-
-    progress: {
+    quantity: {
       type: Number,
-      default: 0,
+      required: true,
+      min: 1,
+    },
+
+    price: {
+      type: Number,
+      required: true,
       min: 0,
-      max: 100,
+    },
+
+    subtotal: {
+      type: Number,
+      required: true,
+      min: 0,
     },
   },
   { timestamps: true }
 );
 
-const Libraries = mongoose.model("Libraries", librariesSchema);
+const OrderItem = mongoose.model("OrderItem", orderItemSchema);
 
-module.exports = Libraries;
+module.exports = OrderItem;

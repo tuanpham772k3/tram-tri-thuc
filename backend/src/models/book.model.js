@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const bookSchema = new mongoose.Schema(
   {
-    uploaderId: {
+    sellerId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,

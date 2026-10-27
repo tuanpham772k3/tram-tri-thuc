@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 
-const usersSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -67,16 +67,11 @@ const usersSchema = new mongoose.Schema(
       default: null,
     },
 
-    isVip: {
-      type: String,
-      enum: ["not_activated", "active", "expired"],
-      default: "not_activated",
-    },
-    vipStartDate: {
+    sellerStartDate: {
       type: Date,
       default: null,
     },
-    vipEndDate: {
+    sellerEndDate: {
       type: Date,
       default: null,
     },
@@ -84,9 +79,5 @@ const usersSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-usersSchema.index({ passwordResetTokenExpires: 1 }, { expireAfterSeconds: 0 });
-usersSchema.index({ verificationCodeExpires: 1 }, { expireAfterSeconds: 0 });
-usersSchema.index({ vipEndDate: 1 }, { expireAfterSeconds: 0 });
-
-const Users = mongoose.model("Users", usersSchema);
-module.exports = Users;
+const User = mongoose.model("User", userSchema);
+module.exports = User;
