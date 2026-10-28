@@ -34,6 +34,7 @@ import SellerUploadPage from "../pages/Seller/SellerUploadPage";
 import SellerDashboardPage from "../pages/Seller/SellerDashboardPage";
 import SellerOrderPage from "../pages/Seller/SellerOrderPage";
 import SellerBooksPage from "../pages/Seller/SellerBooksPage";
+import BookReaderPage from "../pages/Reader/BookReaderPage";
 
 const router = createBrowserRouter([
   // =========================
@@ -80,6 +81,7 @@ const router = createBrowserRouter([
       { path: "wishlist", element: <WishlistPage /> },
       { path: "cart", element: <CartPage /> },
       { path: "checkout", element: <CheckoutPage /> },
+      { path: "read", element: <BookReaderPage /> },
 
       { path: "documents/:documentId", element: <DocumentDetailPage /> },
       { path: "notifications", element: <NotificationPage /> },
