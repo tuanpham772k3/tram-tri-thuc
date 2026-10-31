@@ -17,8 +17,6 @@ import {
 import DownloadButton from "../../components/Common/DownloadButton";
 import CommentSection from "../../components/Comment/CommentSection";
 import RatingStars from "../../components/Rating/RatingStar";
-import DocumentViewer from "../../components/Document/DocumentViewer";
-import DocumentList from "../../components/Document/DocumentList";
 import { fetchRelatedDocuments } from "../../store/slices/documentSlice";
 
 export default function DocumentDetailPage() {

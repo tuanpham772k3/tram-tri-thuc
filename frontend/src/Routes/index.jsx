@@ -18,7 +18,6 @@ import ForgotPasswordPage from "../pages/Auth/ForgotPasswordPage";
 import ProfilePage from "../pages/User/ProfilePage";
 import NotificationPage from "../pages/Notification/NotificationPage";
 import DocumentDetailPage from "../pages/Document/DocumentDetailPage";
-import SearchPage from "../pages/Search/SearchPage";
 import RatingPage from "../pages/Rating/RatingPage";
 import UpgradeAccount from "../pages/UpgradeAccount/UpgradeAccount";
 import CheckoutPage from "../pages/Checkout/CheckoutPage";
@@ -87,7 +86,6 @@ const router = createBrowserRouter([
       { path: "notifications", element: <NotificationPage /> },
       { path: "upgradeAccount", element: <UpgradeAccount /> },
       { path: "rating", element: <RatingPage /> },
-      { path: "search", element: <SearchPage /> },
     ],
   },
 

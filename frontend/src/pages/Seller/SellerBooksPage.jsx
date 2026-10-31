@@ -1,21 +1,18 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import {
   Table,
   Tag,
   Button,
   Input,
   Select,
-  Modal,
   Form,
   Popconfirm,
   Tooltip,
   Space,
   Dropdown,
-  notification,
 } from "antd";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Import Lucide Icons from window.lucideReact
 import {
   BookOpen,
   Plus,
@@ -28,11 +25,12 @@ import {
   XCircle,
   Grid,
   List,
-  ShieldAlert,
   MoreVertical,
   Tag as TagIcon,
   BarChart3,
 } from "lucide-react";
+import AddEditBookModal from "../../components/Modal/AddEditBookModal";
+import BookDetailModal from "../../components/Modal/BookDetailModal";
 
 // INITIAL MOCK DATA
 const INITIAL_BOOKS = [
@@ -40,11 +38,10 @@ const INITIAL_BOOKS = [
     id: "BOOK-1001",
     title: "Đắc Nhân Tâm (How to Win Friends and Influence People)",
     author: "Dale Carnegie",
-    category: "Kỹ năng sống",
+    genre: "Kỹ năng sống",
     isbn: "978-604-58-8888-1",
     price: 86000,
     originalPrice: 110000,
-    stock: 150,
     status: "ACTIVE",
     createdAt: "2026-02-15",
     coverImage:
@@ -57,11 +54,10 @@ const INITIAL_BOOKS = [
     id: "BOOK-1002",
     title: "Clean Code: A Handbook of Agile Software Craftsmanship",
     author: "Robert C. Martin",
-    category: "Công nghệ",
+    genre: "Công nghệ",
     isbn: "978-013-235088-4",
     price: 380000,
     originalPrice: 450000,
-    stock: 45,
     status: "ACTIVE",
     createdAt: "2026-01-20",
     coverImage:
@@ -74,11 +70,10 @@ const INITIAL_BOOKS = [
     id: "BOOK-1003",
     title: "Nhà Giả Kim (The Alchemist)",
     author: "Paulo Coelho",
-    category: "Văn học",
+    genre: "Văn học",
     isbn: "978-604-69-8734-2",
     price: 79000,
     originalPrice: 99000,
-    stock: 0,
     status: "PENDING",
     createdAt: "2026-03-10",
     coverImage:
@@ -91,11 +86,10 @@ const INITIAL_BOOKS = [
     id: "BOOK-1004",
     title: "Tư Duy Nhanh Và Chậm (Thinking, Fast and Slow)",
     author: "Daniel Kahneman",
-    category: "Tâm lý học",
+    genre: "Tâm lý học",
     isbn: "978-0374533557",
     price: 195000,
     originalPrice: 240000,
-    stock: 28,
     status: "REJECTED",
     createdAt: "2026-02-01",
     coverImage:
@@ -109,11 +103,10 @@ const INITIAL_BOOKS = [
     id: "BOOK-1005",
     title: "Cha Giàu Cha Nghèo (Rich Dad Poor Dad)",
     author: "Robert T. Kiyosaki",
-    category: "Kinh tế",
+    genre: "Kinh tế",
     isbn: "978-1612680194",
     price: 115000,
     originalPrice: 135000,
-    stock: 92,
     status: "ACTIVE",
     createdAt: "2026-03-01",
     coverImage:
@@ -126,11 +119,10 @@ const INITIAL_BOOKS = [
     id: "BOOK-1006",
     title: "Tâm Lý Học Về Tiền (The Psychology of Money)",
     author: "Morgan Housel",
-    category: "Kinh tế",
+    genre: "Kinh tế",
     isbn: "978-0857197689",
     price: 142000,
     originalPrice: 168000,
-    stock: 60,
     status: "PENDING",
     createdAt: "2026-03-22",
     coverImage:
@@ -141,7 +133,7 @@ const INITIAL_BOOKS = [
   },
 ];
 
-const CATEGORIES = [
+const GENRES = [
   "Văn học",
   "Kinh tế",
   "Công nghệ",
@@ -156,7 +148,7 @@ const SellerBooksPage = () => {
   const [books, setBooks] = useState(INITIAL_BOOKS);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
-  const [categoryFilter, setCategoryFilter] = useState("ALL");
+  const [genreFilter, setGenreFilter] = useState("ALL");
   const [sortBy, setSortBy] = useState("NEWEST");
   const [viewMode, setViewMode] = useState("table"); // 'table' or 'grid'
 
@@ -174,7 +166,7 @@ const SellerBooksPage = () => {
     const active = books.filter((b) => b.status === "ACTIVE").length;
     const pending = books.filter((b) => b.status === "PENDING").length;
     const rejected = books.filter((b) => b.status === "REJECTED").length;
-    const totalValue = books.reduce((sum, b) => sum + b.price * b.stock, 0);
+    const totalValue = books.reduce((sum, b) => sum + b.price, 0);
     return { total, active, pending, rejected, totalValue };
   }, [books]);
 
@@ -188,8 +180,7 @@ const SellerBooksPage = () => {
           book.isbn.toLowerCase().includes(searchQuery.toLowerCase());
 
         const matchStatus = statusFilter === "ALL" || book.status === statusFilter;
-        const matchCategory =
-          categoryFilter === "ALL" || book.category === categoryFilter;
+        const matchCategory = genreFilter === "ALL" || book.category === genreFilter;
 
         return matchSearch && matchStatus && matchCategory;
       })
@@ -200,7 +191,7 @@ const SellerBooksPage = () => {
         if (sortBy === "PRICE_DESC") return b.price - a.price;
         return 0;
       });
-  }, [books, searchQuery, statusFilter, categoryFilter, sortBy]);
+  }, [books, searchQuery, statusFilter, genreFilter, sortBy]);
 
   // CRUD Operations
   const handleOpenFormModal = (book = null) => {
@@ -210,9 +201,7 @@ const SellerBooksPage = () => {
     } else {
       form.resetFields();
       form.setFieldsValue({
-        status: "PENDING",
-        category: "Công nghệ",
-        stock: 10,
+        genre: "Công nghệ",
         coverImage:
           "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400&auto=format&fit=crop&q=80",
       });
@@ -361,9 +350,9 @@ const SellerBooksPage = () => {
       ),
     },
     {
-      title: "Danh mục",
-      dataIndex: "category",
-      key: "category",
+      title: "Thể loại",
+      dataIndex: "genre",
+      key: "genre",
       render: (cat) => (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
           {cat}
@@ -371,7 +360,7 @@ const SellerBooksPage = () => {
       ),
     },
     {
-      title: "Giá bán & Tồn kho",
+      title: "Giá bán",
       dataIndex: "price",
       key: "price",
       sorter: (a, b) => a.price - b.price,
@@ -385,9 +374,6 @@ const SellerBooksPage = () => {
               {record.originalPrice.toLocaleString("vi-VN")} ₫
             </div>
           )}
-          <div className="text-xs text-slate-500 mt-0.5">
-            Kho: <span className="font-medium text-slate-700">{record.stock}</span>
-          </div>
         </div>
       ),
     },
@@ -576,13 +562,13 @@ const SellerBooksPage = () => {
             <div className="flex flex-wrap items-center gap-2">
               {/* Category Filter */}
               <Select
-                value={categoryFilter}
-                onChange={setCategoryFilter}
+                value={genreFilter}
+                onChange={setGenreFilter}
                 size="large"
                 className="w-40"
                 options={[
-                  { label: "Tất cả danh mục", value: "ALL" },
-                  ...CATEGORIES.map((c) => ({ label: c, value: c })),
+                  { label: "Tất cả thể loại", value: "ALL" },
+                  ...GENRES.map((c) => ({ label: c, value: c })),
                 ]}
               />
 
@@ -765,9 +751,6 @@ const SellerBooksPage = () => {
                       <span className="text-base font-bold text-slate-900">
                         {book.price.toLocaleString("vi-VN")} ₫
                       </span>
-                      <div className="text-[11px] text-slate-400">
-                        Tồn kho: {book.stock}
-                      </div>
                     </div>
 
                     <div className="flex items-center gap-1">
@@ -809,257 +792,22 @@ const SellerBooksPage = () => {
       </main>
 
       {/* MODAL: THÊM / CHỈNH SỬA SÁCH */}
-      <Modal
-        title={
-          <div className="flex items-center gap-2 text-slate-800 font-bold text-lg border-b border-slate-100 pb-3">
-            {editingBook ? (
-              <Edit3 className="text-amber-500" size={20} />
-            ) : (
-              <Plus className="text-indigo-600" size={20} />
-            )}
-            <span>
-              {editingBook ? "Chỉnh Sửa Thông Tin Sách" : "Thêm Sách Mới Vào Kho"}
-            </span>
-          </div>
-        }
-        open={isFormModalOpen}
-        onCancel={() => setIsFormModalOpen(false)}
-        footer={null}
-        destroyOnClose
-        width={650}
-        className="rounded-2xl overflow-hidden"
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSaveBook}
-          className="pt-3 space-y-4"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Form.Item
-              name="title"
-              label="Tên sách"
-              rules={[{ required: true, message: "Vui lòng nhập tên sách!" }]}
-              className="col-span-2 mb-2"
-            >
-              <Input placeholder="Ví dụ: Đắc Nhân Tâm" size="large" />
-            </Form.Item>
-
-            <Form.Item
-              name="author"
-              label="Tác giả"
-              rules={[{ required: true, message: "Vui lòng nhập tên tác giả!" }]}
-              className="mb-2"
-            >
-              <Input placeholder="Ví dụ: Dale Carnegie" size="large" />
-            </Form.Item>
-
-            <Form.Item
-              name="category"
-              label="Danh mục"
-              rules={[{ required: true }]}
-              className="mb-2"
-            >
-              <Select size="large">
-                {CATEGORIES.map((c) => (
-                  <Select.Option key={c} value={c}>
-                    {c}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-
-            <Form.Item
-              name="isbn"
-              label="Mã ISBN"
-              rules={[{ required: true, message: "Vui lòng nhập mã ISBN!" }]}
-              className="mb-2"
-            >
-              <Input placeholder="978-604-..." size="large" />
-            </Form.Item>
-
-            <Form.Item
-              name="status"
-              label="Trạng thái"
-              rules={[{ required: true }]}
-              className="mb-2"
-            >
-              <Select size="large">
-                <Select.Option value="ACTIVE">Đang bán (ACTIVE)</Select.Option>
-                <Select.Option value="PENDING">Chờ duyệt (PENDING)</Select.Option>
-                <Select.Option value="REJECTED">Bị từ chối (REJECTED)</Select.Option>
-              </Select>
-            </Form.Item>
-
-            <Form.Item
-              name="price"
-              label="Giá bán (VNĐ)"
-              rules={[{ required: true, message: "Vui lòng nhập giá!" }]}
-              className="mb-2"
-            >
-              <Input
-                type="number"
-                min={0}
-                placeholder="100000"
-                size="large"
-                addonAfter="₫"
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="stock"
-              label="Số lượng kho"
-              rules={[{ required: true }]}
-              className="mb-2"
-            >
-              <Input type="number" min={0} placeholder="50" size="large" />
-            </Form.Item>
-
-            <Form.Item
-              name="coverImage"
-              label="URL Ảnh Bìa"
-              rules={[{ required: true, message: "Vui lòng dán link ảnh bìa!" }]}
-              className="col-span-2 mb-2"
-            >
-              <Input placeholder="https://images.unsplash.com/..." size="large" />
-            </Form.Item>
-
-            <Form.Item
-              noStyle
-              shouldUpdate={(prevValues, currentValues) =>
-                prevValues.status !== currentValues.status
-              }
-            >
-              {({ getFieldValue }) =>
-                getFieldValue("status") === "REJECTED" ? (
-                  <Form.Item
-                    name="rejectReason"
-                    label="Lý do từ chối phê duyệt"
-                    rules={[{ required: true, message: "Vui lòng ghi rõ lý do từ chối" }]}
-                    className="col-span-2 mb-2"
-                  >
-                    <Input.TextArea
-                      rows={2}
-                      placeholder="Nhập lý do không thông qua sách này..."
-                    />
-                  </Form.Item>
-                ) : null
-              }
-            </Form.Item>
-
-            <Form.Item
-              name="description"
-              label="Mô tả tóm tắt"
-              className="col-span-2 mb-2"
-            >
-              <Input.TextArea
-                rows={3}
-                placeholder="Mô tả nội dung chính của cuốn sách..."
-              />
-            </Form.Item>
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-            <Button onClick={() => setIsFormModalOpen(false)}>Hủy bỏ</Button>
-            <Button type="primary" htmlType="submit" className="bg-indigo-600">
-              {editingBook ? "Cập Nhật" : "Lưu Sách Mới"}
-            </Button>
-          </div>
-        </Form>
-      </Modal>
+      <AddEditBookModal
+        form={form}
+        isOpen={isFormModalOpen}
+        setIsOpen={setIsFormModalOpen}
+        isEdit={editingBook}
+        onSave={handleSaveBook}
+      />
 
       {/* MODAL: XEM CHI TIẾT SÁCH */}
-      <Modal
-        open={isDetailModalOpen}
-        onCancel={() => setIsDetailModalOpen(false)}
-        footer={[
-          <Button key="close" onClick={() => setIsDetailModalOpen(false)}>
-            Đóng
-          </Button>,
-          <Button
-            key="edit"
-            type="primary"
-            className="bg-indigo-600"
-            onClick={() => {
-              setIsDetailModalOpen(false);
-              handleOpenFormModal(selectedBook);
-            }}
-          >
-            Chỉnh sửa
-          </Button>,
-        ]}
-        width={600}
-      >
-        {selectedBook && (
-          <div className="pt-2 space-y-4">
-            <div className="flex gap-4">
-              <img
-                src={selectedBook.coverImage}
-                alt={selectedBook.title}
-                className="w-32 h-44 object-cover rounded-xl shadow-md border border-slate-200 shrink-0"
-              />
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  {renderStatusBadge(selectedBook.status, selectedBook.rejectReason)}
-                  <span className="text-xs text-slate-400 font-mono">
-                    ID: {selectedBook.id}
-                  </span>
-                </div>
-                <h2 className="text-lg font-bold text-slate-800 leading-snug">
-                  {selectedBook.title}
-                </h2>
-                <p className="text-xs text-slate-500">
-                  Tác giả:{" "}
-                  <span className="font-semibold text-slate-700">
-                    {selectedBook.author}
-                  </span>
-                </p>
-
-                <div className="text-xl font-extrabold text-indigo-600 pt-1">
-                  {selectedBook.price.toLocaleString("vi-VN")} ₫
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 pt-2 border-t border-slate-100">
-                  <div>
-                    <span className="text-slate-400">Danh mục:</span>{" "}
-                    {selectedBook.category}
-                  </div>
-                  <div>
-                    <span className="text-slate-400">Mã ISBN:</span> {selectedBook.isbn}
-                  </div>
-                  <div>
-                    <span className="text-slate-400">Số lượng:</span> {selectedBook.stock}{" "}
-                    bản
-                  </div>
-                  <div>
-                    <span className="text-slate-400">Ngày đăng:</span>{" "}
-                    {selectedBook.createdAt}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {selectedBook.status === "REJECTED" && selectedBook.rejectReason && (
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl flex gap-3 text-xs text-rose-800">
-                <ShieldAlert size={18} className="shrink-0 text-rose-600 mt-0.5" />
-                <div>
-                  <span className="font-bold block mb-0.5">Lý do từ chối duyệt:</span>
-                  {selectedBook.rejectReason}
-                </div>
-              </div>
-            )}
-
-            <div className="pt-2 border-t border-slate-100">
-              <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                Mô tả nội dung
-              </h4>
-              <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
-                {selectedBook.description || "Chưa có mô tả cho cuốn sách này."}
-              </p>
-            </div>
-          </div>
-        )}
-      </Modal>
+      <BookDetailModal
+        isOpen={isDetailModalOpen}
+        setIsOpen={setIsDetailModalOpen}
+        onEditBook={handleOpenFormModal}
+        selectedBook={selectedBook}
+        renderStatusBadge={renderStatusBadge}
+      />
     </div>
   );
 };
