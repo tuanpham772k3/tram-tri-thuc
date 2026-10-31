@@ -316,7 +316,7 @@ const RegisterPage = () => {
                   <p className="text-center text-white/70 text-sm mt-8 font-['Montserrat']">
                     Đã có tài khoản?{" "}
                     <Link
-                      to="/auth/login"
+                      to="/login"
                       className="text-pink-300 hover:text-pink-200 font-semibold transition-colors duration-200 hover:underline"
                     >
                       Đăng nhập
