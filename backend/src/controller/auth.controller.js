@@ -13,7 +13,7 @@ const {
 const { AppError, sendSuccess, asyncHandler } = require("../utils/helper");
 
 // ====================== [POST] /register ======================
-exports.register = asyncHandler(async (req, res) => {
+const register = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
   if (!name || typeof name !== "string" || name.trim().length === 0) {
@@ -44,7 +44,6 @@ exports.register = asyncHandler(async (req, res) => {
     name: name.trim(),
     email,
     password: hashedPassword,
-    isActive: false,
     verificationCode,
     verificationCodeExpires,
   });
@@ -63,7 +62,7 @@ exports.register = asyncHandler(async (req, res) => {
 });
 
 // ====================== [POST] /login ======================
-exports.login = asyncHandler(async (req, res) => {
+const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -80,10 +79,6 @@ exports.login = asyncHandler(async (req, res) => {
 
   if (!isMatch) {
     throw new AppError("Email hoặc mật khẩu không hợp lệ.", 401);
-  }
-
-  if (!user.isActive) {
-    throw new AppError("Tài khoản của bạn đã bị vô hiệu hóa.", 403);
   }
 
   const accessToken = generateAccessToken({
@@ -109,7 +104,6 @@ exports.login = asyncHandler(async (req, res) => {
         email: user.email,
         role: user.role,
         avatar: user.avatar,
-        isVip: user.isVip,
       },
       accessToken,
     },
@@ -118,7 +112,7 @@ exports.login = asyncHandler(async (req, res) => {
 });
 
 // ====================== [POST] /forgot-password ======================
-exports.forgotPassword = asyncHandler(async (req, res) => {
+const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
@@ -152,7 +146,7 @@ exports.forgotPassword = asyncHandler(async (req, res) => {
 });
 
 // ====================== [POST] /reset-password ======================
-exports.resetPassword = asyncHandler(async (req, res) => {
+const resetPassword = asyncHandler(async (req, res) => {
   const { token, newPassword } = req.body;
 
   if (!token) {
@@ -184,7 +178,7 @@ exports.resetPassword = asyncHandler(async (req, res) => {
 });
 
 // ====================== [POST] /refresh-token ======================
-exports.refreshToken = asyncHandler(async (req, res) => {
+const refreshToken = asyncHandler(async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
 
   if (!refreshToken) {
@@ -212,7 +206,7 @@ exports.refreshToken = asyncHandler(async (req, res) => {
 });
 
 // ====================== [POST] /logout ======================
-exports.logout = asyncHandler(async (req, res) => {
+const logout = asyncHandler(async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
 
   if (!refreshToken) {
@@ -240,7 +234,7 @@ exports.logout = asyncHandler(async (req, res) => {
 });
 
 // ====================== [POST] /verify-email ======================
-exports.verifyEmail = asyncHandler(async (req, res) => {
+const verifyEmail = asyncHandler(async (req, res) => {
   const { userId, verificationCode } = req.body;
 
   if (!verificationCode || verificationCode.length !== 6) {
@@ -280,7 +274,7 @@ exports.verifyEmail = asyncHandler(async (req, res) => {
 });
 
 // ====================== [POST] /resend-verification ======================
-exports.resendVerificationEmail = asyncHandler(async (req, res) => {
+const resendVerificationEmail = asyncHandler(async (req, res) => {
   const { userId } = req.body;
 
   const user = await User.findById(userId);
@@ -310,3 +304,14 @@ exports.resendVerificationEmail = asyncHandler(async (req, res) => {
     "Email xác thực đã được gửi lại. Vui lòng kiểm tra hộp thư."
   );
 });
+
+module.exports = {
+  register,
+  login,
+  forgotPassword,
+  resetPassword,
+  refreshToken,
+  logout,
+  verifyEmail,
+  resendVerificationEmail,
+};

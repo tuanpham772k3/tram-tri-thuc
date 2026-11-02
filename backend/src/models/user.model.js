@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
-const validator = require("validator");
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    username: {
       type: String,
       required: true,
       maxLength: 50,
@@ -14,36 +13,21 @@ const userSchema = new mongoose.Schema(
       trim: true,
       lowercase: true,
       unique: true,
-      validate: {
-        validator: validator.isEmail,
-        message: "Email không đúng định dạng",
-      },
     },
     password: {
       type: String,
       required: true,
       trim: true,
-      minLength: 6,
-      maxLength: 50,
     },
-
     avatar: {
       type: String,
       default: null,
     },
-
     role: {
       type: String,
       enum: ["customer", "seller", "admin"],
       default: "customer",
     },
-
-    status: {
-      type: String,
-      enum: ["active", "banned"],
-      default: "active",
-    },
-
     refreshToken: {
       type: String,
       default: null,
