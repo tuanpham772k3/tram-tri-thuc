@@ -6,34 +6,36 @@ const paymentSchema = new Schema(
     orderId: {
       type: Schema.Types.ObjectId,
       ref: "Order",
-      require: true,
+      required: true,
     },
 
-    userId: {
+    customerId: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      require: true,
+      required: true,
     },
 
     provider: {
       type: String,
       enum: ["zalopay", "momo", "stripe"],
+      required: true,
     },
 
     transactionId: {
       type: String,
-      require: true,
+      required: true,
     },
 
     amount: {
       type: Number,
       required: true,
-      min: 1000,
+      min: 0,
     },
 
     status: {
       type: String,
       enum: ["pending", "success", "failed"],
+      default: "pending",
     },
 
     paidAt: {
@@ -43,6 +45,8 @@ const paymentSchema = new Schema(
   },
   { timestamps: true }
 );
+
+paymentSchema.index({ orderId: 1, status: 1 }, { unique: true });
 
 const Payment = mongoose.model("Payment", paymentSchema);
 

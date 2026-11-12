@@ -6,19 +6,21 @@ const wishlistSchema = new Schema(
     userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      unique: true,
+      required: true,
     },
 
     books: [
       {
         type: Schema.Types.ObjectId,
         ref: "Book",
-        require: true,
+        required: true,
       },
     ],
   },
   { timestamps: true }
 );
+
+wishlistSchema.index({ userId: 1 }, { unique: true });
 
 const Wishlist = mongoose.model("Wishlist", wishlistSchema);
 

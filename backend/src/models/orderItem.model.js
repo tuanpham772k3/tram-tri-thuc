@@ -6,25 +6,29 @@ const orderItemSchema = new Schema(
     orderId: {
       type: Schema.Types.ObjectId,
       ref: "Order",
-      require: true,
+      required: true,
     },
 
     bookId: {
       type: Schema.Types.ObjectId,
       ref: "Book",
-      require: true,
+      required: true,
     },
 
     sellerId: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      require: true,
+      required: true,
     },
 
-    quantity: {
-      type: Number,
+    bookTitle: {
+      type: String,
       required: true,
-      min: 1,
+    },
+
+    bookAuthor: {
+      type: String,
+      required: true,
     },
 
     price: {
@@ -32,15 +36,11 @@ const orderItemSchema = new Schema(
       required: true,
       min: 0,
     },
-
-    subtotal: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
   },
   { timestamps: true }
 );
+
+orderItemSchema.index({ sellerId: 1, orderId: 1 }, { unique: true });
 
 const OrderItem = mongoose.model("OrderItem", orderItemSchema);
 

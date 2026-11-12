@@ -3,23 +3,21 @@ const { Schema } = mongoose;
 
 const orderSchema = new Schema(
   {
-    userId: {
+    customerId: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      unique: true,
+      required: true,
     },
 
-    totalAmount: Number,
+    totalAmount: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
 
     status: {
       type: String,
-      enum: ["pending", "paid", "cancelled", "failed"],
-      default: "pending",
-    },
-
-    paymentStatus: {
-      type: String,
-      enum: ["pending", "paid", "failed", "refunded"],
+      enum: ["pending", "completed", "cancelled"],
       default: "pending",
     },
   },

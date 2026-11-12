@@ -8,11 +8,11 @@ const isAdmin = (req, res, next) => {
   next();
 };
 
-const isUploader = (req, res, next) => {
-  if (!req.user || req.user.role !== "uploader") {
+const isSeller = (req, res, next) => {
+  if (!req.user || req.user.role !== "seller") {
     return res.status(403).json({
       success: false,
-      message: "Bạn không có quyền truy cập tài nguyên này. Chỉ dành cho uploader.",
+      message: "Bạn không có quyền truy cập tài nguyên này. Chỉ dành cho người bán.",
     });
   }
   next();
@@ -48,4 +48,4 @@ const checkVipAccess = (req, res, next) => {
   }
 };
 
-module.exports = { isAdmin, isUploader, checkVipAccess };
+module.exports = { isAdmin, isSeller, checkVipAccess };

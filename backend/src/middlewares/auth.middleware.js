@@ -15,7 +15,7 @@ const authenticate = async (req, res, next) => {
 
     const decoded = verifyAccessToken(token);
 
-    const user = await User.findById(decoded.id).select("_id email role isActive isVip");
+    const user = await User.findById(decoded.id).select("_id email role isActive");
 
     if (!user) {
       return res.status(401).json({
@@ -23,7 +23,6 @@ const authenticate = async (req, res, next) => {
         message: "Tài khoản không tồn tại.",
       });
     }
-
     if (!user.isActive) {
       return res.status(403).json({
         success: false,
@@ -35,7 +34,6 @@ const authenticate = async (req, res, next) => {
       _id: user._id,
       email: user.email,
       role: user.role,
-      isVip: user.isVip,
     };
 
     next();

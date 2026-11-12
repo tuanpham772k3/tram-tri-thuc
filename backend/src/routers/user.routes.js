@@ -16,9 +16,6 @@ router.get("/me", authenticate, getUserInfo);
 // Cập nhật thông tin cá nhân
 router.put("/me", authenticate, updateUserInfo);
 
-// Xoá tài khoản
-router.delete("/me", authenticate, deleteMyAccount);
-
 // thanh toán
 router.post("/paymentZaloPay", authenticate, PaymentZaloPay);
 

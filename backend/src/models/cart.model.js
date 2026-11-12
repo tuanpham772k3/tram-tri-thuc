@@ -7,18 +7,21 @@ const cartSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
       unique: true,
+      required: true,
     },
 
     items: [
       {
+        _id: false,
+
         bookId: {
           type: Schema.Types.ObjectId,
           ref: "Book",
         },
 
-        quantity: {
-          type: Number,
-          default: 1,
+        isSelected: {
+          type: Boolean,
+          default: true,
         },
       },
     ],

@@ -16,17 +16,12 @@ const bookSchema = new mongoose.Schema(
       maxLength: 200,
     },
 
-    coverUrl: {
+    coverImage: {
       type: String,
       required: true,
     },
 
     fileUrl: {
-      type: String,
-      required: true,
-    },
-
-    fileName: {
       type: String,
       required: true,
     },
@@ -39,7 +34,7 @@ const bookSchema = new mongoose.Schema(
 
     description: {
       type: String,
-      maxLength: 1000,
+      maxLength: 5000,
     },
 
     genre: {
@@ -63,6 +58,12 @@ const bookSchema = new mongoose.Schema(
     },
 
     purchaseCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    viewCount: {
       type: Number,
       default: 0,
       min: 0,

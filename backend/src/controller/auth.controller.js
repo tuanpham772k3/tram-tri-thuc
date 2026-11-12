@@ -50,7 +50,7 @@ const register = asyncHandler(async (req, res) => {
 
   await emailService.sendVerificationCodeEmail(email, verificationCode);
 
-  return sendSuccess(
+  sendSuccess(
     res,
     {
       userId: newUser._id,
@@ -75,6 +75,10 @@ const login = asyncHandler(async (req, res) => {
     throw new AppError("Email hoặc mật khẩu không hợp lệ.", 401);
   }
 
+  if (!user.isActive) {
+    throw new AppError("Tài khoản của bạn chưa được xác thực.", 403);
+  }
+
   const isMatch = await bcrypt.compare(password, user.password);
 
   if (!isMatch) {
@@ -95,7 +99,7 @@ const login = asyncHandler(async (req, res) => {
 
   setRefreshTokenCookie(res, refreshToken);
 
-  return sendSuccess(
+  sendSuccess(
     res,
     {
       user: {
@@ -142,7 +146,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
   await emailService.sendResetPasswordEmail(email, resetLink);
 
-  return sendSuccess(res, {}, "Link đặt lại mật khẩu đã được gửi tới email của bạn.");
+  sendSuccess(res, {}, "Link đặt lại mật khẩu đã được gửi tới email của bạn.");
 });
 
 // ====================== [POST] /reset-password ======================
@@ -174,7 +178,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 
   await user.save();
 
-  return sendSuccess(res, {}, "Mật khẩu được đặt lại thành công!");
+  sendSuccess(res, {}, "Mật khẩu được đặt lại thành công!");
 });
 
 // ====================== [POST] /refresh-token ======================
@@ -202,7 +206,7 @@ const refreshToken = asyncHandler(async (req, res) => {
     role: user.role,
   });
 
-  return sendSuccess(res, { accessToken }, "Làm mới token thành công.");
+  sendSuccess(res, { accessToken }, "Làm mới token thành công.");
 });
 
 // ====================== [POST] /logout ======================
@@ -266,11 +270,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
 
   await user.save();
 
-  return sendSuccess(
-    res,
-    {},
-    "Xác thực email thành công! Bạn có thể đăng nhập ngay bây giờ."
-  );
+  sendSuccess(res, {}, "Xác thực email thành công! Bạn có thể đăng nhập ngay bây giờ.");
 });
 
 // ====================== [POST] /resend-verification ======================
@@ -298,11 +298,7 @@ const resendVerificationEmail = asyncHandler(async (req, res) => {
 
   await emailService.sendVerificationCodeEmail(user.email, verificationCode);
 
-  return sendSuccess(
-    res,
-    {},
-    "Email xác thực đã được gửi lại. Vui lòng kiểm tra hộp thư."
-  );
+  sendSuccess(res, {}, "Email xác thực đã được gửi lại. Vui lòng kiểm tra hộp thư.");
 });
 
 module.exports = {

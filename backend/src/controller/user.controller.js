@@ -3,9 +3,6 @@ const CryptoJS = require("crypto-js");
 const moment = require("moment");
 
 const User = require("../models/user.model");
-const Rating = require("../models/rating.model");
-const Document = require("../models/document.model");
-const Comment = require("../models/comment.model");
 
 const { AppError, sendSuccess, asyncHandler } = require("../utils/helper");
 
@@ -18,7 +15,9 @@ const config = {
 
 // Lấy thông tin người dùng
 const getUserInfo = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id)
+  const userId = req.user._id;
+
+  const user = await User.findById(userId)
     .select("-password -passwordResetToken -token")
     .lean();
 
@@ -48,39 +47,6 @@ const updateUserInfo = asyncHandler(async (req, res) => {
   await user.save();
 
   return sendSuccess(res, user, "Cập nhật thông tin thành công.");
-});
-
-// Xóa tài khoản
-const deleteMyAccount = asyncHandler(async (req, res) => {
-  const userId = req.user._id;
-
-  const user = await User.findById(userId);
-
-  if (!user) {
-    throw new AppError("Không tìm thấy người dùng.", 404);
-  }
-
-  // Xóa tài liệu
-  await Document.deleteMany({
-    uploaderId: userId,
-  });
-
-  // Xóa bình luận
-  await Comment.deleteMany({
-    userId,
-  });
-
-  // Xóa đánh giá
-  await Rating.deleteMany({
-    userId,
-  });
-
-  // Xóa user
-  await User.deleteOne({
-    _id: userId,
-  });
-
-  return sendSuccess(res, null, "Xóa tài khoản thành công.");
 });
 
 // Tạo thanh toán ZaloPay
@@ -237,7 +203,6 @@ const CallBack = async (req, res) => {
 module.exports = {
   getUserInfo,
   updateUserInfo,
-  deleteMyAccount,
   PaymentZaloPay,
   CallBack,
 };

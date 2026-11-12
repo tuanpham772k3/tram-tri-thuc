@@ -3,23 +3,22 @@ const { Schema } = mongoose;
 
 const librarySchema = new Schema(
   {
-    userId: {
+    customerId: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      unique: true,
-      require: true,
+      required: true,
     },
 
     bookId: {
       type: Schema.Types.ObjectId,
       ref: "Book",
-      require: true,
+      required: true,
     },
 
     orderId: {
       type: Schema.Types.ObjectId,
       ref: "Order",
-      require: true,
+      required: true,
     },
 
     purchasedAt: {
@@ -32,6 +31,12 @@ const librarySchema = new Schema(
       default: null,
     },
 
+    // Lưu chuỗi định vị CFI của EpubJS (Ví dụ: "epubcfi(/6/4...")
+    lastLocation: {
+      type: String,
+      default: null,
+    },
+
     progress: {
       type: Number,
       default: 0,
@@ -41,6 +46,9 @@ const librarySchema = new Schema(
   },
   { timestamps: true }
 );
+
+// Đảm bảo 1 customer không bị tạo 2 dòng cho cùng 1 cuốn sách
+librarySchema.index({ customerId: 1, bookId: 1 }, { unique: true });
 
 const Library = mongoose.model("Library", librarySchema);
 

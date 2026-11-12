@@ -33,6 +33,11 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
+
     passwordResetToken: {
       type: String,
       default: null,
